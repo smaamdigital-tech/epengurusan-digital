@@ -135,7 +135,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [siteConfig, setSiteConfig] = useState<SiteConfig>({
     systemTitle: 'SISTEM PENGURUSAN DIGITAL',
     schoolName: 'SMA AL-KHAIRIAH AL-ISLAMIAH MERSING',
-    welcomeMessage: 'SELAMAT DATANG KE PORTAL RASMI',
+    welcomeMessage: 'SELAMAT DATANG KE ePENGURUSAN DIGITAL SMAAM',
   });
 
   const [schoolProfile, setSchoolProfile] = useState<SchoolProfile>({

@@ -124,7 +124,8 @@ export const Dashboard: React.FC = () => {
               <button onClick={saveEdit} className="text-white bg-[#006D77] px-4 py-1.5 rounded text-sm font-bold shadow-md">Simpan</button>
             </div>
           ) : (
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#0B132B] uppercase tracking-tight drop-shadow-sm leading-tight">
+            // Removed 'uppercase' class to support 'ePENGURUSAN'
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#0B132B] tracking-tight drop-shadow-sm leading-tight">
               {siteConfig.welcomeMessage}
               {canEditWelcome && (
                 <button onClick={() => setIsEditing(true)} className="ml-3 text-sm text-[#006064] hover:text-[#0B132B] font-medium underline">
