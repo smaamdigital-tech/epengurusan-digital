@@ -52,11 +52,11 @@ const TEACHER_LIST = [
 ];
 
 const SUBJECTS_LOWER = [
-  "BM", "BI", "SEJ", "MAT", "SCN", "GEO", "PSV", "RBT", "USL", "SYA", "LAM", "PJPK", "UN", "1M1S", "KELAB"
+  "BM", "BI", "SEJ", "MAT", "SCN", "GEO", "PSV", "RBT", "USL", "SYA", "LAM", "PJPK", "UN", "1M1S", "KELAB", "KOKO", "SUKAN"
 ];
 
 const SUBJECTS_UPPER = [
-  "BM", "BI", "SEJ", "MAT", "SCN", "PNG", "USL", "SYA", "LAM", "MAA", "ADB", "PJPK", "UN", "1M1S", "KELAB"
+  "BM", "BI", "SEJ", "MAT", "SCN", "PNG", "USL", "SYA", "LAM", "MAA", "ADB", "PJPK", "UN", "1M1S", "KELAB", "KOKO", "SUKAN"
 ];
 
 const CLASS_CODES = [
@@ -69,10 +69,10 @@ const CLASS_CODES = [
 
 const ALL_SUBJECTS = Array.from(new Set([...SUBJECTS_LOWER, ...SUBJECTS_UPPER])).sort();
 
-const GROUP_MEMBERS_DATA = [
+const INITIAL_GROUP_MEMBERS = [
   { id: 1, name: "KUMPULAN 1", members: ["Muhammad Hafiz bin Jalil", "Norashidah binti A Wahab", "Syahidatun Najihah binti Aziz", "Nik Noorizati binti Ab Kahar", "Noorlela binti Zainudin"] },
   { id: 2, name: "KUMPULAN 2", members: ["Ahmad Fikruddin bin Ahmad Raza'i", "Nooraind binti Ali", "Siti Aminah binti Mohamed", "Masyitah binti Razali", "Nor Ain binti Mohamed Jori"] },
-  { id: 3, name: "KUMPULAN 3", members: ["Mohamad Sukri bin Ali", "Mazuin binti Mat", "Siti Nurul Liza binti Sidin", "Zarith Najiha binti Jamal", "Nurul Izzati bikhani Roslin"] },
+  { id: 3, name: "KUMPULAN 3", members: ["Mohamad Sukri bin Ali", "Mazuin binti Mat", "Siti Nurul Liza binti Sidin", "Zarith Najiha binti Jamal", "Nurul Izzati binti Roslin"] },
   { id: 4, name: "KUMPULAN 4", members: ["Mohd Nur bin Ahmad", "Rosmawati binti Hussin", "Saemah binti Supandi", "Annur Ayuni binti Mohamed", "Nuurul Amira binti Razak"] },
   { id: 5, name: "KUMPULAN 5", members: ["Mohamad Nasreen Hakim bin Che Mohamed", "Mohd Nor bin Salikin", "Zahrah Khairiah Nasution binti Saleh", "Nor Hidayah binti Mahadun", "Nurul Syafiqah binti Husin"] },
   { id: 6, name: "KUMPULAN 6", members: ["Salman bin A Rahman", "Mohammad Firros bin Rosool Gani", "Nor Azean binti Ismail", "Norliyana binti Mhd Amin", "Liyana binti Iskandar"] }
@@ -236,7 +236,7 @@ const initialSpeechSchedule = [
   { id: 9, week: "9", date: "9 – 13 Mac 2026", group: "KUMPULAN 3", speaker: "Nooraind binti Ali", topic: "Adab dan akhlak sebelum ilmu", civic: "", sumur: "" },
   { id: 10, week: "10", date: "16 – 20 Mac 2026", group: "KUMPULAN 4", speaker: "Mazuin binti Mat", topic: "Keutamaan sifat malu", civic: "BERTANGGUNG JAWAB", sumur: "" },
   { id: 11, week: "11", date: "30 Mac – 3 Apr 2026", group: "KUMPULAN 5", speaker: "Rosmawati binti Hussin", topic: "Amar Makruf Nahi Munkar", civic: "", sumur: "" },
-  { id: 12, week: "12", date: "6 – 10 Apr 2026", group: "KUMPULAN 6", speaker: "Mohd Nor bin Salikin", topic: "Hargai Diri", civic: "", sumur: "" },
+  { id: 12, week: "12", date: "6 – 10 Apr 2026", group: "KUMPULAN 6", speaker: "Mohd Nur bin Salikin", topic: "Hargai Diri", civic: "", sumur: "" },
   { id: 13, week: "13", date: "13 – 17 Apr 2026", group: "KUMPULAN 1", speaker: "Mohammad Firros bin Rosool Gani", topic: "Sayangi Sekolah", civic: "", sumur: "" },
   { id: 14, week: "14", date: "20 – 24 Apr 2026", group: "KUMPULAN 2", speaker: "Syahidatun Najihah binti Aziz", topic: "Kejayaan tidak datang bergolek", civic: "KEGEMBIRAAN", sumur: "BUDI BAHASA" },
   { id: 15, week: "15", date: "27 Apr – 1 Mei 2026", group: "KUMPULAN 3", speaker: "Siti Aminah binti Mohamed", topic: "Mensyukuri Nikmat Sang Pencipta", civic: "", sumur: "" },
@@ -266,59 +266,78 @@ const initialSpeechSchedule = [
   { id: 39, week: "39", date: "2 – 6 Nov 2026", group: "KUMPULAN 3", speaker: "Nooraind binti Ali", topic: "Patriotisme Asas Kemajuan Negara", civic: "", sumur: "" },
   { id: 40, week: "40", date: "9 – 13 Nov 2026", group: "KUMPULAN 4", speaker: "Mazuin binti Mat", topic: "Sayangi Harta Benda", civic: "BERTANGGUNG JAWAB", sumur: "" },
   { id: 41, week: "41", date: "16 – 20 Nov 2026", group: "KUMPULAN 5", speaker: "Rosmawati binti Hussin", topic: "Membazir Amalan Syaitan", civic: "", sumur: "" },
-  { id: 42, week: "42", date: "23 – 27 Nov 2026", group: "KUMPULAN 6", speaker: "Mohd Nor bin Salikin", topic: "Tarbiah Asas Kecemerlangan", civic: "", sumur: "" },
+  { id: 42, week: "42", date: "23 – 27 Nov 2026", group: "KUMPULAN 6", speaker: "Mohd Nur bin Salikin", topic: "Tarbiah Asas Kecemerlangan", civic: "", sumur: "" },
   { id: 43, week: "43", date: "30 Nov – 4 Dis 2026", group: "", speaker: "", topic: "", civic: "", sumur: "" },
 ];
 
-// Generate Time Slots 7:30 to 16:00 (30 mins) in 12h format
+// Generate Time Slots 7:30 to 17:00 (30 mins) with "7.30 - 8.00" stack format
 const generateTimeSlots = () => {
   const slots = [];
   let current = 7.5; // 7:30
-  const end = 16.0; // 16:00
+  const end = 17.0; // 17:00
   
   while (current < end) {
-    const hour = Math.floor(current);
-    const min = (current - hour) * 60;
+    const startVal = current;
+    const endVal = current + 0.5;
     
-    // Format to 12h
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour;
-    const timeLabel = `${displayHour}:${min.toString().padStart(2, '0')} ${period}`;
+    const format = (val: number) => {
+        let h = Math.floor(val);
+        const m = Math.round((val - h) * 60);
+        if (h > 12) h -= 12;
+        return `${h}.${m.toString().padStart(2, '0')}`;
+    }
     
-    slots.push(timeLabel);
+    const label = `${format(startVal)}\n-\n${format(endVal)}`;
+    slots.push(label);
     current += 0.5;
   }
   return slots;
 };
 
 const timeSlots = generateTimeSlots();
-// Start with Isnin as requested
 const days = ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat'];
 
 export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
-  const { user, showToast } = useApp();
-  const isAdmin = user?.role === 'admin' || user?.role === 'adminsistem';
+  const { user, showToast, checkPermission } = useApp();
+  
+  // Determine specific permission based on type
+  const getPermissionKey = () => {
+    switch (type) {
+        case 'Guru Ganti': return 'canUpdateJadualGanti';
+        case 'Guru Kelas': return 'canUpdateJadualGuruKelas';
+        case 'Jadual Persendirian': return 'canUpdateJadualPersendirian';
+        case 'Jadual Kelas': return 'canUpdateJadualKelas';
+        case 'Jadual Berucap': return 'canUpdateJadualBerucap';
+        case 'Jadual Pemantauan': return 'canUpdateJadualPemantauan';
+        default: return 'canUpdateJadualGlobal';
+    }
+  };
+
+  const permKey = getPermissionKey();
+  const canEdit = checkPermission(permKey);
 
   // --- STATE MANAGEMENT ---
+  const [teacherList, setTeacherList] = useState(TEACHER_LIST);
   const [reliefList, setReliefList] = useState(initialGuruGanti);
   const [coordinators, setCoordinators] = useState(initialFormCoordinators);
   const [classTeachers, setClassTeachers] = useState(initialClassTeachers);
   const [speechList, setSpeechList] = useState(initialSpeechSchedule);
   const [monitoringList, setMonitoringList] = useState(initialPemantauanData);
+  const [groups, setGroups] = useState(INITIAL_GROUP_MEMBERS);
   
   // Schedule Overrides (Key: "Context-Day-Time", Value: { subject, code, color, teacher })
   const [scheduleData, setScheduleData] = useState<Record<string, any>>({});
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'relief' | 'coordinator' | 'classTeacher' | 'scheduleSlot' | 'addClass' | 'speech' | 'monitoring'>('relief');
+  const [modalType, setModalType] = useState<'relief' | 'coordinator' | 'classTeacher' | 'scheduleSlot' | 'addClass' | 'speech' | 'monitoring' | 'editGroup' | 'addCoordinator' | 'addTeacher'>('relief');
   const [editingItem, setEditingItem] = useState<any>(null);
 
   // Form Data State
   const [formData, setFormData] = useState<any>({});
 
   // Context Selectors for Schedules
-  const [selectedTeacher, setSelectedTeacher] = useState(TEACHER_LIST[0]);
+  const [selectedTeacher, setSelectedTeacher] = useState(teacherList[0]);
   const [selectedClass, setSelectedClass] = useState('5 Al-Hanafi');
 
   // --- HELPER: Detect Form Level ---
@@ -335,14 +354,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
     return split[0];
   };
 
-  // --- HELPER: Format Date for Input ---
-  const formatDateForInput = (dateStr: string) => {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    return dateStr;
-  };
-
   // --- MOCK GENERATORS (Fallback if no state override) ---
   const getPersonalSlotData = (day: string, time: string) => {
     const key = `${selectedTeacher}-${day}-${time}`;
@@ -350,8 +361,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
 
     const hash = (day.length + time.length + selectedTeacher.length) % 7;
     if (hash === 0) return { subject: 'Rehat', code: 'REHAT', color: 'bg-gray-700 text-gray-300' };
-    if (hash === 1 || hash === 4) return { subject: 'MAT', code: '4H', color: 'bg-blue-900/60 text-blue-200 border-blue-700' };
-    if (hash === 2) return { subject: 'KOKO', code: 'KOKO', color: 'bg-orange-900/60 text-orange-200 border-orange-700' };
+    if (hash === 1 || hash === 4) return { subject: 'MAT', code: '4H', color: 'bg-orange-900/60 text-orange-200 border-orange-700' };
+    if (hash === 2) return { subject: 'KOKO', code: 'KOKO', color: 'bg-red-900/60 text-red-200 border-red-700' };
     return null;
   };
 
@@ -360,10 +371,10 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
     if (scheduleData[key]) return scheduleData[key];
 
     const hash = (day.length + time.length + selectedClass.length) % 5;
-    if (time.includes('10:00') || time.includes('10:30')) return { subject: 'REHAT', teacher: '', color: 'bg-gray-700 text-gray-300' };
-    if (hash === 0) return { subject: 'BM', teacher: 'Siti Aminah binti Mohamed', color: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' };
-    if (hash === 1) return { subject: 'SEJ', teacher: 'Saemah binti Supandi', color: 'bg-yellow-900/40 text-yellow-200 border-yellow-700' };
-    if (hash === 2) return { subject: 'MAT', teacher: 'Zulkeffle bin Muhammad', color: 'bg-blue-900/60 text-blue-200 border-blue-700' };
+    if (time.includes('10.00') || time.includes('10.30')) return { subject: 'REHAT', teacher: '', color: 'bg-gray-700 text-gray-300' };
+    if (hash === 0) return { subject: 'BM', teacher: 'Siti Aminah binti Mohamed', color: 'bg-purple-900/60 text-purple-200 border-purple-700' };
+    if (hash === 1) return { subject: 'SEJ', teacher: 'Saemah binti Supandi', color: 'bg-teal-900/60 text-teal-200 border-teal-700' };
+    if (hash === 2) return { subject: 'MAT', teacher: 'Zulkeffle bin Muhammad', color: 'bg-orange-900/60 text-orange-200 border-orange-700' };
     return null; 
   };
 
@@ -378,6 +389,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
         setFormData(item || { date: '', time: '', class: '', subject: '', absent: '', relief: '', status: 'Ganti' });
     } else if (type === 'coordinator') {
         setFormData(item);
+    } else if (type === 'addCoordinator') {
+        setFormData({ form: '', name: '' });
     } else if (type === 'classTeacher') {
         setFormData(item);
     } else if (type === 'addClass') {
@@ -395,6 +408,10 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
             teacher: item?.teacher || '',
             color: item?.color || 'bg-blue-900/60 text-blue-200 border-blue-700'
         });
+    } else if (type === 'editGroup') {
+        setFormData({ ...item, membersStr: item.members.join('\n') });
+    } else if (type === 'addTeacher') {
+        setFormData({ name: '' });
     }
   };
 
@@ -402,6 +419,31 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
       if(window.confirm("Padam rekod jadual berucap ini?")) {
           setSpeechList(speechList.filter(s => s.id !== id));
           showToast("Rekod dipadam.");
+      }
+  };
+  
+  const handleDeleteCoordinator = (id: number) => {
+      if(window.confirm("Padam penyelaras ini?")) {
+          setCoordinators(coordinators.filter(c => c.id !== id));
+          showToast("Penyelaras dipadam.");
+      }
+  };
+
+  const handleDeleteClassTeacher = (id: number) => {
+      if(window.confirm("Padam guru kelas ini?")) {
+          setClassTeachers(classTeachers.filter(c => c.id !== id));
+          showToast("Guru kelas dipadam.");
+      }
+  };
+
+  const handleDeleteSlot = () => {
+      if (window.confirm("Adakah anda pasti ingin memadam data slot ini?")) {
+          const key = `${formData.context}-${formData.day}-${formData.time}`;
+          const newScheduleData = { ...scheduleData };
+          delete newScheduleData[key];
+          setScheduleData(newScheduleData);
+          setIsModalOpen(false);
+          showToast("Data slot berjaya dipadam.");
       }
   };
 
@@ -419,6 +461,9 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
     } else if (modalType === 'coordinator') {
         setCoordinators(coordinators.map(c => c.id === editingItem.id ? { ...c, name: formData.name } : c));
         showToast("Penyelaras dikemaskini");
+    } else if (modalType === 'addCoordinator') {
+        setCoordinators([...coordinators, { id: Date.now(), form: formData.form, name: formData.name }]);
+        showToast("Penyelaras ditambah");
     } else if (modalType === 'classTeacher') {
         setClassTeachers(classTeachers.map(c => c.id === editingItem.id ? { ...c, teacher: formData.teacher } : c));
         showToast("Guru kelas dikemaskini");
@@ -480,18 +525,33 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
             [key]: newSlotData
         }));
         showToast("Slot jadual dikemaskini");
+    } else if (modalType === 'editGroup') {
+        const newMembers = formData.membersStr.split('\n').filter((m: string) => m.trim() !== '');
+        const updatedGroup = { ...editingItem, members: newMembers };
+        setGroups(groups.map(g => g.id === editingItem.id ? updatedGroup : g));
+        showToast(`Ahli kumpulan ${editingItem.name} dikemaskini.`);
+    } else if (modalType === 'addTeacher') {
+        if (formData.name && !teacherList.includes(formData.name)) {
+            setTeacherList([...teacherList, formData.name]);
+            setSelectedTeacher(formData.name);
+            showToast(`Guru ${formData.name} berjaya ditambah.`);
+        } else {
+            showToast(`Guru ${formData.name} sudah wujud atau nama tidak sah.`);
+        }
     }
 
     setIsModalOpen(false);
   };
 
   const colorOptions = [
-      { label: 'Biru (Math/Sains)', value: 'bg-blue-900/60 text-blue-200 border-blue-700' },
-      { label: 'Hijau (Bahasa)', value: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' },
-      { label: 'Kuning (Sejarah/Geo)', value: 'bg-yellow-900/40 text-yellow-200 border-yellow-700' },
-      { label: 'Oren (Sukan/Koko)', value: 'bg-orange-900/60 text-orange-200 border-orange-700' },
+      { label: 'Biru (Teknik Vokasional)', value: 'bg-blue-900/60 text-blue-200 border-blue-700' },
+      { label: 'Oren (Mate & Sains)', value: 'bg-orange-900/60 text-orange-200 border-orange-700' },
+      { label: 'Turqoise (Kemanusiaan)', value: 'bg-teal-900/60 text-teal-200 border-teal-700' },
+      { label: 'Hijau (Agama)', value: 'bg-green-900/60 text-green-200 border-green-700' },
+      { label: 'Merah (Sukan/Koko)', value: 'bg-red-900/60 text-red-200 border-red-700' },
+      { label: 'Ungu (Bahasa)', value: 'bg-purple-900/60 text-purple-200 border-purple-700' },
       { label: 'Kelabu (Rehat)', value: 'bg-gray-700 text-gray-300' },
-      { label: 'Ungu (Agama)', value: 'bg-purple-900/60 text-purple-200 border-purple-700' },
+      { label: 'Kosong', value: 'hidden' },
   ];
 
   // --- SUB-COMPONENTS ---
@@ -513,7 +573,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
               <th className="px-6 py-4">Guru Tidak Hadir</th>
               <th className="px-6 py-4">Guru Ganti</th>
               <th className="px-6 py-4">Status</th>
-              {isAdmin && <th className="px-6 py-4 text-center">Tindakan</th>}
+              {canEdit && <th className="px-6 py-4 text-center">Tindakan</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700 text-sm">
@@ -531,7 +591,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                      {item.status}
                    </span>
                 </td>
-                {isAdmin && (
+                {canEdit && (
                     <td className="px-6 py-4 text-center">
                         <button 
                             onClick={() => openEditModal('relief', item)}
@@ -552,7 +612,12 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   const GuruKelasView = () => (
     <div className="space-y-8 fade-in">
       <div className="bg-[#1C2541] rounded-xl border-l-4 border-[#C9B458] p-6 shadow-lg">
-        <h3 className="text-xl font-bold text-white mb-4">Penyelaras Tingkatan</h3>
+        <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Penyelaras Tingkatan</h3>
+            {canEdit && (
+                <button onClick={() => openEditModal('addCoordinator', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1.5 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah</button>
+            )}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {coordinators.map((coord) => (
             <div key={coord.id} className="flex items-center justify-between gap-3 bg-[#0B132B] p-4 rounded-lg border border-gray-700 group">
@@ -565,21 +630,22 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                       <p className="font-semibold text-white">{coord.name}</p>
                    </div>
                </div>
-               {isAdmin && (
-                   <button 
-                    onClick={() => openEditModal('coordinator', coord)}
-                    className="text-gray-500 hover:text-[#C9B458] opacity-0 group-hover:opacity-100 transition-opacity"
-                   >
-                       ✏️
-                   </button>
+               {canEdit && (
+                   <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <button onClick={() => openEditModal('coordinator', coord)} className="text-gray-500 hover:text-[#C9B458]">✏️</button>
+                       <button onClick={() => handleDeleteCoordinator(coord.id)} className="text-red-500 hover:text-red-400">🗑️</button>
+                   </div>
                )}
             </div>
           ))}
         </div>
       </div>
       <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700">
-        <div className="p-6 border-b border-gray-700 bg-[#0B132B]">
+        <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex justify-between items-center">
            <h3 className="text-xl font-bold text-white">Senarai Guru Kelas</h3>
+           {canEdit && (
+              <button onClick={() => openEditModal('addClass', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1.5 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah Kelas</button>
+           )}
         </div>
         <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
            {[1, 2, 3, 4, 5].map(formLevel => (
@@ -591,13 +657,21 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                           <span className="font-mono text-white font-medium">{ct.class}</span>
                           <div className="flex items-center gap-2">
                             <span className="text-gray-300 text-sm">{ct.teacher}</span>
-                            {isAdmin && (
-                                <button 
-                                    onClick={() => openEditModal('classTeacher', ct)}
-                                    className="text-gray-600 hover:text-[#C9B458] text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                    ✏️
-                                </button>
+                            {canEdit && (
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button 
+                                        onClick={() => openEditModal('classTeacher', ct)}
+                                        className="text-gray-600 hover:text-[#C9B458] text-xs"
+                                    >
+                                        ✏️
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDeleteClassTeacher(ct.id)}
+                                        className="text-red-600 hover:text-red-400 text-xs"
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
                             )}
                           </div>
                        </div>
@@ -613,11 +687,21 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   const JadualBerucapView = () => (
     <div className="space-y-8 fade-in">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {GROUP_MEMBERS_DATA.map((group) => (
-                <div key={group.id} className="bg-[#1C2541] rounded-xl border border-gray-700 shadow-lg overflow-hidden flex flex-col hover:border-[#C9B458] transition-colors">
+            {groups.map((group) => (
+                <div key={group.id} className="bg-[#1C2541] rounded-xl border border-gray-700 shadow-lg overflow-hidden flex flex-col hover:border-[#C9B458] transition-colors group">
                     <div className="bg-[#0B132B] p-3 border-b border-[#C9B458] flex justify-between items-center">
                         <h4 className="font-bold text-[#C9B458] text-sm uppercase tracking-wider">{group.name}</h4>
-                        <span className="bg-[#3A506B] text-white text-xs px-2 py-0.5 rounded font-mono font-bold">{group.id}</span>
+                        <div className="flex gap-2 items-center">
+                            {canEdit && (
+                                <button 
+                                    onClick={() => openEditModal('editGroup', group)} 
+                                    className="text-gray-500 hover:text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    ✏️ Edit
+                                </button>
+                            )}
+                            <span className="bg-[#3A506B] text-white text-xs px-2 py-0.5 rounded font-mono font-bold">{group.id}</span>
+                        </div>
                     </div>
                     <div className="p-4 flex-1">
                         <ul className="space-y-2">
@@ -635,7 +719,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
         <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700">
             <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex justify-between items-center">
                 <h3 className="text-xl font-bold text-white">Jadual Guru Berucap</h3>
-                {isAdmin && <button onClick={() => openEditModal('speech', null)} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah</button>}
+                {canEdit && <button onClick={() => openEditModal('speech', null)} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah</button>}
             </div>
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[1000px] text-left border-collapse">
@@ -647,7 +731,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                             <th className="px-4 py-4 border border-gray-700">GURU BERUCAP</th>
                             <th className="px-4 py-4 border border-gray-700">TAJUK</th>
                             <th className="px-4 py-4 border border-gray-700">SIVIK/SUMUR</th>
-                            {isAdmin && <th className="px-4 py-4 border border-gray-700">AKSI</th>}
+                            {canEdit && <th className="px-4 py-4 border border-gray-700">AKSI</th>}
                         </tr>
                     </thead>
                     <tbody className="text-sm font-poppins">
@@ -662,7 +746,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                                     {item.civic && <div className="text-blue-400 text-[10px] font-normal">{toTitleCase(item.civic)}</div>}
                                     {item.sumur && <div className="text-green-400 text-[10px] font-normal">{toTitleCase(item.sumur)}</div>}
                                 </td>
-                                {isAdmin && (
+                                {canEdit && (
                                     <td className="px-4 py-4 border border-gray-700 text-center">
                                         <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button onClick={() => openEditModal('speech', item)} className="text-blue-400">✏️</button>
@@ -683,30 +767,46 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
     <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full">
         <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 className="text-xl font-bold text-white">Jadual Waktu Persendirian</h3>
-            <select className="bg-[#1C2541] border border-gray-600 text-white rounded px-4 py-2 focus:border-[#C9B458] outline-none min-w-[250px]" value={selectedTeacher} onChange={(e) => setSelectedTeacher(e.target.value)}>
-                {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <div className="flex gap-2 w-full sm:w-auto">
+                <select className="bg-[#1C2541] border border-gray-600 text-white rounded-l px-4 py-2 focus:border-[#C9B458] outline-none flex-1 sm:min-w-[250px]" value={selectedTeacher} onChange={(e) => setSelectedTeacher(e.target.value)}>
+                    {teacherList.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                {canEdit && (
+                    <button onClick={() => openEditModal('addTeacher', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-2 rounded-r font-bold hover:bg-yellow-400 whitespace-nowrap">
+                        + Guru
+                    </button>
+                )}
+            </div>
         </div>
         <div className="overflow-x-auto p-4 custom-scrollbar">
             <table className="w-full border-collapse min-w-[1200px]">
                 <thead>
                     <tr>
-                        <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-24 sticky left-0 z-10 text-center">HARI / MASA</th>
-                        {timeSlots.map(slot => <th key={slot} className="p-2 border border-gray-700 bg-[#0B132B] text-gray-400 text-xs font-bold font-mono w-20 whitespace-nowrap text-center">{slot}</th>)}
+                        <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-32 sticky left-0 z-20 text-center shadow-lg">HARI / MASA</th>
+                        {timeSlots.map(slot => (
+                            <th key={slot} className="p-1 border border-gray-700 bg-[#0B132B] text-gray-400 text-[10px] font-bold font-mono min-w-[60px] text-center leading-tight whitespace-pre">
+                                {slot}
+                            </th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
                     {days.map(day => (
                         <tr key={day}>
-                            <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm">{day}</td>
+                            <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm text-center uppercase shadow-lg">
+                                {day}
+                            </td>
                             {timeSlots.map(slot => {
                                 const data = getPersonalSlotData(day, slot);
                                 return (
-                                    <td key={slot} className={`border border-gray-700 p-1 h-16 relative transition-colors ${isAdmin ? 'hover:bg-[#253252] cursor-pointer' : ''}`} onClick={() => isAdmin && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedTeacher })}>
+                                    <td key={slot} 
+                                        className={`border border-gray-700 p-1 h-20 relative transition-colors ${canEdit ? 'hover:bg-[#253252] cursor-pointer' : ''}`}
+                                        onClick={() => canEdit && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedTeacher })}
+                                    >
                                         {data && (
-                                            <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm`}>
-                                                <span className="font-bold truncate w-full text-center">{data.code}</span>
-                                                <span className="truncate w-full text-center opacity-80">{data.subject}</span>
+                                            <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm overflow-hidden`}>
+                                                <span className="font-bold truncate w-full text-center leading-tight">{data.code}</span>
+                                                <span className="truncate w-full text-center opacity-80 leading-tight text-[9px]">{data.subject}</span>
                                             </div>
                                         )}
                                     </td>
@@ -730,29 +830,38 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                 <select className="bg-[#1C2541] border border-gray-600 text-white rounded-l px-4 py-2 focus:border-[#C9B458] outline-none min-w-[200px]" value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
                    {availableClasses.map(cls => <option key={cls} value={cls}>{cls}</option>)}
                 </select>
-                {isAdmin && <button onClick={() => openEditModal('addClass', null)} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-r font-bold hover:bg-yellow-400">+ Tambah Kelas</button>}
+                {canEdit && <button onClick={() => openEditModal('addClass', null)} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-r font-bold hover:bg-yellow-400">+ Tambah Kelas</button>}
             </div>
          </div>
          <div className="overflow-x-auto p-4 custom-scrollbar">
             <table className="w-full border-collapse min-w-[1200px]">
                <thead>
                   <tr>
-                     <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-24 sticky left-0 z-10 text-center">HARI / MASA</th>
-                     {timeSlots.map(slot => <th key={slot} className="p-2 border border-gray-700 bg-[#0B132B] text-gray-400 text-xs font-bold font-mono w-20 whitespace-nowrap text-center">{slot}</th>)}
+                     <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-32 sticky left-0 z-20 text-center shadow-lg">HARI / MASA</th>
+                     {timeSlots.map(slot => (
+                        <th key={slot} className="p-1 border border-gray-700 bg-[#0B132B] text-gray-400 text-[10px] font-bold font-mono min-w-[60px] text-center leading-tight whitespace-pre">
+                            {slot}
+                        </th>
+                     ))}
                   </tr>
                </thead>
                <tbody>
                   {days.map(day => (
                      <tr key={day}>
-                        <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm">{day}</td>
+                        <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm text-center uppercase shadow-lg">
+                            {day}
+                        </td>
                          {timeSlots.map(slot => {
                             const data = getClassSlotData(day, slot);
                             return (
-                               <td key={slot} className={`border border-gray-700 p-1 h-16 relative transition-colors ${isAdmin ? 'hover:bg-[#253252] cursor-pointer' : ''}`} onClick={() => isAdmin && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedClass })}>
+                               <td key={slot} 
+                                  className={`border border-gray-700 p-1 h-20 relative transition-colors ${canEdit ? 'hover:bg-[#253252] cursor-pointer' : ''}`}
+                                  onClick={() => canEdit && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedClass })}
+                               >
                                   {data && (
-                                     <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm`}>
-                                        <span className="font-bold truncate w-full text-center">{data.subject}</span>
-                                        <span className="truncate w-full text-center opacity-80">{getShortName(data.teacher)}</span>
+                                     <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm overflow-hidden`}>
+                                        <span className="font-bold truncate w-full text-center leading-tight">{data.subject}</span>
+                                        <span className="truncate w-full text-center opacity-80 leading-tight text-[9px]">{getShortName(data.teacher)}</span>
                                      </div>
                                   )}
                                </td>
@@ -776,7 +885,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                         <h4 className="font-bold text-white text-sm uppercase">{group.monitor}</h4>
                         <p className="text-[10px] text-[#C9B458] font-bold tracking-widest">{group.position}</p>
                     </div>
-                    {isAdmin && <button onClick={() => openEditModal('monitoring', group)} className="text-gray-500 hover:text-white">✏️</button>}
+                    {canEdit && <button onClick={() => openEditModal('monitoring', group)} className="text-gray-500 hover:text-white">✏️</button>}
                 </div>
                 <div className="p-4 flex-1">
                     <table className="w-full text-xs">
@@ -831,17 +940,23 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                         <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kelas</label><input type="text" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                         <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Subjek</label><input type="text" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                     </div>
-                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Tidak Hadir</label><select value={formData.absent} onChange={e => setFormData({...formData, absent: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
-                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Ganti</label><select value={formData.relief} onChange={e => setFormData({...formData, relief: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Tidak Hadir</label><select value={formData.absent} onChange={e => setFormData({...formData, absent: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Ganti</label><select value={formData.relief} onChange={e => setFormData({...formData, relief: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
                  </>
                )}
                {(modalType === 'coordinator' || modalType === 'classTeacher') && (
-                 <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Guru</label><select value={modalType === 'coordinator' ? formData.name : formData.teacher} onChange={e => setFormData({...formData, [modalType === 'coordinator' ? 'name' : 'teacher']: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm">{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                 <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Guru</label><select value={modalType === 'coordinator' ? formData.name : formData.teacher} onChange={e => setFormData({...formData, [modalType === 'coordinator' ? 'name' : 'teacher']: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm">{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+               )}
+               {modalType === 'addCoordinator' && (
+                 <>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Tajuk / Penyelaras</label><input type="text" value={formData.form} onChange={e => setFormData({...formData, form: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" placeholder="Contoh: Penyelaras Tingkatan 6" /></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Guru</label><select value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                 </>
                )}
                {modalType === 'addClass' && (
                  <>
                     <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Kelas</label><input type="text" value={formData.className} onChange={e => setFormData({...formData, className: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" placeholder="Cth: 4 Al-Maliki" /></div>
-                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Kelas</label><select value={formData.teacherName} onChange={e => setFormData({...formData, teacherName: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Kelas</label><select value={formData.teacherName} onChange={e => setFormData({...formData, teacherName: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
                  </>
                )}
                {modalType === 'speech' && (
@@ -850,8 +965,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                         <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Minggu</label><input type="text" value={formData.week} onChange={e => setFormData({...formData, week: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                         <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Tarikh</label><input type="text" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                     </div>
-                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kumpulan</label><select value={formData.group} onChange={e => setFormData({...formData, group: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Kumpulan</option>{GROUP_MEMBERS_DATA.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}</select></div>
-                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Berucap</label><select value={formData.speaker} onChange={e => setFormData({...formData, speaker: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kumpulan</label><select value={formData.group} onChange={e => setFormData({...formData, group: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Kumpulan</option>{groups.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Berucap</label><select value={formData.speaker} onChange={e => setFormData({...formData, speaker: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
                     <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Tajuk</label><input type="text" value={formData.topic} onChange={e => setFormData({...formData, topic: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                     <div className="grid grid-cols-2 gap-4">
                         <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Sivik</label><input type="text" value={formData.civic} onChange={e => setFormData({...formData, civic: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
@@ -875,11 +990,45 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                     {formData.context === selectedTeacher ? (
                         <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kod Kelas / Aktiviti</label><input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                     ) : (
-                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Mengajar</label><select value={formData.teacher} onChange={e => setFormData({...formData, teacher: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Tiada</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Mengajar</label><select value={formData.teacher} onChange={e => setFormData({...formData, teacher: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Tiada</option>{teacherList.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
                     )}
                  </>
                )}
-               <div className="flex gap-2 pt-4"><button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">Batal</button><button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] font-bold rounded hover:bg-yellow-400">Simpan</button></div>
+               {modalType === 'editGroup' && (
+                   <>
+                      <div className="text-xs text-gray-400 mb-2">Ahli Kumpulan: <span className="text-[#C9B458] font-bold">{formData.name}</span></div>
+                      <div>
+                          <label className="text-[10px] text-[#C9B458] font-bold uppercase">Senarai Nama (Satu nama per baris)</label>
+                          <textarea 
+                             value={formData.membersStr} 
+                             onChange={e => setFormData({...formData, membersStr: e.target.value})} 
+                             className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm h-48"
+                          />
+                      </div>
+                   </>
+               )}
+               {modalType === 'addTeacher' && (
+                   <>
+                      <div>
+                          <label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Guru Baru</label>
+                          <input 
+                             type="text"
+                             value={formData.name} 
+                             onChange={e => setFormData({...formData, name: e.target.value})} 
+                             className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"
+                             placeholder="Masukkan nama penuh..."
+                          />
+                      </div>
+                   </>
+               )}
+
+               <div className="flex gap-2 pt-4">
+                   <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">Batal</button>
+                   {modalType === 'scheduleSlot' && (
+                       <button type="button" onClick={handleDeleteSlot} className="flex-1 py-2 bg-red-900/60 text-red-200 border border-red-700 rounded hover:bg-red-800">Hapus</button>
+                   )}
+                   <button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] font-bold rounded hover:bg-yellow-400">Simpan</button>
+               </div>
             </form>
           </div>
         </div>

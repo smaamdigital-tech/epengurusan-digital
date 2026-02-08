@@ -23,6 +23,10 @@ export const AdminSettings: React.FC = () => {
 
   const roles = [
     { id: 'admin', label: 'Admin' },
+    { id: 'pengetua', label: 'Pengetua' },
+    { id: 'gpk_pentadbiran', label: 'GPK Pentadbiran' },
+    { id: 'gpk_hem', label: 'GPK HEM' },
+    { id: 'gpk_koko', label: 'GPK Kokurikulum' },
     { id: 'gkmp', label: 'GKMP' },
     { id: 'panitia', label: 'Panitia' },
     { id: 'guru', label: 'Guru' },

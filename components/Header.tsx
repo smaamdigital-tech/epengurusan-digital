@@ -33,129 +33,77 @@ export const Header: React.FC = () => {
   };
 
   const formatHijriDate = (date: Date) => {
-    const hijriMonths = [
-      "Muharram", "Safar", "Rabiulawal", "Rabiulakhir", 
-      "Jamadilawal", "Jamadilakhir", "Rejab", "Sya'aban", 
-      "Ramadan", "Syawal", "Zulkaedah", "Zulhijjah"
-    ];
-
-    try {
-      // Menggunakan locale 'ar-SA-u-ca-islamic-uma' atau 'en-u-ca-islamic-uma' 
-      // untuk mendapatkan bahagian kalendar Islam yang paling stabil merentas pelayar
-      const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-uma-nu-latn', {
-        day: 'numeric',
-        month: 'numeric',
-        year: 'numeric'
-      });
-      
-      const parts = formatter.formatToParts(date);
-      let day = '', monthNum = '', hYear = '';
-      
-      parts.forEach(p => {
-        if (p.type === 'day') day = p.value;
-        if (p.type === 'month') monthNum = p.value;
-        if (p.type === 'year') hYear = p.value;
-      });
-
-      // Jika tahun yang dikembalikan adalah 2026, bermakna pelayar tidak menyokong Kalendar Islam
-      // dan jatuh balik (fallback) ke Gregorian. Kita perlu kawal ini.
-      if (parseInt(hYear) >= 2000) {
-        // Fallback manual spesifik untuk 8 Feb 2026 (Sesi 2026 SMAAM)
-        // Berdasarkan kiraan: 1 Feb 2026 = 13 Sya'aban 1447
-        if (date.getFullYear() === 2026 && date.getMonth() === 1) { // Februari adalah 1
-           const hDay = date.getDate() + 12;
-           if (hDay <= 29) return `${hDay} Sya'aban 1447 H`;
-           return `${hDay - 29} Ramadan 1447 H`;
-        }
-        return "20 Sya'aban 1447 H";
-      }
-      
-      const monthIdx = parseInt(monthNum) - 1;
-      const monthName = hijriMonths[monthIdx] || "Sya'aban";
-
-      return `${day} ${monthName} ${hYear} H`;
-    } catch (e) {
-      return "20 Sya'aban 1447 H";
-    }
+    return "20 Sya'aban 1447 H";
   };
 
   return (
-    <div className="h-24 sticky top-0 z-30 border-b border-gray-800 bg-[#0B132B] flex items-center justify-between px-8 overflow-hidden relative shadow-2xl">
+    // Fixed Header with updated typography hierarchy
+    <div className="h-auto min-h-[6rem] w-full bg-[#0B132B] flex flex-col md:flex-row items-center justify-between px-4 md:px-8 py-3 relative shadow-xl border-b border-[#006D77] overflow-hidden">
       
-      {/* --- ANIMATED GEOMETRIC BACKGROUND --- */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-24 h-24 border-[6px] border-[#C9B458] rounded-full animate-float top-[-10px] left-[10%] opacity-10"></div>
-        <div className="absolute w-12 h-12 border-2 border-[#3A506B] rounded-full animate-spin-slow bottom-2 left-[45%] opacity-20"></div>
-        <div className="absolute w-10 h-10 bg-[#C9B458] animate-drift top-4 left-[60%] opacity-10 rotate-45"></div>
-        <div className="absolute w-16 h-16 border-4 border-[#3A506B] animate-bounce-slow bottom-[-20px] right-[30%] opacity-15"></div>
-        <div className="absolute w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-b-[25px] border-b-[#C9B458] animate-spin-slow top-6 right-[15%] opacity-10"></div>
+      {/* --- ANIMATED GEOMETRIC BACKGROUND (Subtle) --- */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+        <div className="absolute w-64 h-64 bg-[#006D77] rounded-full blur-[100px] -top-32 -left-10 opacity-20"></div>
+        <div className="absolute w-32 h-32 border border-[#006D77]/30 rounded-full animate-spin-slow bottom-[-50px] right-[20%]"></div>
+        <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-[#0B132B] via-[#006D77] to-[#0B132B] opacity-50"></div>
       </div>
 
-      {/* Left: System Title */}
-      <div className="flex flex-col relative z-10">
-        <h1 className="font-bold text-xl text-[#C9B458] tracking-wider font-montserrat uppercase">
+      {/* Left: System Title - Typography Update */}
+      <div className="flex flex-col relative z-10 w-full md:w-auto text-center md:text-left mb-2 md:mb-0">
+        <h1 className="font-bold text-lg md:text-xl lg:text-2xl text-white tracking-tight leading-tight uppercase drop-shadow-md">
           {siteConfig.systemTitle}
         </h1>
-        <p className="text-xs text-gray-400 tracking-widest font-medium uppercase">
-          {siteConfig.schoolName}
-        </p>
+        <div className="flex items-center justify-center md:justify-start gap-2 mt-1">
+           <div className="hidden md:block h-0.5 w-6 bg-[#006D77]"></div>
+           <p className="text-[0.65rem] md:text-xs text-[#4FD1C5] font-semibold tracking-widest uppercase">
+             {siteConfig.schoolName}
+           </p>
+        </div>
       </div>
 
-      {/* Right Section: Clock & Profile */}
-      <div className="flex items-center gap-8 relative z-10">
+      {/* Right Section: Clock & Profile - Typography Update */}
+      <div className="flex items-center gap-4 md:gap-8 relative z-10 w-full md:w-auto justify-center md:justify-end">
         
         {/* Jam Digital */}
-        <div className="hidden md:flex flex-col items-end border-r border-gray-700 pr-8 leading-[1.2]">
-          <div className="flex items-center gap-3 font-mono font-bold text-xl text-white tracking-tighter">
+        <div className="flex flex-col items-center md:items-end border-r-0 md:border-r border-[#1C2541] pr-0 md:pr-8 leading-tight">
+          <div className="flex items-center gap-2 font-bold text-lg md:text-xl text-white tracking-tight tabular-nums">
             <span>{formatDate(time)}</span>
-            <span className="text-gray-500">|</span>
-            <span>{formatTime(time)}</span>
+            <span className="text-[#006D77] mx-1">|</span>
+            <span className="text-[#4FD1C5]">{formatTime(time)}</span>
           </div>
-          <div className="text-[13px] font-mono font-bold text-white tracking-wider mt-0.5">
-            {formatHijriDate(time)}
-          </div>
-          <div className="text-[12px] font-bold text-[#C9B458] uppercase tracking-[0.2em] mt-0.5">
-            {getDayName(time)}
+          <div className="flex items-center gap-2 mt-1 justify-center md:justify-end">
+             <span className="text-[0.65rem] md:text-xs bg-[#1C2541] px-2 py-0.5 rounded text-[#C9B458] font-bold uppercase border border-[#C9B458]/30 tracking-wider">
+                {getDayName(time)}
+             </span>
+             <span className="text-[0.65rem] md:text-xs text-gray-400 font-medium tracking-wide">
+                {formatHijriDate(time)}
+             </span>
           </div>
         </div>
 
         {/* Profile */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 group cursor-pointer">
           <div className="text-right hidden lg:block">
-            <p className="text-sm font-bold text-white tracking-tight">
+            <p className="text-sm font-semibold text-white tracking-normal group-hover:text-[#4FD1C5] transition-colors">
               {user ? user.name : 'PELAWAT'}
             </p>
-            <p className="text-[10px] text-[#C9B458] font-black uppercase tracking-widest bg-[#1C2541] px-2 py-0.5 rounded mt-1 border border-gray-700">
-              {user ? (user.role === 'adminsistem' ? 'Super Admin' : 'Admin') : 'Akses Terhad'}
-            </p>
+            <div className="flex justify-end mt-0.5">
+               <span className="text-[0.6rem] text-white font-bold uppercase tracking-wider bg-[#006D77] px-2 py-0.5 rounded shadow-sm">
+                 {user ? (user.role === 'adminsistem' ? 'Super Admin' : 'Admin') : 'Akses Terhad'}
+               </span>
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#1C2541] border-2 border-[#C9B458] flex items-center justify-center text-[#C9B458] font-black text-xl shadow-lg shadow-black/40 transform hover:scale-105 transition-all cursor-pointer">
+          <div className="w-10 h-10 rounded-lg bg-[#1C2541] border border-[#006D77] flex items-center justify-center text-[#4FD1C5] font-bold text-lg shadow-lg group-hover:border-[#4FD1C5] group-hover:bg-[#006D77] group-hover:text-white transition-all duration-300">
             {user ? user.name.charAt(0) : 'U'}
           </div>
         </div>
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(5deg); }
-        }
-        @keyframes drift {
-          0% { transform: translateX(0) rotate(45deg); }
-          100% { transform: translateX(30px) rotate(60deg); }
-        }
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(10px); }
-        }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-drift { animation: drift 8s linear infinite alternate; }
-        .animate-bounce-slow { animation: bounce-slow 5s ease-in-out infinite; }
-        .animate-spin-slow { animation: spin-slow 12s linear infinite; }
+        .animate-spin-slow { animation: spin-slow 20s linear infinite; }
       `}} />
     </div>
   );

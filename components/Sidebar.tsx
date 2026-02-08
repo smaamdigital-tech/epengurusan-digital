@@ -75,7 +75,7 @@ const Icons = {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) => {
-  const { activeTab, setActiveTab, user, logout, permissions } = useApp();
+  const { activeTab, setActiveTab, user, logout, permissions, schoolProfile } = useApp();
   const [expanded, setExpanded] = useState<string[]>([]);
 
   useEffect(() => {
@@ -136,7 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
       ]
     },
   ].filter(item => {
-    // Basic filtering based on permissions
     const pKey = item.name.toLowerCase();
     if (pKey === 'dashboard' || pKey === 'profil sekolah' || pKey === 'program') return true;
     if (pKey === 'pentadbiran') return permissions.pentadbiran;
@@ -171,120 +170,139 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
   };
 
   return (
-    <div className="w-64 h-full bg-[#1C2541] flex flex-col shadow-2xl border-r border-gray-800">
-      {/* Logo Area */}
-      <div className="h-20 flex items-center justify-between px-4 border-b border-gray-700 bg-[#0B132B]">
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-[#C9B458] rounded-full flex items-center justify-center text-[#0B132B] font-bold text-xl mr-3">
-            S
-          </div>
-          <span className="font-bold text-lg text-white font-montserrat tracking-wider">SMAAM</span>
-        </div>
+    // Updated Sidebar: Navy Blue (#0B132B) to Deep Teal/Turquoise (#006064) Gradient
+    <div className="w-full h-full bg-gradient-to-b from-[#0B132B] via-[#004e64] to-[#006064] flex flex-col border-r border-[#2DD4BF]/30 relative overflow-hidden shadow-2xl font-sans">
+      
+      {/* Background Pattern: Preserved transparency & blend mode */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-10 bg-cover bg-center mix-blend-overlay"
+        style={{ backgroundImage: 'url(https://i.postimg.cc/D0pqvnTy/SMAAM2024.png)' }}
+      ></div>
+
+      {/* Main Content Wrapper */}
+      <div className="flex flex-col h-full relative z-10">
         
-        <button 
-          onClick={onCloseMobile} 
-          className="md:hidden text-gray-400 hover:text-white text-xl"
-        >
-          ✕
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-4 scrollbar-thin">
-        {menuItems.map((item) => {
-          const isParentActive = activeTab.startsWith(item.name);
-          const isExpanded = expanded.includes(item.name);
-          const hasSub = !!item.subItems;
-
-          return (
-            <div key={item.name} className="mb-1">
-              <button
-                onClick={() => handleItemClick(item)}
-                className={`w-full text-left px-6 py-3 flex items-center justify-between transition-all duration-300 group
-                  ${(isParentActive && !hasSub) || (isParentActive && !isExpanded)
-                    ? 'bg-[#3A506B] text-[#C9B458] border-r-4 border-[#C9B458]' 
-                    : 'text-gray-400 hover:bg-[#253252] hover:text-white'
-                  }`}
-              >
-                <div className="flex items-center">
-                  <span className={`mr-4 transition-transform ${isParentActive ? 'scale-110 text-[#C9B458]' : 'group-hover:scale-110 group-hover:text-white'}`}>
-                    {item.icon}
-                  </span>
-                  <span className="font-medium text-[15px]">{item.name}</span>
-                </div>
-                {hasSub && (
-                  <span className={`text-[10px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                    ▼
-                  </span>
-                )}
-              </button>
-
-              {/* Submenu */}
-              {hasSub && (
-                <div className={`overflow-hidden transition-all duration-300 bg-[#0B132B]/50 ${isExpanded ? 'max-h-[400px] py-2' : 'max-h-0'}`}>
-                  {item.subItems?.map((sub) => {
-                    const fullTabName = `${item.name} - ${sub}`;
-                    const isSubActive = activeTab === fullTabName;
-                    
-                    return (
-                      <button
-                        key={sub}
-                        onClick={() => handleSubItemClick(item.name, sub)}
-                        className={`w-full text-left pl-16 pr-6 py-2 text-xs transition-colors block
-                          ${isSubActive 
-                            ? 'text-[#C9B458] font-semibold' 
-                            : 'text-gray-500 hover:text-gray-200'
-                          }`}
-                      >
-                        {sub}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+        {/* Logo Area */}
+        <div className="h-24 flex items-center justify-between px-5 border-b border-[#2DD4BF]/30 bg-[#0B132B]/30 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            {schoolProfile?.logoUrl ? (
+              <img src={schoolProfile.logoUrl} alt="Logo" className="w-10 h-10 object-contain bg-white rounded-full p-0.5 border-2 border-[#2DD4BF]" />
+            ) : (
+              <div className="w-10 h-10 bg-[#006064] rounded-full flex items-center justify-center text-white font-bold text-xl border-2 border-[#2DD4BF]">
+                S
+              </div>
+            )}
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-white tracking-wide leading-none">SMAAM</span>
+              <span className="text-[0.65rem] text-[#2DD4BF] font-semibold tracking-widest uppercase mt-1">Digital System</span>
             </div>
-          );
-        })}
+          </div>
+          
+          <button 
+            onClick={onCloseMobile} 
+            className="md:hidden text-[#2DD4BF] hover:text-white text-xl"
+          >
+            ✕
+          </button>
+        </div>
 
-        {/* Admin Settings Link */}
-        {user?.role === 'adminsistem' && (
-          <button
-            onClick={() => { setActiveTab('Tetapan Admin'); if(onCloseMobile) onCloseMobile(); }}
-            className={`w-full text-left px-6 py-3 my-1 mt-6 flex items-center transition-all duration-300 group
-              ${activeTab === 'Tetapan Admin' 
-                ? 'bg-[#3A506B] text-[#C9B458] border-r-4 border-[#C9B458]' 
-                : 'text-gray-400 hover:bg-[#253252] hover:text-[#C9B458]'
-              }`}
-          >
-            <span className={`mr-4 transition-transform ${activeTab === 'Tetapan Admin' ? 'scale-110 text-[#C9B458]' : 'group-hover:scale-110 group-hover:text-[#C9B458]'}`}>
-              <Icons.Settings />
-            </span>
-            <span className="font-medium text-[15px]">Admin Sistem</span>
-          </button>
-        )}
-      </div>
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto py-4 scrollbar-thin custom-scrollbar">
+          {menuItems.map((item) => {
+            const isParentActive = activeTab.startsWith(item.name);
+            const isExpanded = expanded.includes(item.name);
+            const hasSub = !!item.subItems;
 
-      {/* Footer / Login Status */}
-      <div className="p-4 border-t border-gray-700 bg-[#0B132B]">
-        {user ? (
-          <button
-            onClick={logout}
-            className="w-full bg-red-900/20 hover:bg-red-900/40 text-red-400 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-3 border border-red-900/50 font-bold text-sm"
-          >
-            <Icons.Logout />
-            Log Keluar
-          </button>
-        ) : (
-          <button
-            onClick={onOpenLogin}
-            className="w-full bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-[#C9B458] py-2.5 rounded-xl transition-colors flex items-center justify-center gap-3 border border-[#C9B458]/30 font-bold text-sm"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            Log Masuk
-          </button>
-        )}
+            return (
+              <div key={item.name} className="mb-1">
+                <button
+                  onClick={() => handleItemClick(item)}
+                  className={`w-full text-left px-5 py-3.5 flex items-center justify-between transition-all duration-200 group border-l-4
+                    ${(isParentActive && !hasSub) || (isParentActive && !isExpanded)
+                      ? 'bg-gradient-to-r from-[#2DD4BF]/20 to-transparent text-[#2DD4BF] border-[#2DD4BF]' 
+                      : 'text-gray-300 border-transparent hover:bg-[#2DD4BF]/10 hover:text-white hover:border-[#2DD4BF]/50'
+                    }`}
+                >
+                  <div className="flex items-center">
+                    <span className={`mr-4 transition-transform duration-300 ${isParentActive ? 'scale-110 text-[#2DD4BF]' : 'group-hover:scale-110 group-hover:text-[#2DD4BF]'}`}>
+                      {item.icon}
+                    </span>
+                    <span className="font-medium text-sm tracking-wide">{item.name}</span>
+                  </div>
+                  {hasSub && (
+                    <span className={`text-[0.6rem] transition-transform duration-300 ${isExpanded ? 'rotate-180 text-[#2DD4BF]' : 'text-gray-500'}`}>
+                      ▼
+                    </span>
+                  )}
+                </button>
+
+                {/* Submenu */}
+                {hasSub && (
+                  <div className={`overflow-hidden transition-all duration-300 bg-[#000000]/20 ${isExpanded ? 'max-h-[400px] py-1 border-b border-[#2DD4BF]/20' : 'max-h-0'}`}>
+                    {item.subItems?.map((sub) => {
+                      const fullTabName = `${item.name} - ${sub}`;
+                      const isSubActive = activeTab === fullTabName;
+                      
+                      return (
+                        <button
+                          key={sub}
+                          onClick={() => handleSubItemClick(item.name, sub)}
+                          className={`w-full text-left pl-14 pr-6 py-2.5 text-xs font-medium transition-colors block border-l-2
+                            ${isSubActive 
+                              ? 'text-[#2DD4BF] font-semibold bg-[#2DD4BF]/10 border-[#2DD4BF]' 
+                              : 'text-gray-400 border-transparent hover:text-white hover:border-gray-500'
+                            }`}
+                        >
+                          {sub}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Admin Settings Link */}
+          {user?.role === 'adminsistem' && (
+            <button
+              onClick={() => { setActiveTab('Tetapan Admin'); if(onCloseMobile) onCloseMobile(); }}
+              className={`w-full text-left px-5 py-3.5 mt-4 flex items-center transition-all duration-200 group border-l-4
+                ${activeTab === 'Tetapan Admin' 
+                  ? 'bg-gradient-to-r from-[#2DD4BF]/20 to-transparent text-[#2DD4BF] border-[#2DD4BF]' 
+                  : 'text-gray-300 border-transparent hover:bg-[#2DD4BF]/10 hover:text-white'
+                }`}
+            >
+              <span className={`mr-4 transition-transform duration-300 ${activeTab === 'Tetapan Admin' ? 'scale-110 text-[#2DD4BF]' : 'group-hover:scale-110 group-hover:text-[#2DD4BF]'}`}>
+                <Icons.Settings />
+              </span>
+              <span className="font-medium text-sm tracking-wide">Admin Sistem</span>
+            </button>
+          )}
+        </div>
+
+        {/* Footer / Login Status */}
+        <div className="p-4 border-t border-[#2DD4BF]/30 bg-[#0B132B]/30 backdrop-blur-sm">
+          {user ? (
+            <button
+              onClick={logout}
+              className="w-full bg-[#1C2541]/50 hover:bg-red-900/30 text-red-300 py-3 rounded-lg transition-colors flex items-center justify-center gap-3 border border-red-900/30 hover:border-red-500/50 font-bold text-xs uppercase tracking-wider group"
+            >
+              <span className="group-hover:-translate-x-1 transition-transform"><Icons.Logout /></span>
+              Log Keluar
+            </button>
+          ) : (
+            <button
+              onClick={onOpenLogin}
+              className="w-full bg-[#006064]/40 hover:bg-[#006064]/60 text-[#2DD4BF] py-3 rounded-lg transition-colors flex items-center justify-center gap-3 border border-[#2DD4BF]/50 font-bold text-xs uppercase tracking-wider shadow-lg"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Log Masuk
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

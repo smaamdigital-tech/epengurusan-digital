@@ -68,11 +68,11 @@ const Icons = {
 };
 
 export const ProfilSekolah: React.FC = () => {
-  const { schoolProfile, updateSchoolProfile, user, showToast } = useApp();
+  const { schoolProfile, updateSchoolProfile, user, showToast, checkPermission } = useApp();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState<SchoolProfile>(schoolProfile);
 
-  const isAdmin = user?.role === 'admin' || user?.role === 'adminsistem';
+  const canEdit = checkPermission('canUpdateProfil');
 
   const handleOpenEdit = () => {
     setFormData(schoolProfile);
@@ -90,29 +90,42 @@ export const ProfilSekolah: React.FC = () => {
     <div className="p-4 md:p-10 pb-24 fade-in w-full max-w-7xl mx-auto space-y-10 relative">
       
       {/* --- ADMIN ACTION BUTTON --- */}
-      {isAdmin && (
+      {canEdit && (
         <button 
           onClick={handleOpenEdit}
-          className="fixed bottom-24 right-10 z-40 bg-[#C9B458] text-[#0B132B] px-6 py-3 rounded-full font-black shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 border-2 border-[#1C2541]"
+          className="fixed bottom-24 right-10 z-40 bg-[#2DD4BF] text-[#0B132B] px-6 py-3 rounded-full font-bold shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 border-2 border-[#1C2541] text-sm uppercase tracking-wide"
         >
-          <Icons.Edit /> EDIT PROFIL & GAMBAR
+          <Icons.Edit /> EDIT PROFIL
         </button>
       )}
 
       {/* --- HERO HEADER SECTION --- */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0B132B] to-[#1C2541] p-8 md:p-12 shadow-2xl border border-gray-800">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-[#C9B458] opacity-5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-[#3A506B] opacity-10 rounded-full blur-2xl"></div>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0B132B] to-[#004e64] p-8 md:p-12 shadow-2xl border-l-4 border-[#2DD4BF]">
+        
+        {/* Background Image Overlay */}
+        <div 
+           className="absolute inset-0 bg-center bg-cover bg-no-repeat opacity-20 pointer-events-none mix-blend-overlay"
+           style={{ backgroundImage: 'url(https://i.postimg.cc/D0pqvnTy/SMAAM2024.png)' }}
+        ></div>
+
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-[#2DD4BF] opacity-5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-[#004e64] opacity-10 rounded-full blur-2xl"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-           <div className="w-24 h-24 md:w-32 md:h-32 bg-[#C9B458] rounded-2xl flex items-center justify-center text-[#0B132B] text-4xl md:text-5xl font-black shadow-xl rotate-3">
-              {schoolProfile.schoolName.charAt(0)}
+           {/* Logo Container */}
+           <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center shrink-0">
+              {schoolProfile.logoUrl ? (
+                <img src={schoolProfile.logoUrl} alt="Logo" className="w-full h-full object-contain drop-shadow-2xl" />
+              ) : (
+                <div className="text-white text-5xl font-black">{schoolProfile.schoolName.charAt(0)}</div>
+              )}
            </div>
+           
            <div className="text-center md:text-left">
-              <h1 className="text-3xl md:text-5xl font-black text-white font-montserrat tracking-tight mb-2">
-                 PROFIL <span className="text-[#C9B458]">SMAAM</span>
+              <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-2 drop-shadow-lg leading-tight uppercase">
+                 PROFIL <span className="text-[#2DD4BF]">SMAAM</span>
               </h1>
-              <p className="text-gray-400 font-medium tracking-[0.3em] uppercase text-sm md:text-base">
+              <p className="text-gray-100 font-medium tracking-[0.3em] uppercase text-xs md:text-sm drop-shadow-md">
                  {schoolProfile.schoolName}
               </p>
            </div>
@@ -123,63 +136,65 @@ export const ProfilSekolah: React.FC = () => {
         
         {/* --- LEFT PANEL: LEADERSHIP --- */}
         <div className="lg:col-span-4 space-y-6">
-           <div className="bg-[#1C2541] rounded-2xl shadow-2xl border border-gray-800 overflow-hidden group">
-              <div className="h-24 bg-[#0B132B] relative overflow-hidden flex items-center justify-center">
-                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#C9B458 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-                 <span className="text-xs font-black text-[#C9B458] tracking-[0.5em] uppercase opacity-50">KEPIMPINAN SEKOLAH</span>
+           <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] rounded-2xl shadow-2xl border-l-4 border-[#2DD4BF] overflow-hidden group">
+              <div className="h-24 bg-black/20 relative overflow-hidden flex items-center justify-center">
+                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#2DD4BF 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+                 <span className="text-xs font-bold text-[#2DD4BF] tracking-[0.3em] uppercase opacity-80">KEPIMPINAN</span>
               </div>
               
               <div className="px-8 pb-8 -mt-12 relative z-10 flex flex-col items-center">
-                 <div className="w-32 h-32 rounded-2xl border-4 border-[#C9B458] bg-[#0B132B] shadow-2xl mb-6 overflow-hidden flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
+                 <div className="w-32 h-32 rounded-2xl border-4 border-[#2DD4BF] bg-[#0B132B] shadow-2xl mb-6 overflow-hidden flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
                     {schoolProfile.pengetuaImage ? (
                       <img src={schoolProfile.pengetuaImage} alt="Pengetua" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="text-[#C9B458]">
+                      <div className="text-[#2DD4BF]">
                         <Icons.User />
                       </div>
                     )}
                  </div>
                  
                  <div className="text-center">
-                    <h2 className="text-xl font-bold text-white font-montserrat mb-1">
+                    <h2 className="text-lg md:text-xl font-bold text-white mb-2 leading-tight">
                        {schoolProfile.pengetuaName}
                     </h2>
-                    <p className="text-[#C9B458] font-black text-xs uppercase tracking-widest mb-6 px-4 py-1.5 bg-[#0B132B] rounded-full inline-block border border-gray-700">
+                    <p className="text-[#2DD4BF] font-bold text-[0.65rem] uppercase tracking-widest mb-6 px-4 py-1.5 bg-[#0B132B] rounded-full inline-block border border-[#2DD4BF]/30">
                        Pengetua Cemerlang
                     </p>
                  </div>
 
-                 <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent my-6"></div>
+                 <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent my-6"></div>
 
-                 <div className="relative">
-                    <span className="absolute -top-4 -left-2 text-4xl text-[#C9B458] opacity-20 font-serif">"</span>
-                    <blockquote className="text-gray-300 italic text-sm leading-relaxed font-light text-center px-2">
+                 <div className="relative w-full">
+                    <span className="absolute -top-3 -left-1 text-4xl text-[#2DD4BF] opacity-20 font-serif leading-none">"</span>
+                    <blockquote className="text-gray-100 italic text-sm leading-relaxed font-light text-center px-4">
                        {schoolProfile.pengetuaQuote}
                     </blockquote>
-                    <span className="absolute -bottom-6 -right-2 text-4xl text-[#C9B458] opacity-20 font-serif">"</span>
+                    <span className="absolute -bottom-5 -right-1 text-4xl text-[#2DD4BF] opacity-20 font-serif leading-none">"</span>
                  </div>
                  
                  <div className="mt-10 flex flex-col items-center">
-                    <div className="w-24 h-1 bg-[#C9B458]/30 rounded-full mb-2"></div>
-                    <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest italic">Signature Authenticated</span>
+                    <div className="w-24 h-1 bg-[#2DD4BF]/30 rounded-full mb-2"></div>
+                    <span className="text-[0.6rem] text-gray-400 uppercase font-bold tracking-widest italic">Signature Authenticated</span>
                  </div>
               </div>
            </div>
 
            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-[#1C2541] p-5 rounded-2xl border border-gray-800 shadow-xl group">
-                 <div className="text-[#C9B458] mb-2 group-hover:scale-110 transition-transform">
+              <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] p-5 rounded-2xl border-l-4 border-[#2DD4BF] shadow-xl group text-center relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-2 opacity-5 text-white"><Icons.Chart /></div>
+                 <div className="text-[#2DD4BF] mb-2 group-hover:scale-110 transition-transform flex justify-center bg-[#0B132B]/50 p-3 rounded-full w-fit mx-auto border border-[#2DD4BF]/30">
                    <Icons.Chart />
                  </div>
-                 <span className="text-2xl font-black text-white block">{schoolProfile.stats.lulusSpm}</span>
-                 <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Kadar Lulus SPM</span>
+                 <span className="text-2xl font-black text-white block leading-none">{schoolProfile.stats.lulusSpm}</span>
+                 <span className="text-[0.6rem] text-[#2DD4BF] uppercase font-bold tracking-wider mt-1 block">Kadar Lulus SPM</span>
               </div>
-              <div className="bg-[#1C2541] p-5 rounded-2xl border border-gray-800 shadow-xl group">
-                 <div className="text-[#C9B458] mb-2 group-hover:scale-110 transition-transform">
+              <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] p-5 rounded-2xl border-l-4 border-[#2DD4BF] shadow-xl group text-center relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-2 opacity-5 text-white"><Icons.Award /></div>
+                 <div className="text-[#2DD4BF] mb-2 group-hover:scale-110 transition-transform flex justify-center bg-[#0B132B]/50 p-3 rounded-full w-fit mx-auto border border-[#2DD4BF]/30">
                    <Icons.Award />
                  </div>
-                 <span className="text-2xl font-black text-white block">{schoolProfile.stats.gred}</span>
-                 <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Status Sekolah</span>
+                 <span className="text-2xl font-black text-white block leading-none">{schoolProfile.stats.gred}</span>
+                 <span className="text-[0.6rem] text-[#2DD4BF] uppercase font-bold tracking-wider mt-1 block">Gred Sekolah</span>
               </div>
            </div>
         </div>
@@ -187,7 +202,7 @@ export const ProfilSekolah: React.FC = () => {
         {/* --- RIGHT PANEL: DETAILED INFO --- */}
         <div className="lg:col-span-8 space-y-8">
            
-           <div className="bg-[#1C2541] rounded-2xl shadow-2xl border border-gray-800 p-8 relative overflow-hidden">
+           <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] rounded-2xl shadow-2xl border-l-4 border-[#2DD4BF] p-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
                  <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-white">
                     <path d="M3 21h18M3 7v14m18-14v14M3 7l9-4 9 4M9 21V11h6v10" />
@@ -195,11 +210,11 @@ export const ProfilSekolah: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3 mb-8">
-                 <div className="w-2 h-8 bg-[#C9B458] rounded-full"></div>
-                 <h2 className="text-xl font-bold text-white font-montserrat uppercase tracking-wider">Identiti Sekolah</h2>
+                 <div className="w-1.5 h-8 bg-[#2DD4BF] rounded-full"></div>
+                 <h2 className="text-xl font-bold text-white uppercase tracking-wider">Identiti Sekolah</h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                  {[
                     { label: 'Nama Rasmi', value: schoolProfile.schoolName, icon: <Icons.School /> },
                     { label: 'Kod Institusi', value: schoolProfile.schoolCode, icon: <Icons.IdCard /> },
@@ -209,11 +224,11 @@ export const ProfilSekolah: React.FC = () => {
                     { label: 'Lokasi Strategik', value: schoolProfile.location, icon: <Icons.Globe /> },
                  ].map((item, idx) => (
                     <div key={idx} className="flex gap-4 group">
-                       <div className="w-10 h-10 rounded-xl bg-[#0B132B] border border-gray-700 flex items-center justify-center text-[#C9B458] group-hover:border-[#C9B458] transition-colors">
+                       <div className="w-10 h-10 shrink-0 rounded-xl bg-black/20 border border-[#2DD4BF]/30 flex items-center justify-center text-[#2DD4BF] group-hover:border-[#2DD4BF] transition-colors">
                           {item.icon}
                        </div>
                        <div>
-                          <p className="text-[10px] text-[#C9B458] font-black uppercase tracking-widest mb-1 opacity-70">{item.label}</p>
+                          <p className="text-[0.6rem] text-[#2DD4BF] font-bold uppercase tracking-widest mb-1 opacity-80">{item.label}</p>
                           <p className="text-white text-sm font-semibold uppercase leading-snug">{item.value}</p>
                        </div>
                     </div>
@@ -222,38 +237,40 @@ export const ProfilSekolah: React.FC = () => {
            </div>
 
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-[#1C2541] to-[#0B132B] p-8 rounded-2xl border border-gray-800 shadow-xl group hover:border-[#C9B458] transition-all duration-500">
-                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[#C9B458] font-bold tracking-widest uppercase">VISI</h3>
-                    <div className="text-[#C9B458] group-hover:scale-125 transition-transform">
+              <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] p-8 rounded-2xl border-l-4 border-[#2DD4BF] shadow-xl group hover:border-[#2DD4BF] transition-all duration-500 relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-2 opacity-5 text-white"><Icons.Eye /></div>
+                 <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[#2DD4BF] font-bold tracking-widest uppercase text-sm">VISI</h3>
+                    <div className="text-[#2DD4BF] group-hover:scale-125 transition-transform">
                       <Icons.Eye />
                     </div>
                  </div>
                  <p className="text-white text-lg font-bold leading-relaxed">{schoolProfile.visi}</p>
               </div>
 
-              <div className="bg-gradient-to-br from-[#1C2541] to-[#0B132B] p-8 rounded-2xl border border-gray-800 shadow-xl group hover:border-[#3A506B] transition-all duration-500">
-                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[#3A506B] font-bold tracking-widest uppercase">MISI</h3>
-                    <div className="text-[#3A506B] group-hover:scale-125 transition-transform">
+              <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] p-8 rounded-2xl border-l-4 border-[#2DD4BF] shadow-xl group hover:border-[#2DD4BF] transition-all duration-500 relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-2 opacity-5 text-white"><Icons.Rocket /></div>
+                 <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[#2DD4BF] font-bold tracking-widest uppercase text-sm">MISI</h3>
+                    <div className="text-[#2DD4BF] group-hover:scale-125 transition-transform">
                       <Icons.Rocket />
                     </div>
                  </div>
-                 <p className="text-gray-300 text-sm leading-relaxed">{schoolProfile.misi}</p>
+                 <p className="text-gray-100 text-sm font-medium leading-relaxed">{schoolProfile.misi}</p>
               </div>
            </div>
 
-           <div className="bg-[#0B132B] rounded-2xl p-8 border border-gray-800 shadow-2xl relative">
+           <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] rounded-2xl p-8 border-l-4 border-[#2DD4BF] shadow-2xl relative">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                  <div className="space-y-4">
                     <div className="flex justify-between items-end">
-                       <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Kekuatan Staf</p>
-                       <span className="text-3xl font-black text-white">{schoolProfile.stats.guruTotal} <span className="text-sm font-normal text-gray-400">GURU</span></span>
+                       <p className="text-xs text-[#2DD4BF] font-bold uppercase tracking-widest">Kekuatan Staf</p>
+                       <span className="text-3xl font-black text-white">{schoolProfile.stats.guruTotal} <span className="text-xs font-bold text-gray-400 align-middle">GURU</span></span>
                     </div>
-                    <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                       <div className="bg-[#C9B458] h-full" style={{ width: `${(schoolProfile.stats.guruTotal / 50) * 100}%` }}></div>
+                    <div className="w-full bg-black/30 h-2 rounded-full overflow-hidden">
+                       <div className="bg-[#2DD4BF] h-full" style={{ width: `${(schoolProfile.stats.guruTotal / 50) * 100}%` }}></div>
                     </div>
-                    <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase">
+                    <div className="flex justify-between text-[0.65rem] text-gray-300 font-bold uppercase tracking-wide">
                        <span>Lelaki: {schoolProfile.stats.guruLelaki}</span>
                        <span>Perempuan: {schoolProfile.stats.guruPerempuan}</span>
                     </div>
@@ -261,13 +278,13 @@ export const ProfilSekolah: React.FC = () => {
 
                  <div className="space-y-4">
                     <div className="flex justify-between items-end">
-                       <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Enrolmen Murid</p>
-                       <span className="text-3xl font-black text-white">{schoolProfile.stats.muridTotal} <span className="text-sm font-normal text-gray-400">MURID</span></span>
+                       <p className="text-xs text-[#2DD4BF] font-bold uppercase tracking-widest">Enrolmen Murid</p>
+                       <span className="text-3xl font-black text-white">{schoolProfile.stats.muridTotal} <span className="text-xs font-bold text-gray-400 align-middle">MURID</span></span>
                     </div>
-                    <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                       <div className="bg-[#3A506B] h-full" style={{ width: `${(schoolProfile.stats.muridTotal / 1000) * 100}%` }}></div>
+                    <div className="w-full bg-black/30 h-2 rounded-full overflow-hidden">
+                       <div className="bg-[#006064] h-full" style={{ width: `${(schoolProfile.stats.muridTotal / 1000) * 100}%` }}></div>
                     </div>
-                    <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase">
+                    <div className="flex justify-between text-[0.65rem] text-gray-300 font-bold uppercase tracking-wide">
                        <span>Lelaki: {schoolProfile.stats.muridLelaki}</span>
                        <span>Perempuan: {schoolProfile.stats.muridPerempuan}</span>
                     </div>
@@ -277,13 +294,13 @@ export const ProfilSekolah: React.FC = () => {
 
            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {[
-                 { label: 'Moto', value: schoolProfile.moto, color: 'border-[#C9B458]', text: 'text-[#C9B458]' },
-                 { label: 'Slogan', value: schoolProfile.slogan, color: 'border-white/20', text: 'text-white' },
-                 { label: 'Status', value: schoolProfile.status, color: 'border-white/20', text: 'text-white' },
+                 { label: 'Moto', value: schoolProfile.moto },
+                 { label: 'Slogan', value: schoolProfile.slogan },
+                 { label: 'Status', value: schoolProfile.status },
               ].map((tile, i) => (
-                 <div key={i} className={`bg-[#1C2541] p-6 rounded-2xl border-2 ${tile.color} shadow-lg text-center`}>
-                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] mb-2">{tile.label}</p>
-                    <p className={`font-black uppercase tracking-tight ${tile.text}`}>{tile.value}</p>
+                 <div key={i} className="bg-gradient-to-br from-[#0B132B] to-[#004e64] p-6 rounded-2xl border-l-4 border-[#2DD4BF] shadow-lg text-center flex flex-col justify-center h-full hover:-translate-y-1 transition-transform">
+                    <p className="text-[0.6rem] text-[#2DD4BF] font-black uppercase tracking-[0.2em] mb-2">{tile.label}</p>
+                    <p className="font-black uppercase tracking-tight text-sm leading-tight text-white">{tile.value}</p>
                  </div>
               ))}
            </div>
@@ -293,93 +310,97 @@ export const ProfilSekolah: React.FC = () => {
       {/* --- EDIT MODAL --- */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md fade-in px-4 py-6 overflow-y-auto">
-          <div className="bg-[#1C2541] w-full max-w-4xl p-8 rounded-3xl border-2 border-[#C9B458] shadow-2xl space-y-8 my-auto overflow-y-auto max-h-full scrollbar-thin">
+          <div className="bg-[#1C2541] w-full max-w-4xl p-8 rounded-3xl border-2 border-[#2DD4BF] shadow-2xl space-y-8 my-auto overflow-y-auto max-h-full scrollbar-thin">
             <div className="flex justify-between items-center border-b border-gray-700 pb-4">
-               <h2 className="text-2xl font-black text-white uppercase tracking-wider">Editor Profil SMAAM</h2>
-               <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-white">✕</button>
+               <h2 className="text-xl font-black text-white uppercase tracking-wider">Editor Profil SMAAM</h2>
+               <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-white font-bold text-xl">✕</button>
             </div>
             
             <form onSubmit={handleSave} className="space-y-8">
               {/* Group 1: Leadership */}
               <div className="bg-[#0B132B] p-6 rounded-2xl border border-gray-700 space-y-4">
-                 <h3 className="text-[#C9B458] font-bold text-xs uppercase tracking-[0.2em]">Pengurusan Pengetua</h3>
+                 <h3 className="text-[#2DD4BF] font-bold text-xs uppercase tracking-[0.2em]">Pengurusan Pengetua</h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Nama Pengetua</label>
-                       <input type="text" value={formData.pengetuaName} onChange={e => setFormData({...formData, pengetuaName: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-3 text-white focus:border-[#C9B458] outline-none" />
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Nama Pengetua</label>
+                       <input type="text" value={formData.pengetuaName} onChange={e => setFormData({...formData, pengetuaName: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-3 text-sm text-white focus:border-[#2DD4BF] outline-none" />
                     </div>
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">URL Gambar Pengetua</label>
-                       <input type="text" value={formData.pengetuaImage} onChange={e => setFormData({...formData, pengetuaImage: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-3 text-white focus:border-[#C9B458] outline-none" placeholder="https://..." />
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">URL Gambar Pengetua</label>
+                       <input type="text" value={formData.pengetuaImage} onChange={e => setFormData({...formData, pengetuaImage: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-3 text-sm text-white focus:border-[#2DD4BF] outline-none" placeholder="https://..." />
                     </div>
                  </div>
                  <div>
-                    <label className="text-[10px] text-gray-500 uppercase font-black">Kata-kata Alu-aluan</label>
-                    <textarea value={formData.pengetuaQuote} onChange={e => setFormData({...formData, pengetuaQuote: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-3 text-white h-24 focus:border-[#C9B458] outline-none resize-none" />
+                    <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Kata-kata Alu-aluan / Piagam</label>
+                    <textarea value={formData.pengetuaQuote} onChange={e => setFormData({...formData, pengetuaQuote: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-3 text-sm text-white h-24 focus:border-[#2DD4BF] outline-none resize-none" />
                  </div>
               </div>
 
               {/* Group 2: Identity */}
               <div className="bg-[#0B132B] p-6 rounded-2xl border border-gray-700 space-y-4">
-                 <h3 className="text-[#C9B458] font-bold text-xs uppercase tracking-[0.2em]">Identiti Institusi</h3>
+                 <h3 className="text-[#2DD4BF] font-bold text-xs uppercase tracking-[0.2em]">Identiti Institusi</h3>
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Nama Sekolah</label>
-                       <input type="text" value={formData.schoolName} onChange={e => setFormData({...formData, schoolName: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#C9B458]" />
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Nama Sekolah</label>
+                       <input type="text" value={formData.schoolName} onChange={e => setFormData({...formData, schoolName: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" />
                     </div>
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Kod Sekolah</label>
-                       <input type="text" value={formData.schoolCode} onChange={e => setFormData({...formData, schoolCode: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#C9B458]" />
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Kod Sekolah</label>
+                       <input type="text" value={formData.schoolCode} onChange={e => setFormData({...formData, schoolCode: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" />
                     </div>
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Lokasi</label>
-                       <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#C9B458]" />
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Lokasi</label>
+                       <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" />
                     </div>
                  </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Alamat</label>
-                       <input type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#C9B458]" />
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Alamat</label>
+                       <input type="text" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                        <div>
-                          <label className="text-[10px] text-gray-500 uppercase font-black">Email</label>
-                          <input type="text" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#C9B458]" />
+                          <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Email</label>
+                          <input type="text" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" />
                        </div>
                        <div>
-                          <label className="text-[10px] text-gray-500 uppercase font-black">Telefon</label>
-                          <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#C9B458]" />
+                          <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Telefon</label>
+                          <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" />
                        </div>
                     </div>
+                 </div>
+                 <div>
+                    <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">URL Logo Sekolah</label>
+                    <input type="text" value={formData.logoUrl || ''} onChange={e => setFormData({...formData, logoUrl: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded-lg p-2 text-sm text-white focus:border-[#2DD4BF]" placeholder="URL imej logo" />
                  </div>
               </div>
 
               {/* Group 3: Stats */}
               <div className="bg-[#0B132B] p-6 rounded-2xl border border-gray-700 space-y-4">
-                 <h3 className="text-[#C9B458] font-bold text-xs uppercase tracking-[0.2em]">Statistik & Falsafah</h3>
+                 <h3 className="text-[#2DD4BF] font-bold text-xs uppercase tracking-[0.2em]">Statistik & Falsafah</h3>
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Lulus SPM (%)</label>
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Lulus SPM (%)</label>
                        <input type="text" value={formData.stats.lulusSpm} onChange={e => setFormData({...formData, stats: {...formData.stats, lulusSpm: e.target.value}})} className="w-full bg-[#1C2541] border border-gray-700 rounded p-2 text-sm text-white" />
                     </div>
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Guru (Jum)</label>
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Guru (Jum)</label>
                        <input type="number" value={formData.stats.guruTotal} onChange={e => setFormData({...formData, stats: {...formData.stats, guruTotal: parseInt(e.target.value)}})} className="w-full bg-[#1C2541] border border-gray-700 rounded p-2 text-sm text-white" />
                     </div>
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Murid (Jum)</label>
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Murid (Jum)</label>
                        <input type="number" value={formData.stats.muridTotal} onChange={e => setFormData({...formData, stats: {...formData.stats, muridTotal: parseInt(e.target.value)}})} className="w-full bg-[#1C2541] border border-gray-700 rounded p-2 text-sm text-white" />
                     </div>
                     <div>
-                       <label className="text-[10px] text-gray-500 uppercase font-black">Status Gred</label>
+                       <label className="text-[0.65rem] text-gray-500 uppercase font-black tracking-wide mb-1 block">Status Gred</label>
                        <input type="text" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full bg-[#1C2541] border border-gray-700 rounded p-2 text-sm text-white" />
                     </div>
                  </div>
               </div>
 
               <div className="flex gap-4 pt-4">
-                 <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-4 bg-gray-700 text-gray-300 rounded-xl font-bold hover:bg-gray-600 transition-all">Batal</button>
-                 <button type="submit" className="flex-1 py-4 bg-[#C9B458] text-[#0B132B] rounded-xl font-black hover:bg-yellow-400 shadow-xl shadow-yellow-900/20 transition-all">SIMPAN DATA PROFIL</button>
+                 <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-4 bg-gray-700 text-gray-300 rounded-xl font-bold hover:bg-gray-600 transition-all text-sm uppercase">Batal</button>
+                 <button type="submit" className="flex-1 py-4 bg-[#2DD4BF] text-[#0B132B] rounded-xl font-black hover:bg-[#20b2aa] shadow-xl shadow-teal-900/20 transition-all text-sm uppercase">SIMPAN DATA PROFIL</button>
               </div>
             </form>
           </div>
@@ -390,10 +411,10 @@ export const ProfilSekolah: React.FC = () => {
       <div className="pt-10 border-t border-gray-800 flex flex-col items-center gap-4">
          <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-gray-800"></div>
-            <span className="text-xs text-gray-600 font-bold uppercase tracking-[0.5em]">Teras Kecemerlangan</span>
+            <span className="text-[0.6rem] text-gray-600 font-bold uppercase tracking-[0.5em]">Teras Kecemerlangan</span>
             <div className="h-px w-12 bg-gray-800"></div>
          </div>
-         <p className="text-[10px] text-gray-500 italic max-w-xl text-center">
+         <p className="text-[0.65rem] text-gray-500 italic max-w-xl text-center">
             Sistem Pengurusan Digital SMAAM dibangunkan untuk memperkasa tadbir urus sekolah kearah pendigitalan pendidikan yang mampan dan dinamik.
          </p>
       </div>

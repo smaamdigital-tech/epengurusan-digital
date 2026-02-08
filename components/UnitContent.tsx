@@ -144,14 +144,28 @@ const DEFAULT_DESCRIPTIONS: Record<string, string> = {
 export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   const { user, showToast, checkPermission } = useApp();
   
-  // Determine Permission Module
-  // All units use 'jawatankuasa' permission key for simplicity as per requirement
-  const permKey = 'jawatankuasa'; 
-  
-  const canEdit = checkPermission(permKey, 'edit');
-  const canDelete = checkPermission(permKey, 'delete');
-  const canSave = checkPermission(permKey, 'save');
-  const canDownload = checkPermission('dokumentasi', 'download');
+  // Dynamic Permission Key Calculation
+  const getPermissionKey = (): string => {
+    if (unit === 'Pentadbiran') {
+      return type === 'Jawatankuasa' ? 'canUpdatePentadbiranJK' : 'canUpdatePentadbiranTakwim';
+    }
+    if (unit === 'Kurikulum') {
+      return type === 'Jawatankuasa' ? 'canUpdateKurikulumJK' : 'canUpdateKurikulumTakwim';
+    }
+    if (unit === 'Hal Ehwal Murid') {
+      return type === 'Jawatankuasa' ? 'canUpdateHEMJK' : 'canUpdateHEMTakwim';
+    }
+    if (unit === 'Kokurikulum') {
+      return type === 'Jawatankuasa' ? 'canUpdateKokoJK' : 'canUpdateKokoTakwim';
+    }
+    return ''; // Fallback or strict deny
+  };
+
+  const permKey = getPermissionKey();
+  const canEdit = checkPermission(permKey);
+  const canDelete = checkPermission(permKey);
+  const canSave = checkPermission(permKey);
+  const canDownload = true; // Everyone can download mostly
 
   const isSystemAdmin = user?.role === 'adminsistem';
 
@@ -688,7 +702,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                           {committees.find(c => c.id === activeCommitteeId)?.name || "Pilih Jawatankuasa"}
                       </h3>
                       
-                      {checkPermission('tugasFungsi', 'edit') && (
+                      {canEdit && (
                         <button 
                           onClick={() => { 
                             if (!isEditingDesc) setTempDesc(description); 
@@ -712,7 +726,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                                 className="w-full bg-[#0B132B] border border-[#C9B458] rounded-lg p-3 text-[13px] text-white h-48 focus:outline-none focus:ring-1 focus:ring-[#C9B458] leading-[1.3]"
                                 placeholder={`Masukkan fungsi untuk ${committees.find(c => c.id === activeCommitteeId)?.name}...`}
                             />
-                            {checkPermission('tugasFungsi', 'save') && (
+                            {canEdit && (
                                 <button 
                                     onClick={saveDescription} 
                                     className="w-full bg-[#C9B458] text-[#0B132B] py-2 rounded-lg font-bold text-xs hover:bg-yellow-400 transition-colors"
@@ -787,20 +801,22 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                                           const dayLetter = getDayLetter(monthIdx, date);
                                           if (!dayLetter) return <td key={monthIdx} className="bg-black/40 border border-gray-800"></td>;
                                           const dateStr = `${(date).toString().padStart(2, '0')}-${(monthIdx + 1).toString().padStart(2, '0')}-${year}`;
-                                          const event = items.find(item => item.date === dateStr);
+                                          
+                                          // Find ALL events for this day
+                                          const eventsOnDay = items.filter(item => item.date === dateStr);
 
                                           return (
                                               <td 
                                                 key={monthIdx} 
                                                 className={`bg-[#1C2541] border border-gray-700 relative h-12 p-1 align-middle hover:bg-[#253252] transition-colors ${canEdit ? 'cursor-pointer' : ''}`}
-                                                onClick={() => { if (canEdit) event ? handleOpenModal(event) : handleOpenModal({ date: dateStr }); }}
+                                                onClick={() => { if (canEdit) eventsOnDay.length > 0 ? handleOpenModal(eventsOnDay[0]) : handleOpenModal({ date: dateStr }); }}
                                               >
                                                   <span className="absolute top-0.5 right-1 text-[8px] text-gray-500 font-mono">{dayLetter}</span>
-                                                  {event ? (
-                                                      <div className={`w-full h-full rounded flex items-center justify-center text-[9px] font-bold text-center leading-tight px-1 shadow-sm ${getStatusColor(event.status)}`} title={event.event}>
+                                                  {eventsOnDay.map((event, idx) => (
+                                                      <div key={idx} className={`w-full rounded flex items-center justify-center text-[9px] font-bold text-center leading-tight px-1 shadow-sm mb-1 ${getStatusColor(event.status)}`} title={event.event}>
                                                           {event.event.length > 15 ? event.event.substring(0, 15) + '...' : event.event}
                                                       </div>
-                                                  ) : null}
+                                                  ))}
                                               </td>
                                           );
                                       })}

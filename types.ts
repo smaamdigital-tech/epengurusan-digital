@@ -1,5 +1,5 @@
 
-export type UserRole = 'adminsistem' | 'admin' | 'gkmp' | 'panitia' | 'guru' | 'su_pentadbir' | 'su_hem' | 'su_kuri' | 'su_koko' | null;
+export type UserRole = 'adminsistem' | 'admin' | 'pengetua' | 'gpk_pentadbiran' | 'gpk_hem' | 'gpk_koko' | 'gkmp' | 'panitia' | 'guru' | 'su_pentadbir' | 'su_hem' | 'su_kuri' | 'su_koko' | null;
 
 export interface User {
   username: string;
@@ -43,6 +43,7 @@ export interface SchoolProfile {
   moto: string;
   slogan: string;
   status: string;
+  logoUrl?: string;
   stats: {
     lulusSpm: string;
     gred: string;
