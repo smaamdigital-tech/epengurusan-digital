@@ -139,10 +139,12 @@ export const ProfilSekolah: React.FC = () => {
            <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] rounded-2xl shadow-2xl border-l-4 border-[#2DD4BF] overflow-hidden group">
               <div className="h-24 bg-black/20 relative overflow-hidden flex items-center justify-center">
                  <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#2DD4BF 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-                 <span className="text-xs font-bold text-[#2DD4BF] tracking-[0.3em] uppercase opacity-80">KEPIMPINAN</span>
+                 {/* Font size increased to text-xl to match Identiti Sekolah */}
+                 <span className="text-xl font-bold text-[#2DD4BF] tracking-widest uppercase opacity-80">KEPIMPINAN</span>
               </div>
               
-              <div className="px-8 pb-8 -mt-12 relative z-10 flex flex-col items-center">
+              {/* Adjusted margin from -mt-12 to -mt-6 to move image down */}
+              <div className="px-8 pb-8 -mt-6 relative z-10 flex flex-col items-center">
                  <div className="w-32 h-32 rounded-2xl border-4 border-[#2DD4BF] bg-[#0B132B] shadow-2xl mb-6 overflow-hidden flex items-center justify-center transform group-hover:scale-105 transition-transform duration-500">
                     {schoolProfile.pengetuaImage ? (
                       <img src={schoolProfile.pengetuaImage} alt="Pengetua" className="w-full h-full object-cover" />
@@ -216,11 +218,11 @@ export const ProfilSekolah: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                  {[
-                    { label: 'Nama Rasmi', value: schoolProfile.schoolName, icon: <Icons.School /> },
-                    { label: 'Kod Institusi', value: schoolProfile.schoolCode, icon: <Icons.IdCard /> },
+                    { label: 'Nama Sekolah', value: schoolProfile.schoolName, icon: <Icons.School /> },
+                    { label: 'Kod Sekolah', value: schoolProfile.schoolCode, icon: <Icons.IdCard /> },
                     { label: 'Alamat Surat Menyurat', value: schoolProfile.address, icon: <Icons.MapPin /> },
-                    { label: 'Platform Digital', value: schoolProfile.email, icon: <Icons.Mail /> },
-                    { label: 'Hubungan Rasmi', value: schoolProfile.phone, icon: <Icons.Phone /> },
+                    { label: 'Platform Digital', value: schoolProfile.email, icon: <Icons.Mail />, isEmail: true },
+                    { label: 'No. Tel / Fax', value: schoolProfile.phone, icon: <Icons.Phone /> },
                     { label: 'Lokasi Strategik', value: schoolProfile.location, icon: <Icons.Globe /> },
                  ].map((item, idx) => (
                     <div key={idx} className="flex gap-4 group">
@@ -229,7 +231,7 @@ export const ProfilSekolah: React.FC = () => {
                        </div>
                        <div>
                           <p className="text-[0.6rem] text-[#2DD4BF] font-bold uppercase tracking-widest mb-1 opacity-80">{item.label}</p>
-                          <p className="text-white text-sm font-semibold uppercase leading-snug">{item.value}</p>
+                          <p className={`text-white text-sm font-semibold leading-snug ${item.isEmail ? 'lowercase' : 'uppercase'}`}>{item.value}</p>
                        </div>
                     </div>
                  ))}
@@ -245,7 +247,8 @@ export const ProfilSekolah: React.FC = () => {
                       <Icons.Eye />
                     </div>
                  </div>
-                 <p className="text-white text-lg font-bold leading-relaxed">{schoolProfile.visi}</p>
+                 {/* Update Font Size Visi to match Misi */}
+                 <p className="text-white text-sm font-medium leading-relaxed">{schoolProfile.visi}</p>
               </div>
 
               <div className="bg-gradient-to-br from-[#0B132B] to-[#004e64] p-8 rounded-2xl border-l-4 border-[#2DD4BF] shadow-xl group hover:border-[#2DD4BF] transition-all duration-500 relative overflow-hidden">
