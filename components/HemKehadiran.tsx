@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 
@@ -331,20 +332,20 @@ export const HemKehadiran: React.FC = () => {
   );
 
   return (
-    <div className="p-4 md:p-8 space-y-6 pb-20 fade-in">
+    <div className="p-4 md:p-8 space-y-6 pb-20 fade-in bg-[#A9CCE3] min-h-screen">
       {/* Header */}
-      <div className="border-b border-gray-700 pb-4">
-        <div className="flex items-center gap-2 text-sm text-[#C9B458] font-mono mb-2">
-           <span>HEM</span>
-           <span>/</span>
-           <span className="uppercase">KEHADIRAN MURID</span>
+      <div className="border-b border-gray-400 pb-4">
+        <div className="flex items-center gap-2 text-sm text-[#0B132B] font-mono mb-2">
+           <span className="font-bold">HEM</span>
+           <span className="opacity-50">/</span>
+           <span className="uppercase font-bold opacity-80">KEHADIRAN MURID</span>
         </div>
-        <h2 className="text-3xl font-bold text-white font-montserrat">Kehadiran Murid</h2>
-        <p className="text-gray-400 mt-1">Rekod Harian, Laporan, dan Analitik Kehadiran.</p>
+        <h2 className="text-3xl font-bold text-black font-montserrat uppercase">Kehadiran Murid</h2>
+        <p className="text-black mt-1 opacity-70 font-semibold">Rekod Harian, Laporan, dan Analitik Kehadiran.</p>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-gray-800">
+      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-gray-400">
         {[
           { key: 'rekod', label: 'Rekod Harian', icon: '📝' },
           { key: 'laporan', label: 'Laporan', icon: '📊' },
@@ -356,7 +357,7 @@ export const HemKehadiran: React.FC = () => {
             className={`px-6 py-3 rounded-t-lg font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap
               ${activeTab === tab.key 
                 ? 'bg-[#1C2541] text-[#C9B458] border-t-2 border-[#C9B458]' 
-                : 'text-gray-400 hover:text-white hover:bg-[#1C2541]/50'
+                : 'text-[#1C2541] hover:text-black hover:bg-white/30'
               }`}
           >
             <span>{tab.icon}</span>

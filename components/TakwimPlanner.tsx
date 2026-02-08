@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 
@@ -37,7 +38,7 @@ interface CalendarEvent {
   isSchoolHoliday?: boolean;
   color?: string; // custom bg color
   icon?: string;
-  islamicDate?: string;
+  islamicDate?: string; // Custom override if needed
 }
 
 interface MonthData {
@@ -50,6 +51,11 @@ interface MonthData {
   daysInMonth: number;
   catatan: React.ReactNode;
   events: CalendarEvent[];
+  // Data for Hijri calculation within the month
+  hijriDayStart: number; 
+  hijriMonth1: string;
+  hijriMonth2: string;
+  hijriTransitionDay: number; // Gregorian day where hijri month changes to 1
 }
 
 // --- REAL DATA FOR 2026 BASED ON PDF ---
@@ -58,10 +64,14 @@ const calendar2026Data: MonthData[] = [
     id: 0,
     name: 'JANUARI 2026',
     islamicMonth: "REJAB - SYA'BAN 1447",
-    headerColor1: 'bg-[#1a237e]', // Deep Blue
-    headerColor2: 'bg-[#2e7d32]', // Green
-    startDay: 4, // Thursday
+    headerColor1: 'bg-[#1a237e]',
+    headerColor2: 'bg-[#2e7d32]',
+    startDay: 4, 
     daysInMonth: 31,
+    hijriDayStart: 11,
+    hijriMonth1: "Rejab",
+    hijriMonth2: "Sya'ban",
+    hijriTransitionDay: 20,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
         <div className="border-b-2 border-dashed border-gray-400 pb-2">
@@ -84,23 +94,21 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-      { day: 1, label: 'Tahun Baru', islamicDate: '11 Rejab', isHoliday: true },
-      { day: 2, label: 'Cuti Sekolah', islamicDate: '12 Rejab', isSchoolHoliday: true },
-      { day: 3, label: 'Cuti Sekolah', islamicDate: '13 Rejab', isSchoolHoliday: true },
-      { day: 4, label: 'Cuti Sekolah', islamicDate: '14 Rejab', isSchoolHoliday: true },
-      { day: 5, label: 'Cuti Sekolah', islamicDate: '15 Rejab', isSchoolHoliday: true },
-      { day: 6, label: 'Cuti Sekolah', islamicDate: '16 Rejab', isSchoolHoliday: true },
-      { day: 7, label: 'Cuti Sekolah', islamicDate: '17 Rejab', isSchoolHoliday: true },
-      { day: 8, label: 'Cuti Sekolah', islamicDate: '18 Rejab', isSchoolHoliday: true },
-      { day: 9, label: 'Cuti Sekolah', islamicDate: '19 Rejab', isSchoolHoliday: true },
-      { day: 10, label: 'Cuti Sekolah', islamicDate: '20 Rejab', isSchoolHoliday: true },
-      { day: 11, label: 'Sesi Persekolahan 2026 Bermula', islamicDate: '21 Rejab', icon: '🎒' },
-      { day: 12, label: 'Sesi Persekolahan 2026 Bermula', islamicDate: '22 Rejab', icon: '🎒' },
-      { day: 14, label: 'Hari Keputeraan YDP Besar N.Sembilan', islamicDate: '24 Rejab', color: 'bg-yellow-400' },
-      { day: 17, label: 'Israk & Mikraj', islamicDate: '27 Rejab', color: 'bg-purple-600 text-white', icon: '🕌' },
-      { day: 22, label: 'Bayaran Gaji Penjawat Awam', islamicDate: '3 Sya\'ban', icon: '💵', color: 'bg-green-200' },
-      { day: 25, label: '', islamicDate: '6 Sya\'ban' },
-      { day: 31, label: '', islamicDate: '12 Sya\'ban' },
+      { day: 1, label: 'Tahun Baru', isHoliday: true },
+      { day: 2, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 3, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 4, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 5, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 6, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 7, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 8, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 9, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 10, label: 'Cuti Sekolah', isSchoolHoliday: true },
+      { day: 11, label: 'Sesi Persekolahan 2026 Bermula', icon: '🎒' },
+      { day: 12, label: 'Sesi Persekolahan 2026 Bermula', icon: '🎒' },
+      { day: 14, label: 'Hari Keputeraan YDP Besar N.Sembilan', color: 'bg-yellow-400' },
+      { day: 17, label: 'Israk & Mikraj', color: 'bg-purple-600 text-white', icon: '🕌' },
+      { day: 22, label: 'Bayaran Gaji Penjawat Awam', icon: '💵', color: 'bg-green-200' },
     ]
   },
   {
@@ -109,8 +117,12 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "SYAABAN - RAMADAN 1447",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 0, // Sunday
+    startDay: 0, 
     daysInMonth: 28,
+    hijriDayStart: 13,
+    hijriMonth1: "Sya'ban",
+    hijriMonth2: "Ramadan",
+    hijriTransitionDay: 19,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
          <div>
@@ -124,14 +136,14 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-        { day: 1, label: 'Thaipusam / Hari Wilayah', islamicDate: '13 Sya\'ban', isHoliday: true, icon: '🕯️' },
-        { day: 12, label: 'Bayaran Gaji Penjawat Awam', islamicDate: '24 Sya\'ban', icon: '💵', color: 'bg-green-200' },
-        { day: 15, label: 'Cuti Sekolah', islamicDate: '27 Sya\'ban', isSchoolHoliday: true },
-        { day: 16, label: 'Cuti Sekolah', islamicDate: '28 Sya\'ban', isSchoolHoliday: true },
-        { day: 17, label: 'Tahun Baru Cina', islamicDate: '29 Sya\'ban', isHoliday: true, color: 'bg-red-500 text-white', icon: '🏮' },
-        { day: 18, label: 'Tahun Baru Cina', islamicDate: '30 Sya\'ban', isHoliday: true, color: 'bg-red-500 text-white', icon: '🏮' },
-        { day: 19, label: '1 Ramadan', islamicDate: '1 Ramadan', color: 'bg-purple-500 text-white', icon: '🌙' },
-        { day: 20, label: 'Cuti Sekolah', islamicDate: '2 Ramadan', isSchoolHoliday: true },
+        { day: 1, label: 'Thaipusam / Hari Wilayah', isHoliday: true, icon: '🕯️' },
+        { day: 12, label: 'Bayaran Gaji Penjawat Awam', icon: '💵', color: 'bg-green-200' },
+        { day: 15, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 16, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 17, label: 'Tahun Baru Cina', isHoliday: true, color: 'bg-red-500 text-white', icon: '🏮' },
+        { day: 18, label: 'Tahun Baru Cina', isHoliday: true, color: 'bg-red-500 text-white', icon: '🏮' },
+        { day: 19, label: '1 Ramadan', color: 'bg-purple-500 text-white', icon: '🌙' },
+        { day: 20, label: 'Cuti Sekolah', isSchoolHoliday: true },
     ]
   },
   {
@@ -140,8 +152,12 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "RAMADAN - SYAWAL 1447",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 0, // Sunday
+    startDay: 0, 
     daysInMonth: 31,
+    hijriDayStart: 11,
+    hijriMonth1: "Ramadan",
+    hijriMonth2: "Syawal",
+    hijriTransitionDay: 21,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
         <div className="border-b-2 border-dashed border-gray-400 pb-2">
@@ -161,20 +177,20 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-       { day: 4, label: 'Ulang Tahun Pertabalan Sultan Terengganu', islamicDate: '14 Ramadan', isHoliday: true },
-       { day: 7, label: 'Nuzul Al-Quran', islamicDate: '17 Ramadan', isHoliday: true, icon: '📖' },
-       { day: 8, label: 'Selamat Hari Wanita', islamicDate: '18 Ramadan', color: 'bg-pink-200' },
-       { day: 19, label: 'Cuti Sekolah', islamicDate: '29 Ramadan', isSchoolHoliday: true },
-       { day: 20, label: 'Cuti Sekolah', islamicDate: '30 Ramadan', isSchoolHoliday: true },
-       { day: 21, label: 'Hari Raya Aidilfitri', islamicDate: '1 Syawal', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
-       { day: 22, label: 'Hari Raya Aidilfitri', islamicDate: '2 Syawal', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
-       { day: 23, label: 'Hari Keputeraan Sultan Johor', islamicDate: '3 Syawal', isHoliday: true, color: 'bg-blue-800 text-white' },
-       { day: 24, label: 'Cuti Sekolah', islamicDate: '4 Syawal', isSchoolHoliday: true },
-       { day: 25, label: 'Cuti Sekolah', islamicDate: '5 Syawal', isSchoolHoliday: true },
-       { day: 26, label: 'Cuti Sekolah', islamicDate: '6 Syawal', isSchoolHoliday: true },
-       { day: 27, label: 'Cuti Sekolah', islamicDate: '7 Syawal', isSchoolHoliday: true },
-       { day: 28, label: 'Cuti Sekolah', islamicDate: '8 Syawal', isSchoolHoliday: true },
-       { day: 29, label: 'Cuti Sekolah', islamicDate: '9 Syawal', isSchoolHoliday: true },
+       { day: 4, label: 'Ulang Tahun Pertabalan Sultan Terengganu', isHoliday: true },
+       { day: 7, label: 'Nuzul Al-Quran', isHoliday: true, icon: '📖' },
+       { day: 8, label: 'Selamat Hari Wanita', color: 'bg-pink-200' },
+       { day: 19, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 20, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 21, label: 'Hari Raya Aidilfitri', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
+       { day: 22, label: 'Hari Raya Aidilfitri', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
+       { day: 23, label: 'Hari Keputeraan Sultan Johor', isHoliday: true, color: 'bg-blue-800 text-white' },
+       { day: 24, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 25, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 26, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 27, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 28, label: 'Cuti Sekolah', isSchoolHoliday: true },
+       { day: 29, label: 'Cuti Sekolah', isSchoolHoliday: true },
     ]
   },
   {
@@ -183,15 +199,19 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "SYAWAL - ZULKAEDAH 1447",
     headerColor1: 'bg-red-600',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 3, // Wednesday
+    startDay: 3, 
     daysInMonth: 30,
+    hijriDayStart: 13,
+    hijriMonth1: "Syawal",
+    hijriMonth2: "Zulkaedah",
+    hijriTransitionDay: 19,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
          <p>Tiada cuti sekolah panjang pada bulan ini.</p>
       </div>
     ),
     events: [
-       { day: 26, label: 'Hari Keputeraan Sultan Terengganu', islamicDate: '8 Zulkaedah', isHoliday: true },
+       { day: 26, label: 'Hari Keputeraan Sultan Terengganu', isHoliday: true },
     ]
   },
   {
@@ -200,11 +220,15 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "ZULKAEDAH - ZULHIJJAH 1447",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 5, // Friday
+    startDay: 5, 
     daysInMonth: 31,
+    hijriDayStart: 13,
+    hijriMonth1: "Zulkaedah",
+    hijriMonth2: "Zulhijjah",
+    hijriTransitionDay: 19,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
-         <div className="border-b-2 border-dashed border-gray-400 pb-2">
+        <div className="border-b-2 border-dashed border-gray-400 pb-2">
           <h4 className="font-bold text-[#1a237e]">CUTI PERTENGAHAN TAHUN<br/>Sesi Persekolahan 2026</h4>
           <div className="mt-2 text-xs">
              <p className="font-bold">Kump. A: 22.05 - 06.06</p>
@@ -215,19 +239,19 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-        { day: 1, label: 'Hari Pekerja', islamicDate: '14 Zulkaedah', isHoliday: true },
-        { day: 4, label: 'Hari Wesak', islamicDate: '17 Zulkaedah', isHoliday: true, icon: '🪷' },
-        { day: 17, label: 'Hari Keputeraan Raja Perlis', islamicDate: '1 Zulhijjah', isHoliday: true },
-        { day: 22, label: 'Hari Hol Pahang / Cuti Sekolah', islamicDate: '6 Zulhijjah', isSchoolHoliday: true },
-        { day: 23, label: 'Cuti Sekolah', islamicDate: '7 Zulhijjah', isSchoolHoliday: true },
-        { day: 24, label: 'Cuti Sekolah', islamicDate: '8 Zulhijjah', isSchoolHoliday: true },
-        { day: 25, label: 'Cuti Sekolah', islamicDate: '9 Zulhijjah', isSchoolHoliday: true },
-        { day: 26, label: 'Cuti Sekolah / Hari Arafah', islamicDate: '10 Zulhijjah', isSchoolHoliday: true },
-        { day: 27, label: 'Hari Raya Aidiladha', islamicDate: '11 Zulhijjah', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
-        { day: 28, label: 'Cuti Sekolah', islamicDate: '12 Zulhijjah', isSchoolHoliday: true },
-        { day: 29, label: 'Cuti Sekolah', islamicDate: '13 Zulhijjah', isSchoolHoliday: true },
-        { day: 30, label: 'Pesta Kaamatan', islamicDate: '14 Zulhijjah', isHoliday: true },
-        { day: 31, label: 'Pesta Kaamatan', islamicDate: '15 Zulhijjah', isHoliday: true },
+        { day: 1, label: 'Hari Pekerja', isHoliday: true },
+        { day: 4, label: 'Hari Wesak', isHoliday: true, icon: '🪷' },
+        { day: 17, label: 'Hari Keputeraan Raja Perlis', isHoliday: true },
+        { day: 22, label: 'Hari Hol Pahang / Cuti Sekolah', isSchoolHoliday: true },
+        { day: 23, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 24, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 25, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 26, label: 'Cuti Sekolah / Hari Arafah', isSchoolHoliday: true },
+        { day: 27, label: 'Hari Raya Aidiladha', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
+        { day: 28, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 29, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 30, label: 'Pesta Kaamatan', isHoliday: true },
+        { day: 31, label: 'Pesta Kaamatan', isHoliday: true },
     ]
   },
   {
@@ -236,23 +260,27 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "ZULHIJJAH 1447 - MUHARAM 1448",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 1, // Monday
+    startDay: 1, 
     daysInMonth: 30,
+    hijriDayStart: 15,
+    hijriMonth1: "Zulhijjah",
+    hijriMonth2: "Muharram",
+    hijriTransitionDay: 17,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
          <p>Sambungan Cuti Pertengahan Tahun sehingga 6/7 Jun.</p>
       </div>
     ),
     events: [
-        { day: 1, label: 'Hari Gawai / Keputeraan YDP Agong', islamicDate: '15 Zulhijjah', isHoliday: true },
-        { day: 2, label: 'Hari Gawai', islamicDate: '16 Zulhijjah', isHoliday: true },
-        { day: 3, label: 'Cuti Sekolah', islamicDate: '17 Zulhijjah', isSchoolHoliday: true },
-        { day: 4, label: 'Cuti Sekolah', islamicDate: '18 Zulhijjah', isSchoolHoliday: true },
-        { day: 5, label: 'Cuti Sekolah', islamicDate: '19 Zulhijjah', isSchoolHoliday: true },
-        { day: 6, label: 'Cuti Sekolah', islamicDate: '20 Zulhijjah', isSchoolHoliday: true },
-        { day: 7, label: 'Cuti Sekolah', islamicDate: '21 Zulhijjah', isSchoolHoliday: true },
-        { day: 17, label: 'Awal Muharram', islamicDate: '1 Muharam', isHoliday: true, color: 'bg-purple-600 text-white', icon: '🕌' },
-        { day: 21, label: 'Hari Keputeraan Sultan Kedah', islamicDate: '5 Muharam', isHoliday: true },
+        { day: 1, label: 'Hari Gawai / Keputeraan YDP Agong', isHoliday: true },
+        { day: 2, label: 'Hari Gawai', isHoliday: true },
+        { day: 3, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 4, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 5, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 6, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 7, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 17, label: 'Awal Muharram', isHoliday: true, color: 'bg-purple-600 text-white', icon: '🕌' },
+        { day: 21, label: 'Hari Keputeraan Sultan Kedah', isHoliday: true },
     ]
   },
   {
@@ -261,18 +289,22 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "MUHARAM - SAFAR 1448",
     headerColor1: 'bg-red-600',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 3, // Wednesday
+    startDay: 3, 
     daysInMonth: 31,
+    hijriDayStart: 15,
+    hijriMonth1: "Muharram",
+    hijriMonth2: "Safar",
+    hijriTransitionDay: 17,
     catatan: (
        <div className="space-y-4 text-sm text-gray-800">
          <p>Tiada cuti sekolah panjang.</p>
       </div>
     ),
     events: [
-        { day: 7, label: 'Hari Warisan Dunia Georgetown', islamicDate: '21 Muharam', color: 'bg-yellow-200' },
-        { day: 11, label: 'Hari Kelahiran TYT P.Pinang', islamicDate: '25 Muharam', isHoliday: true },
-        { day: 21, label: 'Hari Hol Johor', islamicDate: '6 Safar', isHoliday: true },
-        { day: 30, label: 'Hari Keputeraan Sultan Pahang', islamicDate: '15 Safar', isHoliday: true },
+        { day: 7, label: 'Hari Warisan Dunia Georgetown', color: 'bg-yellow-200' },
+        { day: 11, label: 'Hari Kelahiran TYT P.Pinang', isHoliday: true },
+        { day: 21, label: 'Hari Hol Johor', isHoliday: true },
+        { day: 30, label: 'Hari Keputeraan Sultan Pahang', isHoliday: true },
     ]
   },
   {
@@ -281,8 +313,12 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "SAFAR - RABIULAWAL 1448",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 6, // Saturday
+    startDay: 6, 
     daysInMonth: 31,
+    hijriDayStart: 16,
+    hijriMonth1: "Safar",
+    hijriMonth2: "Rabiulawal",
+    hijriTransitionDay: 16,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
         <div className="border-b-2 border-dashed border-gray-400 pb-2">
@@ -296,12 +332,12 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-        { day: 24, label: 'Hari Kelahiran TYT Melaka', islamicDate: '11 Rabiulawal', isHoliday: true },
-        { day: 25, label: 'Maulidur Rasul', islamicDate: '12 Rabiulawal', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
-        { day: 28, label: 'Cuti Sekolah', islamicDate: '15 Rabiulawal', isSchoolHoliday: true },
-        { day: 29, label: 'Cuti Sekolah', islamicDate: '16 Rabiulawal', isSchoolHoliday: true },
-        { day: 30, label: 'Cuti Sekolah', islamicDate: '17 Rabiulawal', isSchoolHoliday: true },
-        { day: 31, label: 'Hari Kebangsaan / Cuti Sekolah', islamicDate: '18 Rabiulawal', isHoliday: true, icon: '🇲🇾', color: 'bg-blue-800 text-white' },
+        { day: 24, label: 'Hari Kelahiran TYT Melaka', isHoliday: true },
+        { day: 25, label: 'Maulidur Rasul', isHoliday: true, color: 'bg-green-600 text-white', icon: '🕌' },
+        { day: 28, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 29, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 30, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 31, label: 'Hari Kebangsaan / Cuti Sekolah', isHoliday: true, icon: '🇲🇾', color: 'bg-blue-800 text-white' },
     ]
   },
   {
@@ -310,23 +346,27 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "RABIULAWAL - RABIULAKHIR 1448",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 2, // Tuesday
+    startDay: 2, 
     daysInMonth: 30,
+    hijriDayStart: 18,
+    hijriMonth1: "Rabiulawal",
+    hijriMonth2: "Rabiulakhir",
+    hijriTransitionDay: 14,
     catatan: (
        <div className="space-y-4 text-sm text-gray-800">
          <p>Sambungan Cuti Penggal 2 sehingga 5/6 Sep.</p>
       </div>
     ),
     events: [
-        { day: 1, label: 'Cuti Sekolah', islamicDate: '19 Rabiulawal', isSchoolHoliday: true },
-        { day: 2, label: 'Cuti Sekolah', islamicDate: '20 Rabiulawal', isSchoolHoliday: true },
-        { day: 3, label: 'Cuti Sekolah', islamicDate: '21 Rabiulawal', isSchoolHoliday: true },
-        { day: 4, label: 'Cuti Sekolah', islamicDate: '22 Rabiulawal', isSchoolHoliday: true },
-        { day: 5, label: 'Cuti Sekolah', islamicDate: '23 Rabiulawal', isSchoolHoliday: true },
-        { day: 6, label: 'Cuti Sekolah', islamicDate: '24 Rabiulawal', isSchoolHoliday: true },
-        { day: 16, label: 'Hari Malaysia', islamicDate: '4 Rabiulakhir', isHoliday: true, icon: '🇲🇾' },
-        { day: 29, label: 'Hari Keputeraan Sultan Kelantan', islamicDate: '17 Rabiulakhir', isHoliday: true },
-        { day: 30, label: 'Hari Keputeraan Sultan Kelantan', islamicDate: '18 Rabiulakhir', isHoliday: true },
+        { day: 1, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 2, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 3, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 4, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 5, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 6, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 16, label: 'Hari Malaysia', isHoliday: true, icon: '🇲🇾' },
+        { day: 29, label: 'Hari Keputeraan Sultan Kelantan', isHoliday: true },
+        { day: 30, label: 'Hari Keputeraan Sultan Kelantan', isHoliday: true },
     ]
   },
   {
@@ -335,15 +375,19 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "RABIULAKHIR - JAMADILAWAL 1448",
     headerColor1: 'bg-red-600',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 4, // Thursday
+    startDay: 4, 
     daysInMonth: 31,
+    hijriDayStart: 18,
+    hijriMonth1: "Rabiulakhir",
+    hijriMonth2: "Jamadilawal",
+    hijriTransitionDay: 13,
     catatan: (
        <div className="space-y-4 text-sm text-gray-800">
          <p>Tiada cuti sekolah panjang.</p>
       </div>
     ),
     events: [
-        { day: 10, label: 'Hari Kelahiran TYT Sarawak', islamicDate: '28 Rabiulakhir', isHoliday: true },
+        { day: 10, label: 'Hari Kelahiran TYT Sarawak', isHoliday: true },
     ]
   },
   {
@@ -352,8 +396,12 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "JAMADILAWAL - JAMADILAKHIR 1448",
     headerColor1: 'bg-red-600',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 0, // Sunday
+    startDay: 0, 
     daysInMonth: 30,
+    hijriDayStart: 20,
+    hijriMonth1: "Jamadilawal",
+    hijriMonth2: "Jamadilakhir",
+    hijriTransitionDay: 12,
     catatan: (
       <div className="space-y-4 text-sm text-gray-800">
          <div>
@@ -366,10 +414,10 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-        { day: 6, label: 'Hari Keputeraan Sultan Perak', islamicDate: '26 Jamadilawal', isHoliday: true },
-        { day: 8, label: 'Deepavali', islamicDate: '28 Jamadilawal', isHoliday: true, icon: '🪔', color: 'bg-purple-800 text-white' },
-        { day: 9, label: 'Cuti Deepavali', islamicDate: '29 Jamadilawal', isHoliday: true, color: 'bg-purple-800 text-white' },
-        { day: 10, label: 'Cuti Deepavali', islamicDate: '30 Jamadilawal', isHoliday: true, color: 'bg-purple-800 text-white' },
+        { day: 6, label: 'Hari Keputeraan Sultan Perak', isHoliday: true },
+        { day: 8, label: 'Deepavali', isHoliday: true, icon: '🪔', color: 'bg-purple-800 text-white' },
+        { day: 9, label: 'Cuti Deepavali', isHoliday: true, color: 'bg-purple-800 text-white' },
+        { day: 10, label: 'Cuti Deepavali', isHoliday: true, color: 'bg-purple-800 text-white' },
     ]
   },
   {
@@ -378,8 +426,12 @@ const calendar2026Data: MonthData[] = [
     islamicMonth: "JAMADILAKHIR - REJAB 1448",
     headerColor1: 'bg-[#1a237e]',
     headerColor2: 'bg-[#2e7d32]',
-    startDay: 2, // Tuesday
+    startDay: 2, 
     daysInMonth: 31,
+    hijriDayStart: 20,
+    hijriMonth1: "Jamadilakhir",
+    hijriMonth2: "Rejab",
+    hijriTransitionDay: 11,
     catatan: (
        <div className="space-y-4 text-sm text-gray-800">
         <div className="border-b-2 border-dashed border-gray-400 pb-2">
@@ -393,18 +445,17 @@ const calendar2026Data: MonthData[] = [
       </div>
     ),
     events: [
-        { day: 4, label: 'Cuti Sekolah', islamicDate: '24 Jamadilakhir', isSchoolHoliday: true },
-        { day: 5, label: 'Cuti Sekolah', islamicDate: '25 Jamadilakhir', isSchoolHoliday: true },
-        { day: 6, label: 'Cuti Sekolah', islamicDate: '26 Jamadilakhir', isSchoolHoliday: true },
-        { day: 11, label: 'Hari Keputeraan Sultan Selangor', islamicDate: '1 Rejab', isHoliday: true },
-        { day: 25, label: 'Hari Krismas', islamicDate: '15 Rejab', isHoliday: true, icon: '🎄', color: 'bg-red-600 text-white' },
-        // Fill the rest with Cuti Sekolah loops visually if needed, but for simplicity we rely on the side note
-        { day: 26, label: 'Cuti Sekolah', islamicDate: '16 Rejab', isSchoolHoliday: true },
-        { day: 27, label: 'Cuti Sekolah', islamicDate: '17 Rejab', isSchoolHoliday: true },
-        { day: 28, label: 'Cuti Sekolah', islamicDate: '18 Rejab', isSchoolHoliday: true },
-        { day: 29, label: 'Cuti Sekolah', islamicDate: '19 Rejab', isSchoolHoliday: true },
-        { day: 30, label: 'Cuti Sekolah', islamicDate: '20 Rejab', isSchoolHoliday: true },
-        { day: 31, label: 'Cuti Sekolah', islamicDate: '21 Rejab', isSchoolHoliday: true },
+        { day: 4, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 5, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 6, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 11, label: 'Hari Keputeraan Sultan Selangor', isHoliday: true },
+        { day: 25, label: 'Hari Krismas', isHoliday: true, icon: '🎄', color: 'bg-red-600 text-white' },
+        { day: 26, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 27, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 28, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 29, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 30, label: 'Cuti Sekolah', isSchoolHoliday: true },
+        { day: 31, label: 'Cuti Sekolah', isSchoolHoliday: true },
     ]
   },
 ];
@@ -538,7 +589,7 @@ const johorHolidays = [
   { date: '23 Mac', day: 'Isnin', name: 'Cuti Hari Raya Aidilfitri' },
   { date: '1 Mei', day: 'Jumaat', name: 'Hari Pekerja' },
   { date: '27 Mei', day: 'Rabu', name: 'Hari Raya Haji' },
-  { date: '31 Mei', day: 'Ahad', name: 'Hari Wesak' },
+  { day: 'Ahad', date: '31 Mei', name: 'Hari Wesak' },
   { date: '1 Jun', day: 'Isnin', name: 'Hari Keputeraan YDP Agong' },
   { date: '1 Jun', day: 'Isnin', name: 'Cuti Hari Wesak' },
   { date: '17 Jun', day: 'Rabu', name: 'Awal Muharram' },
@@ -584,13 +635,25 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
       showToast("Data berjaya dikemaskini.");
   };
 
-  // --- KALENDAR INTERAKTIF 2026 (PDF REPLICA) ---
+  // Helper for Hijri Date Label
+  const getHijriLabel = (month: MonthData, day: number) => {
+      let hijriDay = 0;
+      let hijriMonthName = "";
+      if (day < month.hijriTransitionDay) {
+          hijriDay = month.hijriDayStart + (day - 1);
+          hijriMonthName = month.hijriMonth1;
+      } else {
+          hijriDay = (day - month.hijriTransitionDay) + 1;
+          hijriMonthName = month.hijriMonth2;
+      }
+      return `${hijriDay} ${hijriMonthName}`;
+  };
+
+  // --- KALENDAR INTERAKTIF 2026 ---
   const renderCalendarView = () => {
     const month = calendar2026Data[currentMonthIndex];
     const prevMonth = () => setCurrentMonthIndex(prev => prev > 0 ? prev - 1 : 11);
     const nextMonth = () => setCurrentMonthIndex(prev => prev < 11 ? prev + 1 : 0);
-
-    // Days Columns Configuration (Matches PDF Colors)
     const dayHeaders = [
        { short: 'SUN', long: 'AHAD', bg: 'bg-[#fff59d]', text: 'text-red-600', border: 'border-gray-400' },
        { short: 'MON', long: 'ISNIN', bg: 'bg-[#c5e1a5]', text: 'text-[#1a237e]', border: 'border-gray-400' },
@@ -600,102 +663,61 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
        { short: 'FRI', long: 'JUMAAT', bg: 'bg-[#ffe082]', text: 'text-[#1a237e]', border: 'border-gray-400' },
        { short: 'SAT', long: 'SABTU', bg: 'bg-[#9fa8da]', text: 'text-[#1a237e]', border: 'border-gray-400' },
     ];
-
-    // Generate Days Grid
     const blanks = Array.from({ length: month.startDay }, (_, i) => i);
     const days = Array.from({ length: month.daysInMonth }, (_, i) => i + 1);
-
     return (
        <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-300 fade-in text-[#1a237e] max-w-7xl mx-auto">
-          {/* NAVIGATION */}
           <div className="bg-[#0B132B] p-2 flex justify-between items-center text-white">
-             <button onClick={prevMonth} className="px-4 py-2 hover:bg-[#3A506B] rounded">❮ Bulan Lepas</button>
-             <span className="font-bold tracking-widest">KALENDAR 2026</span>
-             <button onClick={nextMonth} className="px-4 py-2 hover:bg-[#3A506B] rounded">Bulan Depan ❯</button>
+             <button onClick={prevMonth} className="px-2 md:px-4 py-2 hover:bg-[#3A506B] rounded text-xs md:text-sm">❮ Lepas</button>
+             <span className="font-bold tracking-widest text-xs md:text-base">KALENDAR 2026</span>
+             <button onClick={nextMonth} className="px-2 md:px-4 py-2 hover:bg-[#3A506B] rounded text-xs md:text-sm">Depan ❯</button>
           </div>
-
           <div className="flex flex-col lg:flex-row">
-              {/* LEFT SIDEBAR - CATATAN */}
-              <div className="w-full lg:w-1/4 p-6 border-r border-gray-300 bg-white relative">
+              <div className="w-full lg:w-1/4 p-4 md:p-6 border-r border-gray-300 bg-white relative">
                   <div className="border-2 border-black rounded-xl p-4 h-full relative">
-                      <h3 className="text-xl font-bold text-black font-serif text-center mb-6 uppercase tracking-widest border-b-2 border-black pb-2 mx-auto w-3/4">
-                          CATATAN
-                      </h3>
-                      {month.catatan}
-                      
-                      {/* Rujukan Footer in Sidebar */}
-                      <div className="absolute bottom-4 left-4 right-4 text-[10px] text-gray-500 leading-tight">
+                      <h3 className="text-lg md:text-xl font-bold text-black font-serif text-center mb-4 md:mb-6 uppercase tracking-widest border-b-2 border-black pb-2 mx-auto w-3/4">CATATAN</h3>
+                      <div className="text-xs md:text-sm">{month.catatan}</div>
+                      <div className="mt-8 text-[9px] md:text-[10px] text-gray-500 leading-tight">
                          <p className="font-bold mb-1">Rujukan:</p>
                          <ul className="list-disc list-outside ml-3 space-y-1">
-                            <li>Surat Siaran KPM Bil. 3: Kalendar Akademik Tahun 2026 Bagi Sekolah Kerajaan Dan Sekolah Bantuan Kerajaan KPM</li>
-                            <li>Surat Pekeliling Akauntan Negara Malaysia (SPANM) Bil. 5 Tahun 2025</li>
+                            <li>Surat Siaran KPM Bil. 3: Kalendar Akademik 2026</li>
+                            <li>SPANM Bil. 5 Tahun 2025</li>
                          </ul>
                       </div>
                   </div>
               </div>
-
-              {/* RIGHT SIDE - CALENDAR GRID */}
               <div className="w-full lg:w-3/4 flex flex-col">
-                  {/* HEADER */}
-                  <div className="flex text-white text-center h-24">
-                      <div className={`${month.headerColor1} w-1/4 flex items-center justify-center text-6xl font-serif font-bold`}>
-                         {currentMonthIndex + 1}
-                      </div>
-                      <div className={`${month.headerColor1} w-1/2 flex items-center justify-center text-4xl font-serif font-bold uppercase tracking-widest`}>
-                         {month.name.split(' ')[0]} <span className="text-3xl ml-2">{month.name.split(' ')[1]}</span>
-                      </div>
-                      <div className={`${month.headerColor2} w-1/4 flex flex-col items-center justify-center font-bold px-2`}>
-                         <span className="text-lg leading-tight uppercase">{month.islamicMonth.split(' 1')[0]}</span>
-                         <span className="text-2xl">{month.islamicMonth.split(' ').pop()}</span>
+                  <div className="flex text-white text-center h-16 md:h-24">
+                      <div className={`${month.headerColor1} w-1/4 flex items-center justify-center text-3xl md:text-6xl font-serif font-bold`}>{currentMonthIndex + 1}</div>
+                      <div className={`${month.headerColor1} w-1/2 flex items-center justify-center text-xl md:text-4xl font-serif font-bold uppercase tracking-widest`}>{month.name.split(' ')[0]} <span className="text-sm md:text-3xl ml-1 md:ml-2">{month.name.split(' ')[1]}</span></div>
+                      <div className={`${month.headerColor2} w-1/4 flex flex-col items-center justify-center font-bold px-1 md:px-2`}>
+                         <span className="text-[10px] md:text-lg leading-tight uppercase">{month.islamicMonth.split(' 1')[0]}</span>
+                         <span className="text-sm md:text-2xl">{month.islamicMonth.split(' ').pop()}</span>
                       </div>
                   </div>
-
-                  {/* GRID */}
-                  <div className="flex-1 p-4">
-                      <div className="grid grid-cols-7 gap-3 h-full">
-                          {/* HEADERS */}
+                  <div className="flex-1 p-2 md:p-4 overflow-x-auto">
+                      <div className="grid grid-cols-7 gap-1 md:gap-3 min-w-[320px]">
                           {dayHeaders.map((h, i) => (
-                             <div key={i} className={`${h.bg} ${h.border} border-2 rounded-2xl p-2 flex flex-col items-center justify-center h-20 shadow-sm`}>
-                                 <span className={`text-3xl font-bold font-serif ${h.text}`}>{h.short}</span>
-                                 <span className={`text-[10px] font-bold tracking-widest ${h.text}`}>{h.long}</span>
+                             <div key={i} className={`${h.bg} ${h.border} border-2 rounded-lg md:rounded-2xl p-1 md:p-2 flex flex-col items-center justify-center h-14 md:h-20 shadow-sm`}>
+                                 <span className={`text-lg md:text-3xl font-bold font-serif ${h.text}`}>{h.short}</span>
+                                 <span className={`text-[8px] md:text-[10px] font-bold tracking-widest ${h.text}`}>{h.long}</span>
                              </div>
                           ))}
-
-                          {/* BLANKS */}
                           {blanks.map(b => (
-                             <div key={`blank-${b}`} className="min-h-[100px]"></div>
+                             <div key={`blank-${b}`} className="min-h-[60px] md:min-h-[100px]"></div>
                           ))}
-
-                          {/* DAYS */}
                           {days.map(d => {
                              const event = month.events.find(e => e.day === d);
                              return (
-                                <div key={d} className="relative border-2 border-gray-400 rounded-2xl min-h-[100px] bg-white flex flex-col overflow-hidden hover:shadow-md transition-shadow">
-                                    {/* Islamic Date */}
-                                    {event?.islamicDate && (
-                                       <div className="absolute top-1 right-2 text-[10px] font-bold text-gray-600">
-                                          {event.islamicDate}
-                                       </div>
-                                    )}
-
-                                    {/* Gregorian Date */}
-                                    <div className={`text-5xl font-serif font-bold p-2 z-10 ${event?.isHoliday ? 'text-red-600' : 'text-[#1a237e]'}`}>
-                                        {d}
-                                    </div>
-
-                                    {/* Content/Event */}
-                                    <div className="flex-1 flex flex-col justify-end items-center pb-1">
-                                       {event?.isSchoolHoliday && (
-                                           <div className="w-full bg-yellow-300 text-[10px] font-bold text-center py-0.5 uppercase text-black mx-1 rounded">
-                                               Cuti Sekolah
-                                           </div>
-                                       )}
+                                <div key={d} className="relative border border-gray-300 md:border-2 md:border-gray-400 rounded-lg md:rounded-2xl min-h-[60px] md:min-h-[100px] bg-white flex flex-col overflow-hidden hover:shadow-md transition-shadow">
+                                    <div className="absolute top-0.5 right-1 text-[7px] md:text-[10px] font-bold text-gray-600 whitespace-nowrap">{getHijriLabel(month, d)}</div>
+                                    <div className={`text-2xl md:text-5xl font-serif font-bold p-1 md:p-2 z-10 ${event?.isHoliday ? 'text-red-600' : 'text-[#1a237e]'}`}>{d}</div>
+                                    <div className="flex-1 flex flex-col justify-end items-center pb-0.5">
+                                       {event?.isSchoolHoliday && <div className="w-full bg-yellow-300 text-[6px] md:text-[10px] font-bold text-center py-0.5 uppercase text-black mx-1 rounded">Cuti</div>}
                                        {event?.label && !event.isSchoolHoliday && (
-                                           <div className={`w-full text-[9px] font-bold text-center leading-tight px-1 py-1 mx-1 rounded flex flex-col items-center justify-center h-full
-                                             ${event.color ? event.color : 'text-black'}
-                                           `}>
-                                               {event.icon && <span className="text-lg mb-1">{event.icon}</span>}
-                                               {event.label}
+                                           <div className={`w-full text-[6px] md:text-[9px] font-bold text-center leading-tight px-0.5 py-0.5 md:py-1 mx-1 rounded flex flex-col items-center justify-center h-full ${event.color ? event.color : 'text-black'}`}>
+                                               {event.icon && <span className="text-xs md:text-lg mb-0.5">{event.icon}</span>}
+                                               <span className="line-clamp-2">{event.label}</span>
                                            </div>
                                        )}
                                     </div>
@@ -886,121 +908,71 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
         </div>
      );
   };
-
-  // --- SCHOOL WEEKS VIEW (Jadual Mingguan 2026) ---
-  const SchoolWeeksView = () => {
-    return (
-        <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
-            <div className="overflow-x-auto">
-                <table className="w-full text-center border-collapse border border-gray-600 min-w-[800px]">
-                    <thead>
-                        <tr className="bg-[#C9B458] text-[#0B132B] font-extrabold text-base uppercase">
-                            <th className="border border-gray-600 px-4 py-3">MINGGU</th>
-                            <th className="border border-gray-600 px-4 py-3">TARIKH</th>
-                            <th className="border border-gray-600 px-4 py-3">PERKARA (cuti jika ada)</th>
-                            <th className="border border-gray-600 px-4 py-3">JUM.<br/>HARI</th>
-                            <th className="border border-gray-600 px-4 py-3">JUM.<br/>MINGGU</th>
-                            {isAdmin && <th className="border border-gray-600 px-4 py-3">EDIT</th>}
+  // --- SCHOOL WEEKS VIEW ---
+  const SchoolWeeksView = () => (
+    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
+        <div className="overflow-x-auto">
+            <table className="w-full text-center border-collapse border border-gray-600 min-w-[800px] text-xs md:text-sm">
+                <thead>
+                    <tr className="bg-[#C9B458] text-[#0B132B] font-bold uppercase"><th className="border border-gray-600 px-2 py-3">MNGU</th><th className="border border-gray-600 px-2 py-3">TARIKH</th><th className="border border-gray-600 px-2 py-3">CATATAN</th><th className="border border-gray-600 px-2 py-3">HARI</th><th className="border border-gray-600 px-2 py-3">MNGU</th>{isAdmin && <th className="border border-gray-600 px-2 py-3">EDIT</th>}</tr>
+                </thead>
+                <tbody>
+                    {schoolWeeks.map((item) => (
+                        <tr key={item.id} className={`${item.isHoliday ? 'bg-[#C9B458] text-[#0B132B] font-bold' : 'hover:bg-[#253252] text-gray-300'}`}>
+                            <td className="border border-gray-600 py-2">{item.week}</td><td className="border border-gray-600 py-2 px-2 whitespace-nowrap">{item.date}</td><td className="border border-gray-600 py-2 px-2 text-left">{item.notes}</td>
+                            {item.totalDays && <td rowSpan={item.rowSpan || 1} className={`border border-gray-600 py-2 font-semibold ${item.isHoliday ? 'bg-[#C9B458]' : 'bg-[#1C2541] text-white'}`}>{item.totalDays}</td>}
+                            {item.totalWeeks && <td rowSpan={item.rowSpan || 1} className={`border border-gray-600 py-2 font-semibold ${item.isHoliday ? 'bg-[#C9B458]' : 'bg-[#1C2541] text-white'}`}>{item.totalWeeks}</td>}
+                            {isAdmin && <td className="border border-gray-600 py-2 px-2"><button onClick={() => handleOpenEdit('school', item)} className="text-blue-400 hover:text-white">✏️</button></td>}
                         </tr>
-                    </thead>
-                    <tbody className="text-sm">
-                        {schoolWeeks.map((item) => (
-                            <tr key={item.id} className={`${item.isHoliday ? 'bg-[#C9B458] text-[#0B132B] font-bold' : 'hover:bg-[#253252] text-gray-300'}`}>
-                                <td className={`border border-gray-600 py-2 ${!item.week && !item.isHoliday ? 'bg-transparent' : ''}`}>
-                                    {item.week}
-                                </td>
-                                <td className="border border-gray-600 py-2 px-2 whitespace-nowrap">{item.date}</td>
-                                <td className={`border border-gray-600 py-2 px-2 whitespace-pre-line ${item.isHoliday ? 'uppercase' : ''}`}>
-                                    {item.notes}
-                                </td>
-                                {item.totalDays && (
-                                    <td rowSpan={item.rowSpan || 1} className={`border border-gray-600 py-2 align-middle font-semibold ${item.isHoliday ? 'bg-[#C9B458] text-[#0B132B]' : 'bg-[#1C2541] text-white'}`}>
-                                        {item.totalDays}
-                                    </td>
-                                )}
-                                {item.totalWeeks && (
-                                    <td rowSpan={item.rowSpan || 1} className={`border border-gray-600 py-2 align-middle font-semibold ${item.isHoliday ? 'bg-[#C9B458] text-[#0B132B]' : 'bg-[#1C2541] text-white'}`}>
-                                        {item.totalWeeks}
-                                    </td>
-                                )}
-                                {isAdmin && (
-                                    <td className="border border-gray-600 py-2 px-2">
-                                        <button onClick={() => handleOpenEdit('school', item)} className="text-blue-400 hover:text-white text-xs">✏️</button>
-                                    </td>
-                                )}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                    ))}
+                </tbody>
+            </table>
         </div>
-    );
-  };
+    </div>
+  );
 
   // --- TAKWIM PEPERIKSAAN VIEW ---
-  const TakwimPeperiksaanView = () => {
-    return (
-        <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col">
-            <div className="p-6 bg-[#0B132B] border-b border-gray-700 flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white font-montserrat uppercase flex items-center gap-2">
-                    <span className="text-[#C9B458]">📅</span> TAKWIM PEPERIKSAAN 2026
-                </h3>
-            </div>
-            
-            <div className="overflow-x-auto">
-                <table className="w-full text-center border-collapse border border-gray-600 min-w-[900px]">
-                    <thead>
-                        <tr className="bg-[#C9B458] text-[#0B132B] text-base uppercase font-extrabold">
-                            <th className="border border-gray-600 px-2 py-3 w-16">M</th>
-                            <th className="border border-gray-600 px-4 py-3 w-40">TARIKH</th>
-                            <th className="border border-gray-600 px-4 py-3 w-1/4">PEPERIKSAAN DALAMAN</th>
-                            <th className="border border-gray-600 px-4 py-3 w-1/4">PEPERIKSAAN JAJ</th>
-                            <th className="border border-gray-600 px-4 py-3 w-1/4">PEPERIKSAAN AWAM</th>
-                            {isAdmin && <th className="border border-gray-600 px-2 py-3 w-16">EDIT</th>}
-                        </tr>
-                    </thead>
-                    <tbody className="text-sm">
-                        {examWeeks.map((item) => {
-                             if (item.isHoliday) {
-                                 return (
-                                     <tr key={item.id} className="bg-[#C9B458] text-[#0B132B] font-bold uppercase border-b border-gray-600">
-                                         <td colSpan={2} className="border border-gray-600 py-3 px-2 text-center">{item.date}</td>
-                                         <td colSpan={3} className="border border-gray-600 py-3 px-2 text-center tracking-wide">{item.dalaman}</td>
-                                         {isAdmin && (
-                                             <td className="border border-gray-600 py-2 px-2 bg-[#0B132B]">
-                                                 <button onClick={() => handleOpenEdit('exam', item)} className="text-[#C9B458] hover:text-white font-bold">✏️</button>
-                                             </td>
-                                         )}
-                                     </tr>
-                                 );
-                             }
-                             return (
-                                <tr key={item.id} className="hover:bg-[#253252] text-gray-300 transition-colors group">
-                                    <td className="border border-gray-600 py-3 font-mono text-[#C9B458] font-bold">{item.week}</td>
-                                    <td className="border border-gray-600 py-3 px-2 whitespace-nowrap text-white">{item.date}</td>
-                                    <td className="border border-gray-600 py-3 px-2 whitespace-pre-line text-left align-top">{item.dalaman}</td>
-                                    <td className="border border-gray-600 py-3 px-2 whitespace-pre-line text-left align-top">{item.jaj}</td>
-                                    <td className="border border-gray-600 py-3 px-2 whitespace-pre-line text-left align-top">{item.awam}</td>
-                                    {isAdmin && (
-                                        <td className="border border-gray-600 py-2 px-2 text-center">
-                                             <button onClick={() => handleOpenEdit('exam', item)} className="text-gray-500 hover:text-[#C9B458] transition-colors">✏️</button>
-                                        </td>
-                                    )}
-                                </tr>
-                             );
-                        })}
-                    </tbody>
-                </table>
-            </div>
-            {/* Footer hint */}
-            <div className="p-3 bg-[#0B132B] border-t border-gray-700 text-xs text-gray-500 text-center italic">
-                * Tertakluk kepada pindaan KPM
-            </div>
+  const TakwimPeperiksaanView = () => (
+    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col">
+        <div className="p-4 md:p-6 bg-[#0B132B] border-b border-gray-700"><h3 className="text-lg md:text-xl font-bold text-white font-montserrat uppercase flex items-center gap-2"><span className="text-[#C9B458]">📅</span> TAKWIM PEPERIKSAAN 2026</h3></div>
+        <div className="overflow-x-auto">
+            <table className="w-full text-center border-collapse border border-gray-600 min-w-[650px] md:min-w-[900px] text-[10px] md:text-sm table-fixed">
+                <thead>
+                    <tr className="bg-[#C9B458] text-[#0B132B] uppercase font-bold">
+                        <th className="border border-gray-600 px-1 py-3 w-8 md:w-16">M</th>
+                        <th className="border border-gray-600 px-2 py-3 w-24 md:w-40">TARIKH</th>
+                        <th className="border border-gray-600 px-2 py-3">DALAMAN</th>
+                        <th className="border border-gray-600 px-2 py-3">JAJ</th>
+                        <th className="border border-gray-600 px-2 py-3">AWAM</th>
+                        {isAdmin && <th className="border border-gray-600 px-1 py-3 w-8 md:w-16">EDIT</th>}
+                    </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                    {examWeeks.map((item) => (
+                        item.isHoliday ? (
+                             <tr key={item.id} className="bg-[#C9B458] text-[#0B132B] font-bold uppercase border-b border-gray-600">
+                                 <td colSpan={2} className="border border-gray-600 py-2 px-1 text-center">{item.date}</td>
+                                 <td colSpan={3} className="border border-gray-600 py-2 px-1 text-center truncate">{item.dalaman}</td>
+                                 {isAdmin && <td className="border border-gray-600 py-2 px-1 bg-[#0B132B]"><button onClick={() => handleOpenEdit('exam', item)} className="text-[#C9B458] hover:text-white">✏️</button></td>}
+                             </tr>
+                        ) : (
+                            <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
+                                <td className="border border-gray-600 py-2 font-mono text-[#C9B458] font-bold">{item.week}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 whitespace-nowrap text-white">{item.date}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 text-left align-top leading-tight break-words">{item.dalaman}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 text-left align-top leading-tight break-words">{item.jaj}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 text-left align-top leading-tight break-words">{item.awam}</td>
+                                {isAdmin && <td className="border border-gray-600 py-2 px-1 text-center"><button onClick={() => handleOpenEdit('exam', item)} className="text-gray-500 hover:text-[#C9B458]">✏️</button></td>}
+                            </tr>
+                        )
+                    ))}
+                </tbody>
+            </table>
         </div>
-    );
-  };
+    </div>
+  );
 
-  // --- CUTI PERAYAAN VIEW (UPDATED TO LAMPIRAN C DESIGN) ---
+  // --- CUTI PERAYAAN VIEW ---
   const CutiPerayaanView = () => {
       return (
           <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
@@ -1013,9 +985,9 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                  <table className="w-full text-center border-collapse border border-gray-600 min-w-[900px]">
                      <thead>
                          <tr>
-                             <th rowSpan={2} className="bg-[#C9B458] text-[#0B132B] font-extrabold text-base p-3 border border-gray-600 w-1/4">CUTI PERAYAAN</th>
-                             <th colSpan={2} className="bg-[#C9B458] text-[#0B132B] font-extrabold text-base p-3 border border-gray-600">TAMBAHAN CUTI PERAYAAN YANG DIPERUNTUKKAN OLEH KEMENTERIAN PENDIDIKAN MALAYSIA (KPM)</th>
-                             <th rowSpan={2} className="bg-[#C9B458] text-[#0B132B] font-extrabold text-base p-3 border border-gray-600 w-1/5">CATATAN</th>
+                             <th rowSpan={2} className="bg-[#C9B458] text-[#0B132B] font-bold p-3 border border-gray-600 w-1/4">CUTI PERAYAAN</th>
+                             <th colSpan={2} className="bg-[#C9B458] text-[#0B132B] font-bold p-3 border border-gray-600">TAMBAHAN CUTI PERAYAAN YANG DIPERUNTUKKAN OLEH KEMENTERIAN PENDIDIKAN MALAYSIA (KPM)</th>
+                             <th rowSpan={2} className="bg-[#C9B458] text-[#0B132B] font-bold p-3 border border-gray-600 w-1/5">CATATAN</th>
                          </tr>
                          <tr>
                              <th className="bg-[#3A506B] text-white font-bold p-3 border border-gray-600 w-1/4">KUMPULAN A</th>
@@ -1231,13 +1203,13 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
   return (
     <div className="p-4 md:p-8 space-y-6 pb-20 fade-in">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-[#C9B458] font-mono mb-2">
-         <span>TAKWIM</span>
-         <span>/</span>
-         <span className="capitalize">{type}</span>
+      <div className="flex items-center gap-2 text-sm text-[#0B132B] font-mono mb-2">
+         <span className="font-bold">TAKWIM</span>
+         <span className="opacity-50">/</span>
+         <span className="capitalize font-bold opacity-80">{type}</span>
       </div>
 
-      <h2 className="text-3xl font-bold text-white font-montserrat mb-6">
+      <h2 className="text-3xl font-bold text-black font-montserrat mb-6">
          {type}
       </h2>
 

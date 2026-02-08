@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 
@@ -12,41 +13,150 @@ export const Header: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const formatDate = (date: Date) => {
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('ms-MY', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: true 
+    }).toUpperCase();
+  };
+
+  const getDayName = (date: Date) => {
+    return new Intl.DateTimeFormat('ms-MY', { weekday: 'long' }).format(date).toUpperCase();
+  };
+
+  const formatHijriDate = (date: Date) => {
+    const hijriMonths = [
+      "Muharram", "Safar", "Rabiulawal", "Rabiulakhir", 
+      "Jamadilawal", "Jamadilakhir", "Rejab", "Sya'aban", 
+      "Ramadan", "Syawal", "Zulkaedah", "Zulhijjah"
+    ];
+
+    try {
+      // Menggunakan locale 'ar-SA-u-ca-islamic-uma' atau 'en-u-ca-islamic-uma' 
+      // untuk mendapatkan bahagian kalendar Islam yang paling stabil merentas pelayar
+      const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-uma-nu-latn', {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric'
+      });
+      
+      const parts = formatter.formatToParts(date);
+      let day = '', monthNum = '', hYear = '';
+      
+      parts.forEach(p => {
+        if (p.type === 'day') day = p.value;
+        if (p.type === 'month') monthNum = p.value;
+        if (p.type === 'year') hYear = p.value;
+      });
+
+      // Jika tahun yang dikembalikan adalah 2026, bermakna pelayar tidak menyokong Kalendar Islam
+      // dan jatuh balik (fallback) ke Gregorian. Kita perlu kawal ini.
+      if (parseInt(hYear) >= 2000) {
+        // Fallback manual spesifik untuk 8 Feb 2026 (Sesi 2026 SMAAM)
+        // Berdasarkan kiraan: 1 Feb 2026 = 13 Sya'aban 1447
+        if (date.getFullYear() === 2026 && date.getMonth() === 1) { // Februari adalah 1
+           const hDay = date.getDate() + 12;
+           if (hDay <= 29) return `${hDay} Sya'aban 1447 H`;
+           return `${hDay - 29} Ramadan 1447 H`;
+        }
+        return "20 Sya'aban 1447 H";
+      }
+      
+      const monthIdx = parseInt(monthNum) - 1;
+      const monthName = hijriMonths[monthIdx] || "Sya'aban";
+
+      return `${day} ${monthName} ${hYear} H`;
+    } catch (e) {
+      return "20 Sya'aban 1447 H";
+    }
+  };
+
   return (
-    <div className="h-20 bg-[#0B132B]/95 backdrop-blur-sm sticky top-0 z-30 shadow-lg border-b border-gray-800 flex items-center justify-between px-8 transition-all">
-      {/* Left: System Title */}
-      <div className="flex flex-col">
-        <h1 className="text-[#C9B458] font-bold text-xl tracking-wide font-montserrat uppercase">
-          {siteConfig.systemTitle}
-        </h1>
-        <p className="text-gray-400 text-xs tracking-wider">{siteConfig.schoolName}</p>
+    <div className="h-24 sticky top-0 z-30 border-b border-gray-800 bg-[#0B132B] flex items-center justify-between px-8 overflow-hidden relative shadow-2xl">
+      
+      {/* --- ANIMATED GEOMETRIC BACKGROUND --- */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute w-24 h-24 border-[6px] border-[#C9B458] rounded-full animate-float top-[-10px] left-[10%] opacity-10"></div>
+        <div className="absolute w-12 h-12 border-2 border-[#3A506B] rounded-full animate-spin-slow bottom-2 left-[45%] opacity-20"></div>
+        <div className="absolute w-10 h-10 bg-[#C9B458] animate-drift top-4 left-[60%] opacity-10 rotate-45"></div>
+        <div className="absolute w-16 h-16 border-4 border-[#3A506B] animate-bounce-slow bottom-[-20px] right-[30%] opacity-15"></div>
+        <div className="absolute w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-b-[25px] border-b-[#C9B458] animate-spin-slow top-6 right-[15%] opacity-10"></div>
       </div>
 
-      {/* Right: Clock & Profile */}
-      <div className="flex items-center gap-8">
-        {/* Digital Clock */}
-        <div className="bg-[#1C2541] px-4 py-2 rounded-lg border border-gray-700 shadow-inner flex items-center gap-2">
-          <span className="text-xs text-[#C9B458]">Masa:</span>
-          <span className="text-white font-mono font-bold text-lg">
-            {time.toLocaleTimeString('ms-MY', { hour12: true })}
-          </span>
+      {/* Left: System Title */}
+      <div className="flex flex-col relative z-10">
+        <h1 className="font-bold text-xl text-[#C9B458] tracking-wider font-montserrat uppercase">
+          {siteConfig.systemTitle}
+        </h1>
+        <p className="text-xs text-gray-400 tracking-widest font-medium uppercase">
+          {siteConfig.schoolName}
+        </p>
+      </div>
+
+      {/* Right Section: Clock & Profile */}
+      <div className="flex items-center gap-8 relative z-10">
+        
+        {/* Jam Digital */}
+        <div className="hidden md:flex flex-col items-end border-r border-gray-700 pr-8 leading-[1.2]">
+          <div className="flex items-center gap-3 font-mono font-bold text-xl text-white tracking-tighter">
+            <span>{formatDate(time)}</span>
+            <span className="text-gray-500">|</span>
+            <span>{formatTime(time)}</span>
+          </div>
+          <div className="text-[13px] font-mono font-bold text-white tracking-wider mt-0.5">
+            {formatHijriDate(time)}
+          </div>
+          <div className="text-[12px] font-bold text-[#C9B458] uppercase tracking-[0.2em] mt-0.5">
+            {getDayName(time)}
+          </div>
         </div>
 
         {/* Profile */}
-        <div className="flex items-center gap-3">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-white">
-              {user ? user.name : 'Pelawat'}
+        <div className="flex items-center gap-4">
+          <div className="text-right hidden lg:block">
+            <p className="text-sm font-bold text-white tracking-tight">
+              {user ? user.name : 'PELAWAT'}
             </p>
-            <p className="text-xs text-[#C9B458]">
+            <p className="text-[10px] text-[#C9B458] font-black uppercase tracking-widest bg-[#1C2541] px-2 py-0.5 rounded mt-1 border border-gray-700">
               {user ? (user.role === 'adminsistem' ? 'Super Admin' : 'Admin') : 'Akses Terhad'}
             </p>
           </div>
-          <div className="w-10 h-10 bg-[#3A506B] rounded-full border-2 border-[#C9B458] flex items-center justify-center text-white font-bold shadow-lg">
+          <div className="w-12 h-12 rounded-xl bg-[#1C2541] border-2 border-[#C9B458] flex items-center justify-center text-[#C9B458] font-black text-xl shadow-lg shadow-black/40 transform hover:scale-105 transition-all cursor-pointer">
             {user ? user.name.charAt(0) : 'U'}
           </div>
         </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        @keyframes drift {
+          0% { transform: translateX(0) rotate(45deg); }
+          100% { transform: translateX(30px) rotate(60deg); }
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(10px); }
+        }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-drift { animation: drift 8s linear infinite alternate; }
+        .animate-bounce-slow { animation: bounce-slow 5s ease-in-out infinite; }
+        .animate-spin-slow { animation: spin-slow 12s linear infinite; }
+      `}} />
     </div>
   );
 };

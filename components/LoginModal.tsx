@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { UserRole, UserCredential } from '../types';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -10,7 +12,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useApp();
+  const { login, userCredentials } = useApp();
 
   if (!isOpen) return null;
 
@@ -18,21 +20,22 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError('');
 
-    // Hardcoded logic as per prompt
-    if (password === 'admin123') {
-      if (username === 'admin') {
-        login(username, 'admin');
+    // Mencari peranan yang sepadan dengan kredential yang dimasukkan
+    let foundRole: UserRole = null;
+
+    // Fix: Explicitly cast Object.entries to resolve TypeScript 'unknown' type errors for creds
+    (Object.entries(userCredentials) as [string, UserCredential][]).forEach(([role, creds]) => {
+        if (creds.username === username && creds.password === password) {
+            foundRole = role as UserRole;
+        }
+    });
+
+    if (foundRole) {
+        login(username, foundRole);
         onClose();
-        return;
-      }
-      if (username === 'adminsistem') {
-        login(username, 'adminsistem');
-        onClose();
-        return;
-      }
+    } else {
+        setError('Nama pengguna atau kata laluan tidak sah.');
     }
-    
-    setError('Nama pengguna atau kata laluan tidak sah.');
   };
 
   return (
@@ -69,23 +72,21 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
              <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors"
+              className="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors font-bold"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[#C9B458] text-[#0B132B] px-4 py-3 rounded-lg font-bold hover:bg-yellow-500 shadow-lg shadow-yellow-900/20 transition-all hover:scale-[1.02]"
+              className="flex-1 bg-[#C9B458] text-[#0B132B] px-4 py-3 rounded-lg font-black hover:bg-yellow-500 shadow-lg shadow-yellow-900/20 transition-all hover:scale-[1.02]"
             >
-              Log Masuk
+              LOG MASUK
             </button>
           </div>
         </form>
         
-        <div className="mt-6 text-center text-xs text-gray-500">
-          <p>Akaun Demo:</p>
-          <p>admin / admin123 (Biasa)</p>
-          <p>adminsistem / admin123 (Super)</p>
+        <div className="mt-6 text-center text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+           Portal Pengurusan Digital SMAAM
         </div>
       </div>
     </div>

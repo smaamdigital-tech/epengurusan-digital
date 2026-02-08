@@ -1,15 +1,11 @@
+
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Program } from '../types';
 
 export const ProgramView: React.FC = () => {
-  const { programs, user, addProgram, updateProgram, deleteProgram, showToast, checkPermission } = useApp();
-  
-  // Permissions
-  const canEdit = checkPermission('program', 'edit');
-  const canDelete = checkPermission('program', 'delete');
-  const canSave = checkPermission('program', 'save');
-  const canDownload = checkPermission('dokumentasi', 'download');
+  const { programs, user, addProgram, updateProgram, deleteProgram, showToast } = useApp();
+  const isAdmin = user?.role === 'admin' || user?.role === 'adminsistem';
   
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -26,10 +22,6 @@ export const ProgramView: React.FC = () => {
   };
 
   const handleDownloadPDF = () => {
-    if (!canDownload) {
-        showToast("Tiada kebenaran untuk muat turun.");
-        return;
-    }
     showToast("Sedang memuat turun laporan PDF...");
     // Simulation of PDF generation logic
     setTimeout(() => {
@@ -97,12 +89,12 @@ export const ProgramView: React.FC = () => {
     <div className="p-8 space-y-8 fade-in pb-20">
       <div className="flex flex-col md:flex-row justify-between items-end border-b border-gray-700 pb-4 gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-white font-montserrat flex items-center gap-3">
+          <h2 className="text-3xl font-bold text-black font-montserrat flex items-center gap-3">
             <span>🎯</span> Program & Berita Sekolah
           </h2>
-          <p className="text-gray-400 mt-1">Laporan aktiviti terkini dan program akan datang.</p>
+          <p className="text-black font-medium opacity-80 mt-1">Laporan aktiviti terkini dan program minggu ini.</p>
         </div>
-        {(canEdit || canSave) && (
+        {isAdmin && (
           <button 
             onClick={() => handleOpenEdit()}
             className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-colors shadow-lg"
@@ -149,9 +141,23 @@ export const ProgramView: React.FC = () => {
                     Baca Laporan <span>→</span>
                   </button>
                   
-                  <div className="flex gap-2">
-                      {canEdit && <button onClick={() => handleOpenEdit(prog)} className="text-blue-400 hover:text-blue-300" title="Edit">✏️</button>}
-                      {canDelete && <button onClick={() => handleDelete(prog.id)} className="text-red-400 hover:text-red-300" title="Hapus">🗑️</button>}
+                  <div className="flex gap-3 items-center">
+                      {/* Ikon Muat Turun - Dipaparkan untuk semua */}
+                      <button 
+                        onClick={handleDownloadPDF} 
+                        className="text-gray-400 hover:text-[#C9B458] transition-colors text-lg" 
+                        title="Muat Turun Laporan"
+                      >
+                        📥
+                      </button>
+                      
+                      {/* Ikon Edit/Hapus - Hanya untuk Admin */}
+                      {isAdmin && (
+                          <div className="flex gap-2 border-l border-gray-700 pl-3">
+                              <button onClick={() => handleOpenEdit(prog)} className="text-blue-400 hover:text-blue-300" title="Edit">✏️</button>
+                              <button onClick={() => handleDelete(prog.id)} className="text-red-400 hover:text-red-300" title="Hapus">🗑️</button>
+                          </div>
+                      )}
                   </div>
               </div>
             </div>
@@ -223,14 +229,12 @@ export const ProgramView: React.FC = () => {
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-700 mt-auto">
                       <p className="text-xs text-gray-500">Disediakan oleh: Admin Sekolah</p>
-                      {canDownload && (
-                          <button 
-                            onClick={handleDownloadPDF}
-                            className="bg-[#C9B458] text-[#0B132B] px-6 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-colors shadow-lg flex items-center gap-2"
-                          >
-                             <span>📄</span> Muat Turun PDF
-                          </button>
-                      )}
+                      <button 
+                        onClick={handleDownloadPDF}
+                        className="bg-[#C9B458] text-[#0B132B] px-6 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-colors shadow-lg flex items-center gap-2"
+                      >
+                         <span>📄</span> Muat Turun PDF
+                      </button>
                   </div>
                </div>
             </div>
@@ -286,7 +290,7 @@ export const ProgramView: React.FC = () => {
                      </div>
                      <div className="flex gap-2 pt-2">
                          <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600">Batal</button>
-                         <button type="submit" disabled={!canSave} className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] rounded-lg font-bold hover:bg-yellow-400">Simpan</button>
+                         <button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] rounded-lg font-bold hover:bg-yellow-400">Simpan</button>
                      </div>
                  </form>
              </div>

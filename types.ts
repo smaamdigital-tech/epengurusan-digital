@@ -1,6 +1,9 @@
+
+export type UserRole = 'adminsistem' | 'admin' | 'gkmp' | 'panitia' | 'guru' | 'su_pentadbir' | 'su_hem' | 'su_kuri' | 'su_koko' | null;
+
 export interface User {
   username: string;
-  role: 'admin' | 'adminsistem' | null;
+  role: UserRole;
   name: string;
 }
 
@@ -25,25 +28,80 @@ export interface Program {
   image2?: string;
 }
 
-export interface ActionPermissions {
-  view: boolean;
-  edit: boolean;
-  delete: boolean;
-  save: boolean;
-  download: boolean;
+export interface SchoolProfile {
+  pengetuaName: string;
+  pengetuaQuote: string;
+  pengetuaImage: string;
+  schoolName: string;
+  schoolCode: string;
+  address: string;
+  email: string;
+  phone: string;
+  location: string;
+  visi: string;
+  misi: string;
+  moto: string;
+  slogan: string;
+  status: string;
+  stats: {
+    lulusSpm: string;
+    gred: string;
+    guruTotal: number;
+    guruLelaki: number;
+    guruPerempuan: number;
+    muridTotal: number;
+    muridLelaki: number;
+    muridPerempuan: number;
+  };
 }
 
-export type PermissionKey = 
-  | 'dashboard' 
-  | 'pengguna' 
-  | 'jawatankuasa' 
-  | 'tugasFungsi' 
-  | 'program' 
-  | 'dokumentasi' 
-  | 'laporan' 
-  | 'tetapan';
+export interface RolePermission {
+  // Asas
+  canUpdateProfil: boolean;
+  canUpdateProgram: boolean;
+  canUpdatePengumuman: boolean;
+  // Pentadbiran
+  canUpdatePentadbiranJK: boolean;
+  canUpdatePentadbiranTakwim: boolean;
+  // Kurikulum
+  canUpdateKurikulumJK: boolean;
+  canUpdateKurikulumTakwim: boolean;
+  canUpdateKurikulumPeperiksaan: boolean;
+  // HEM
+  canUpdateHEMJK: boolean;
+  canUpdateHEMTakwim: boolean;
+  canUpdateHEMKehadiran: boolean;
+  // Kokurikulum
+  canUpdateKokoJK: boolean;
+  canUpdateKokoTakwim: boolean;
+  // Global Takwim
+  canUpdateTakwimGlobal: boolean;
+  // Global Jadual (Submenu)
+  canUpdateJadualGanti: boolean;
+  canUpdateJadualGuruKelas: boolean;
+  canUpdateJadualPersendirian: boolean;
+  canUpdateJadualKelas: boolean;
+  canUpdateJadualBerucap: boolean;
+  canUpdateJadualPemantauan: boolean;
+  canUpdateJadualGlobal: boolean;
+}
 
-export type Permissions = Record<PermissionKey, ActionPermissions>;
+export interface UserCredential {
+  username: string;
+  password: string;
+  label: string;
+}
+
+export interface Permissions {
+  pentadbiran: boolean;
+  kurikulum: boolean;
+  hem: boolean;
+  kokurikulum: boolean;
+  takwim: boolean;
+  program: boolean;
+  pengumuman: boolean;
+  jadual: boolean;
+}
 
 export interface SiteConfig {
   systemTitle: string;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 
@@ -70,6 +71,24 @@ const KOKO_JK_LIST = [
   "Jawatankuasa RIMUP"
 ];
 
+// Helper to format teacher names correctly
+const formatTeacherName = (name: string): string => {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => {
+      // Keep bin and binti in lowercase
+      if (word === 'bin' || word === 'binti') return word;
+      // Handle words with special characters like @
+      if (word.includes('@')) {
+          return word.split('@').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('@');
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+};
+
 // Default descriptions map (Committee ID -> Description)
 const DEFAULT_DESCRIPTIONS: Record<string, string> = {
   // Jawatankuasa Induk Pengurusan dan Pentadbiran (Index 0)
@@ -91,7 +110,7 @@ const DEFAULT_DESCRIPTIONS: Record<string, string> = {
 
 9. Mengurus dan menyelia pengoperasian bilik khas berkaitan kurikulum.
 
-10. Merancang, menyusun dan melaksana program-program dan aktiviti-aktiviti untuk meningkatkan tahap pencapaian sekolah dalam bidang pengurusan, akademik, kemenjadian murid, kokurikulum dan keceriaan.
+10. Merancang, menyusun dan melaksana program-program dan aktiviti-aktiviti untuk meningkatkan tahap pencahaian sekolah dalam bidang pengurusan, akademik, kemenjadian murid, kokurikulum dan keceriaan.
 
 11. Membuat penilaian kendiri tahap pencapaian sekolah berdasarkan keputusan Pelaporan Sekolah Rendah dan PBD.
 
@@ -187,7 +206,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       if (unit === 'Pentadbiran') { targetList = PENTADBIRAN_JK_LIST; prefix = 'jk_pentadbiran_'; }
       else if (unit === 'Kurikulum') { targetList = KURIKULUM_JK_LIST; prefix = 'jk_kurikulum_'; }
       else if (unit === 'Hal Ehwal Murid') { targetList = HEM_JK_LIST; prefix = 'jk_hem_'; }
-      else if (unit === 'Kokurikulum') { targetList = KOKO_JK_LIST; prefix = 'jk_kokurikulum_'; }
+      else if (unit === 'Kokurikulum') { targetList = KOKO_JK_LIST; prefix = 'jk_koko_'; }
       else { targetList = ["Jawatankuasa Induk"]; prefix = 'jk_general_'; }
 
       if (savedCommittees) {
@@ -474,7 +493,8 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       newItem = {
         role: formData.role,
         position: formData.position,
-        teacherName: formData.teacherName,
+        // Automatically format teacher name on save
+        teacherName: formatTeacherName(formData.teacherName),
         committeeId: activeCommitteeId 
       };
     } else {
@@ -515,15 +535,15 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-700 pb-4 gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[13px] text-[#C9B458] font-mono mb-1 font-inter">
-             <span>{unit.toUpperCase()}</span>
-             <span>/</span>
-             <span>{type.toUpperCase()}</span>
+          <div className="flex items-center gap-2 text-[13px] text-black font-mono mb-1 font-inter">
+             <span className="font-bold">{unit.toUpperCase()}</span>
+             <span className="opacity-50">/</span>
+             <span className="font-bold opacity-80">{type.toUpperCase()}</span>
           </div>
-          <h2 className="text-[22px] md:text-3xl font-bold text-white font-montserrat">
+          <h2 className="text-[22px] md:text-3xl font-bold text-black font-montserrat">
             Pengurusan {type}
           </h2>
-          <p className="text-gray-400 mt-1 text-[13px] font-inter">
+          <p className="text-black/80 mt-1 text-[13px] font-inter font-medium">
             {type === 'Jawatankuasa' 
               ? `Senarai jawatankuasa dan ahli bagi unit ${unit}.`
               : `Kalendar dan jadual aktiviti bagi unit ${unit}.`
@@ -542,7 +562,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                 </button>
             )}
             
-            {/* Show Add button if Edit OR Save permission is true (loosely interpreted as modifying rights) */}
             {(canEdit || canSave) && (
                 <button 
                   onClick={() => handleOpenModal()}
@@ -563,7 +582,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
             
             {/* COL 1: COMMITTEE LIST (Compact Sidebar) */}
             <div className="lg:col-span-3 flex flex-col gap-4 h-full">
-                {/* HEADER DESIGN: SENARAI JAWATANKUASA */}
                 <div className="bg-[#0B132B] p-4 rounded-xl border border-gray-700 text-center shadow-lg relative overflow-hidden group shrink-0">
                     <div className="absolute inset-0 border border-[#C9B458]/20 rounded-xl pointer-events-none"></div>
                     <span className="block text-4xl font-bold text-[#C9B458] font-['Century_Gothic']">{committees.length}</span>
@@ -610,7 +628,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
             {/* COL 2: MEMBER TABLE */}
             <div className="lg:col-span-6 flex flex-col h-full">
                 <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-800 flex flex-col h-full">
-                    {/* NEW HEADER DESIGN: ORGANISASI (Title below subtitle) */}
                     <div className="bg-[#0B132B] p-6 border-b border-gray-700 flex flex-col items-center justify-center text-center shadow-md min-h-[120px] shrink-0 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C9B458]/50 to-transparent"></div>
                         <span className="text-white text-[16px] font-bold font-['Century_Gothic'] uppercase tracking-wider mb-1">ORGANISASI</span>
@@ -633,9 +650,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                                 {filteredItems.length > 0 ? (
                                     filteredItems.map((item: any) => (
                                         <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
-                                            <td className="px-4 py-3 font-bold text-white border-r border-gray-800/50">{item.role}</td>
+                                            {/* Font role tidak bold */}
+                                            <td className="px-4 py-3 font-normal text-white border-r border-gray-800/50">{item.role}</td>
                                             <td className="px-4 py-3 text-gray-400 italic">{item.position}</td>
-                                            <td className="px-4 py-3 font-semibold text-[#C9B458] uppercase">{item.teacherName}</td>
+                                            {/* Font nama guru format Title Case & lowercase bin/binti */}
+                                            <td className="px-4 py-3 font-semibold text-[#C9B458]">{formatTeacherName(item.teacherName)}</td>
                                             {(canEdit || canDelete) && (
                                                 <td className="px-4 py-3 text-right">
                                                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -662,7 +681,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
             {/* COL 3: INFO PANEL */}
             <div className="lg:col-span-3 h-full">
               <div className="bg-[#1C2541] rounded-xl shadow-xl border border-gray-800 sticky top-24 overflow-hidden h-full flex flex-col">
-                  {/* NEW HEADER DESIGN: TUGAS & FUNGSI (Title below subtitle) */}
                   <div className="bg-[#0B132B] p-6 border-b border-gray-700 flex flex-col items-center justify-center text-center shadow-md min-h-[120px] shrink-0 relative overflow-hidden group">
                       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C9B458]/50 to-transparent"></div>
                       <span className="text-white text-[16px] font-bold font-['Century_Gothic'] uppercase tracking-wider mb-1">TUGAS & FUNGSI</span>
@@ -670,7 +688,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                           {committees.find(c => c.id === activeCommitteeId)?.name || "Pilih Jawatankuasa"}
                       </h3>
                       
-                      {/* Using checkPermission for Tugas & Fungsi (tugasFungsi key) */}
                       {checkPermission('tugasFungsi', 'edit') && (
                         <button 
                           onClick={() => { 
@@ -797,7 +814,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
 
             {/* List View */}
             {takwimView === 'list' && (
-                <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-800">
+                <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700">
                   <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex flex-col gap-2">
                      <h4 className="text-white font-bold flex items-center gap-2 text-[16px]">
                         <span className="text-[#C9B458]">📋</span> Senarai Aktiviti
@@ -862,7 +879,6 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
             </h3>
             
             <form onSubmit={handleSave} className="space-y-5">
-               {/* Form fields remain same */}
                {type === 'Jawatankuasa' ? (
                 <>
                   <div className="bg-[#0B132B] p-3 rounded border border-gray-700 mb-4 text-sm text-gray-400">

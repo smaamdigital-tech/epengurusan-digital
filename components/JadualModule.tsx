@@ -1,9 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 
 interface JadualModuleProps {
   type: string;
 }
+
+// --- HELPERS ---
+const toTitleCase = (str: string) => {
+  if (!str) return '';
+  return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
 
 // --- CONSTANTS ---
 
@@ -65,22 +72,22 @@ const ALL_SUBJECTS = Array.from(new Set([...SUBJECTS_LOWER, ...SUBJECTS_UPPER]))
 const GROUP_MEMBERS_DATA = [
   { id: 1, name: "KUMPULAN 1", members: ["Muhammad Hafiz bin Jalil", "Norashidah binti A Wahab", "Syahidatun Najihah binti Aziz", "Nik Noorizati binti Ab Kahar", "Noorlela binti Zainudin"] },
   { id: 2, name: "KUMPULAN 2", members: ["Ahmad Fikruddin bin Ahmad Raza'i", "Nooraind binti Ali", "Siti Aminah binti Mohamed", "Masyitah binti Razali", "Nor Ain binti Mohamed Jori"] },
-  { id: 3, name: "KUMPULAN 3", members: ["Mohamad Sukri bin Ali", "Mazuin binti Mat", "Siti Nurul Liza binti Sidin", "Zarith Najiha binti Jamal", "Nurul Izzati binti Roslin"] },
+  { id: 3, name: "KUMPULAN 3", members: ["Mohamad Sukri bin Ali", "Mazuin binti Mat", "Siti Nurul Liza binti Sidin", "Zarith Najiha binti Jamal", "Nurul Izzati bikhani Roslin"] },
   { id: 4, name: "KUMPULAN 4", members: ["Mohd Nur bin Ahmad", "Rosmawati binti Hussin", "Saemah binti Supandi", "Annur Ayuni binti Mohamed", "Nuurul Amira binti Razak"] },
   { id: 5, name: "KUMPULAN 5", members: ["Mohamad Nasreen Hakim bin Che Mohamed", "Mohd Nor bin Salikin", "Zahrah Khairiah Nasution binti Saleh", "Nor Hidayah binti Mahadun", "Nurul Syafiqah binti Husin"] },
   { id: 6, name: "KUMPULAN 6", members: ["Salman bin A Rahman", "Mohammad Firros bin Rosool Gani", "Nor Azean binti Ismail", "Norliyana binti Mhd Amin", "Liyana binti Iskandar"] }
 ];
 
-// --- DATA JADUAL PEMANTAUAN (10 KAD) ---
+// --- DATA JADUAL PEMANTAUAN (DIKEMASKINI URUTAN & KOD GURU) ---
 const initialPemantauanData = [
   {
     id: 1,
     monitor: "ZULKEFFLE BIN MUHAMMAD",
     position: "PENGETUA",
     items: [
-      { code: "2.1", name: "Noratikah binti Abd. Kadir" },
-      { code: "2.2", name: "Shaharer bin Hj Husain" },
-      { code: "2.3", name: "Zulkifli bin Md Aspan" }
+      { code: "1.1", name: "Noratikah binti Abd. Kadir" },
+      { code: "1.2", name: "Shaharer bin Hj Husain" },
+      { code: "1.3", name: "Zulkifli bin Md Aspan" }
     ]
   },
   {
@@ -98,9 +105,9 @@ const initialPemantauanData = [
     monitor: "SHAHARER BIN HJ HUSAIN",
     position: "GPK HAL EHWAL MURID",
     items: [
-      { code: "4.1", name: "Rosmawati @ Rohayati binti Hussin" },
-      { code: "4.2", name: "Salman bin A Rahman" },
-      { code: "4.3", name: "Muhammad Hafiz bin Jalil" }
+      { code: "3.1", name: "Rosmawati @ Rohayati binti Hussin" },
+      { code: "3.2", name: "Salman bin A Rahman" },
+      { code: "3.3", name: "Muhammad Hafiz bin Jalil" }
     ]
   },
   {
@@ -119,10 +126,10 @@ const initialPemantauanData = [
     monitor: "SAEMAH BINTI SUPANDI",
     position: "GKMP AGAMA",
     items: [
-      { code: "6.1", name: "Annur Ayuni binti Mohamed" },
-      { code: "6.2", name: "Masyitah binti Razali" },
-      { code: "6.3", name: "Mohamad Sukri bin Ali" },
-      { code: "6.4", name: "Nor Hidayah binti Mahadun" }
+      { code: "5.1", name: "Annur Ayuni binti Mohamed" },
+      { code: "5.2", name: "Masyitah binti Razali" },
+      { code: "5.3", name: "Mohamad Sukri bin Ali" },
+      { code: "5.4", name: "Nor Hidayah binti Mahadun" }
     ]
   },
   {
@@ -140,9 +147,9 @@ const initialPemantauanData = [
     monitor: "ROSMAWATI @ ROHAYATI BINTI HUSSIN",
     position: "GKMP BAHASA",
     items: [
-      { code: "8.1", name: "Mohamad Nasreen Hakim bin Che Mohamed" },
-      { code: "8.2", name: "Nor Ain binti Mohamed Jori" },
-      { code: "8.3", name: "Siti Nurul Liza binti Sidin" }
+      { code: "7.1", name: "Mohamad Nasreen Hakim bin Che Mohamed" },
+      { code: "7.2", name: "Nor Ain binti Mohamed Jori" },
+      { code: "7.3", name: "Siti Nurul Liza binti Sidin" }
     ]
   },
   {
@@ -160,9 +167,9 @@ const initialPemantauanData = [
     monitor: "NOORAIND BINTI ALI",
     position: "GKMP KEMANUSIAAN",
     items: [
-      { code: "10.1", name: "Mohd Nor bin Salikin" },
-      { code: "10.2", name: "Nurul Izzati binti Roslin" },
-      { code: "10.3", name: "Syahidatun Najihah binti Aziz" }
+      { code: "9.1", name: "Mohd Nor bin Salikin" },
+      { code: "9.2", name: "Nurul Izzati binti Roslin" },
+      { code: "9.3", name: "Syahidatun Najihah binti Aziz" }
     ]
   },
   {
@@ -173,7 +180,7 @@ const initialPemantauanData = [
       { code: "10.1", name: "Ahmad Fikruddin bin Ahmad Raza'i" },
       { code: "10.2", name: "Nurul Syafiqah binti Husin" },
       { code: "10.3", name: "Nuurul Amira binti Razak" },
-      { code: "10.4", name: "Мohammad Firros bin Rosool Gani" }
+      { code: "10.4", name: "Mohammad Firros bin Rosool Gani" }
     ]
   }
 ];
@@ -240,7 +247,7 @@ const initialSpeechSchedule = [
   { id: 20, week: "20", date: "15 – 19 Jun 2026", group: "KUMPULAN 2", speaker: "Nik Noorizati binti Ab Kahar", topic: "Teguran Tanda Sayang", civic: "", sumur: "" },
   { id: 21, week: "21", date: "22 – 26 Jun 2026", group: "KUMPULAN 3", speaker: "Masyitah binti Razali", topic: "Memuliakan Orang Tua", civic: "HORMAT MENGHORMATI", sumur: "JATI DIRI" },
   { id: 22, week: "22", date: "29 Jun – 3 Jul 2026", group: "KUMPULAN 4", speaker: "Zarith Najiha binti Jamal", topic: "Sikap Saling Menghormati", civic: "", sumur: "" },
-  { id: 23, week: "23", date: "6 – 10 Jul 2026", group: "KUMPULAN 5", speaker: "Annur Ayuni binti Mohamed", topic: "Pengurusan Masa Yang Sistematik", civic: "", sumur: "" },
+  { id: 23, week: "23", date: "6 – 10 Jul 2026", group: "KUMPULAN 5", speaker: "Annur Ayuni bikhani Mohamed", topic: "Pengurusan Masa Yang Sistematik", civic: "", sumur: "" },
   { id: 24, week: "24", date: "13 – 17 Jul 2026", group: "KUMPULAN 6", speaker: "Nor Hidayah binti Mahadun", topic: "Tanggungjawab Seorang Pemimpin", civic: "BERTANGGUNG JAWAB", sumur: "JATI DIRI" },
   { id: 25, week: "25", date: "20 – 24 Jul 2026", group: "KUMPULAN 1", speaker: "Liyana binti Iskandar", topic: "", civic: "", sumur: "" },
   { id: 26, week: "26", date: "27 – 31 Jul 2026", group: "KUMPULAN 2", speaker: "Noorlela binti Zainudin", topic: "Sayangi Buku Teks Anda", civic: "", sumur: "" },
@@ -300,7 +307,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   const [monitoringList, setMonitoringList] = useState(initialPemantauanData);
   
   // Schedule Overrides (Key: "Context-Day-Time", Value: { subject, code, color, teacher })
-  // Context is either Teacher Name or Class Name
   const [scheduleData, setScheduleData] = useState<Record<string, any>>({});
 
   // Modal State
@@ -325,7 +331,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   // --- HELPER: Get Short Name (Before bin/binti) ---
   const getShortName = (fullName: string) => {
     if (!fullName) return '';
-    // Split by case-insensitive ' bin ' or ' binti '
     const split = fullName.split(/ bin | binti /i);
     return split[0];
   };
@@ -341,9 +346,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   // --- MOCK GENERATORS (Fallback if no state override) ---
   const getPersonalSlotData = (day: string, time: string) => {
     const key = `${selectedTeacher}-${day}-${time}`;
-    if (scheduleData[key]) return scheduleData[key]; // Return override if exists
+    if (scheduleData[key]) return scheduleData[key];
 
-    // Default Mock (Just for demo visualization)
     const hash = (day.length + time.length + selectedTeacher.length) % 7;
     if (hash === 0) return { subject: 'Rehat', code: 'REHAT', color: 'bg-gray-700 text-gray-300' };
     if (hash === 1 || hash === 4) return { subject: 'MAT', code: '4H', color: 'bg-blue-900/60 text-blue-200 border-blue-700' };
@@ -353,9 +357,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
 
   const getClassSlotData = (day: string, time: string) => {
     const key = `${selectedClass}-${day}-${time}`;
-    if (scheduleData[key]) return scheduleData[key]; // Return override if exists
+    if (scheduleData[key]) return scheduleData[key];
 
-    // Default Mock
     const hash = (day.length + time.length + selectedClass.length) % 5;
     if (time.includes('10:00') || time.includes('10:30')) return { subject: 'REHAT', teacher: '', color: 'bg-gray-700 text-gray-300' };
     if (hash === 0) return { subject: 'BM', teacher: 'Siti Aminah binti Mohamed', color: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' };
@@ -368,7 +371,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
 
   const openEditModal = (type: typeof modalType, item: any, extraData?: any) => {
     setModalType(type);
-    setEditingItem(item); // item might be null for new slots
+    setEditingItem(item);
     setIsModalOpen(true);
 
     if (type === 'relief') {
@@ -385,14 +388,12 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
         const itemsStr = item.items.map((i: any) => `${i.code}|${i.name}`).join('\n');
         setFormData({ ...item, itemsStr });
     } else if (type === 'scheduleSlot') {
-        // extraData contains { day, time, context }
-        const existingData = item;
         setFormData({
             ...extraData,
-            subject: existingData?.subject || '',
-            code: existingData?.code || '',
-            teacher: existingData?.teacher || '',
-            color: existingData?.color || 'bg-blue-900/60 text-blue-200 border-blue-700'
+            subject: item?.subject || '',
+            code: item?.code || '',
+            teacher: item?.teacher || '',
+            color: item?.color || 'bg-blue-900/60 text-blue-200 border-blue-700'
         });
     }
   };
@@ -411,6 +412,9 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
         if (editingItem) {
             setReliefList(reliefList.map(r => r.id === editingItem.id ? { ...formData, id: r.id } : r));
             showToast("Jadual guru ganti dikemaskini");
+        } else {
+            setReliefList([...reliefList, { ...formData, id: Date.now() }]);
+            showToast("Jadual guru ganti ditambah");
         }
     } else if (modalType === 'coordinator') {
         setCoordinators(coordinators.map(c => c.id === editingItem.id ? { ...c, name: formData.name } : c));
@@ -426,7 +430,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
             teacher: formData.teacherName
         };
         setClassTeachers([...classTeachers, newClass]);
-        setSelectedClass(formData.className); // Auto select new class
+        setSelectedClass(formData.className);
         showToast(`Kelas ${formData.className} berjaya ditambah.`);
     } else if (modalType === 'speech') {
         const payload = {
@@ -447,7 +451,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
             setSpeechList([...speechList, payload]);
             showToast("Jadual berucap ditambah");
         }
-
     } else if (modalType === 'monitoring') {
         const newItems = formData.itemsStr.split('\n').map((line: string) => {
             const [code, name] = line.split('|');
@@ -463,15 +466,12 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
         
         setMonitoringList(monitoringList.map(g => g.id === editingItem.id ? updatedGroup : g));
         showToast("Jadual pemantauan dikemaskini");
-
     } else if (modalType === 'scheduleSlot') {
-        // Save to Schedule Override Dictionary
         const key = `${formData.context}-${formData.day}-${formData.time}`;
-        
         const newSlotData = {
             subject: formData.subject,
-            code: formData.code, // used in personal schedule
-            teacher: formData.teacher, // used in class schedule
+            code: formData.code,
+            teacher: formData.teacher,
             color: formData.color
         };
 
@@ -494,9 +494,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
       { label: 'Ungu (Agama)', value: 'bg-purple-900/60 text-purple-200 border-purple-700' },
   ];
 
-  // --- SUB-COMPONENTS (With Edit Wrappers) ---
+  // --- SUB-COMPONENTS ---
 
-  // 1. GURU GANTI VIEW
   const GuruGantiView = () => (
     <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
       <div className="p-6 border-b border-gray-700 bg-[#0B132B]">
@@ -519,7 +518,7 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
           </thead>
           <tbody className="divide-y divide-gray-700 text-sm">
             {reliefList.map((item) => (
-              <tr key={item.id} className="hover:bg-[#253252] transition-colors">
+              <tr key={item.id} className="hover:bg-[#253252] transition-colors text-center">
                 <td className="px-6 py-4 font-mono text-gray-300 whitespace-nowrap">{item.time}</td>
                 <td className="px-6 py-4">
                    <div className="font-bold text-white">{item.class}</div>
@@ -533,10 +532,10 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                    </span>
                 </td>
                 {isAdmin && (
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-center">
                         <button 
                             onClick={() => openEditModal('relief', item)}
-                            className="text-blue-400 hover:text-white bg-[#3A506B]/50 hover:bg-[#3A506B] p-2 rounded transition-colors"
+                            className="text-blue-400 hover:text-white"
                         >
                             ✏️ Edit
                         </button>
@@ -550,10 +549,8 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
     </div>
   );
 
-  // 2. GURU KELAS VIEW
   const GuruKelasView = () => (
     <div className="space-y-8 fade-in">
-      {/* Coordinators */}
       <div className="bg-[#1C2541] rounded-xl border-l-4 border-[#C9B458] p-6 shadow-lg">
         <h3 className="text-xl font-bold text-white mb-4">Penyelaras Tingkatan</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -580,8 +577,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
           ))}
         </div>
       </div>
-
-      {/* Class Teachers List */}
       <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700">
         <div className="p-6 border-b border-gray-700 bg-[#0B132B]">
            <h3 className="text-xl font-bold text-white">Senarai Guru Kelas</h3>
@@ -607,9 +602,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                           </div>
                        </div>
                     ))}
-                    {classTeachers.filter(t => t.form === formLevel.toString()).length === 0 && (
-                      <p className="text-gray-600 italic text-sm">Tiada data kelas.</p>
-                    )}
                  </div>
               </div>
            ))}
@@ -618,185 +610,151 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
     </div>
   );
 
-  // 3. JADUAL BERUCAP VIEW
-  const JadualBerucapView = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-
-    const filteredSpeech = speechList.filter(s => 
-       s.speaker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       s.group.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       s.topic.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    return (
-        <div className="space-y-8 fade-in font-poppins">
-            {/* GROUP CARDS SECTION */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {GROUP_MEMBERS_DATA.map((group) => (
-                    <div key={group.id} className="bg-[#1C2541] rounded-xl border border-gray-700 shadow-lg overflow-hidden flex flex-col hover:border-[#C9B458] transition-colors">
-                        <div className="bg-[#0B132B] p-3 border-b border-[#C9B458] flex justify-between items-center">
-                            <h4 className="font-bold text-[#C9B458] text-sm uppercase tracking-wider">{group.name}</h4>
-                            <span className="bg-[#3A506B] text-white text-xs px-2 py-0.5 rounded font-mono font-bold">{group.id}</span>
-                        </div>
-                        <div className="p-4 flex-1">
-                            <ul className="space-y-2">
-                                {group.members.map((member, idx) => (
-                                    <li key={idx} className="text-gray-300 text-sm flex items-start gap-2">
-                                        <span className="text-[#3A506B] mt-1 text-[10px]">●</span>
-                                        <span className="leading-tight">{member}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+  const JadualBerucapView = () => (
+    <div className="space-y-8 fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {GROUP_MEMBERS_DATA.map((group) => (
+                <div key={group.id} className="bg-[#1C2541] rounded-xl border border-gray-700 shadow-lg overflow-hidden flex flex-col hover:border-[#C9B458] transition-colors">
+                    <div className="bg-[#0B132B] p-3 border-b border-[#C9B458] flex justify-between items-center">
+                        <h4 className="font-bold text-[#C9B458] text-sm uppercase tracking-wider">{group.name}</h4>
+                        <span className="bg-[#3A506B] text-white text-xs px-2 py-0.5 rounded font-mono font-bold">{group.id}</span>
                     </div>
-                ))}
-            </div>
-
-            {/* SCHEDULE TABLE SECTION */}
-            <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 flex flex-col h-full">
-                <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex flex-col md:flex-row justify-between items-center gap-4">
-                    <h3 className="text-xl font-bold text-white font-montserrat">Jadual Guru Bertugas / Berucap</h3>
-                    <div className="flex gap-2 w-full md:w-auto">
-                        <input 
-                        type="text" 
-                        placeholder="Cari guru, kumpulan atau tajuk..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="bg-[#1C2541] border border-gray-600 text-white rounded px-4 py-2 focus:border-[#C9B458] outline-none text-sm w-full md:w-64"
-                        />
-                        {isAdmin && (
-                            <button 
-                            onClick={() => openEditModal('speech', null)}
-                            className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded text-sm font-bold hover:bg-yellow-400 whitespace-nowrap"
-                            >
-                                + Tambah
-                            </button>
-                        )}
-                    </div>
-                </div>
-                <div className="overflow-x-auto w-full">
-                    <table className="w-full min-w-[1000px] text-left border-collapse border border-gray-700">
-                        <thead>
-                            <tr className="bg-[#3A506B]/20 text-[#C9B458] text-base font-bold uppercase tracking-wider text-center font-montserrat">
-                                <th className="px-4 py-5 w-16 border border-gray-700">M</th>
-                                <th className="px-4 py-5 w-40 border border-gray-700">TARIKH</th>
-                                <th className="px-4 py-5 w-40 border border-gray-700">KUMPULAN BERTUGAS / PELAPOR</th>
-                                <th className="px-4 py-5 w-1/4 border border-gray-700 text-center">GURU BERUCAP</th>
-                                <th className="px-4 py-5 w-1/4 border border-gray-700 text-center">TAJUK</th>
-                                <th className="px-4 py-5 w-40 border border-gray-700">SIVIK / SUMUR</th>
-                                {isAdmin && <th className="px-4 py-5 w-20 text-center border border-gray-700">EDIT</th>}
-                            </tr>
-                        </thead>
-                        <tbody className="text-sm">
-                            {filteredSpeech.map((item) => (
-                                <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
-                                    <td className="px-4 py-5 font-mono text-center font-bold text-[#C9B458] border border-gray-700 align-top text-lg">{item.week}</td>
-                                    <td className="px-4 py-5 font-mono text-gray-200 border border-gray-700 align-top text-sm font-medium text-center">{item.date}</td>
-                                    <td className="px-4 py-5 text-center font-bold text-white border border-gray-700 align-top">
-                                        {item.group && (
-                                            <span className="inline-block bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded font-bold text-xs shadow-md">
-                                                {item.group.replace('KUMPULAN ', 'K')}
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-5 border border-gray-700 align-top">
-                                        <span className="text-white font-semibold text-base block mb-1 font-poppins">{item.speaker}</span>
-                                        <span className="text-xs text-gray-400 uppercase tracking-wider">Guru Berucap</span>
-                                    </td>
-                                    <td className="px-6 py-5 border border-gray-700 align-top">
-                                        <span className="text-gray-300 italic leading-relaxed font-poppins block">
-                                            "{item.topic}"
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-5 align-top space-y-2 text-center border border-gray-700">
-                                        {item.civic && (
-                                            <div className="bg-blue-900/40 border border-blue-600/50 rounded p-1.5 shadow-sm inline-block w-full">
-                                                <span className="block text-[9px] text-blue-300 font-bold uppercase tracking-wider">Sivik</span>
-                                                <span className="block text-white font-bold text-xs truncate">{item.civic}</span>
-                                            </div>
-                                        )}
-                                        {item.sumur && (
-                                            <div className="bg-green-900/40 border border-green-600/50 rounded p-1.5 shadow-sm inline-block w-full">
-                                                <span className="block text-[9px] text-green-300 font-bold uppercase tracking-wider">Sumur</span>
-                                                <span className="block text-white font-bold text-xs truncate">{item.sumur}</span>
-                                            </div>
-                                        )}
-                                    </td>
-                                    {isAdmin && (
-                                        <td className="px-4 py-5 text-right align-top border border-gray-700">
-                                            <div className="flex flex-col gap-2 items-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => openEditModal('speech', item)} className="text-blue-400 hover:text-white bg-[#3A506B]/50 hover:bg-[#3A506B] p-2 rounded transition-colors" title="Edit">✏️</button>
-                                                <button onClick={() => handleDeleteSpeech(item.id)} className="text-red-400 hover:text-white bg-red-900/30 hover:bg-red-900/60 p-2 rounded transition-colors" title="Padam">🗑️</button>
-                                            </div>
-                                        </td>
-                                    )}
-                                </tr>
+                    <div className="p-4 flex-1">
+                        <ul className="space-y-2">
+                            {group.members.map((member, idx) => (
+                                <li key={idx} className="text-gray-300 text-sm flex items-start gap-2">
+                                    <span className="text-[#3A506B] mt-1 text-[10px]">●</span>
+                                    <span className="leading-tight">{member}</span>
+                                </li>
                             ))}
-                            {filteredSpeech.length === 0 && (
-                                <tr>
-                                    <td colSpan={isAdmin ? 7 : 6} className="px-6 py-12 text-center text-gray-500 italic bg-[#1C2541] border border-gray-700">
-                                        Tiada rekod dijumpai untuk carian "{searchQuery}".
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                        </ul>
+                    </div>
                 </div>
+            ))}
+        </div>
+        <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700">
+            <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex justify-between items-center">
+                <h3 className="text-xl font-bold text-white">Jadual Guru Berucap</h3>
+                {isAdmin && <button onClick={() => openEditModal('speech', null)} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah</button>}
+            </div>
+            <div className="overflow-x-auto">
+                <table className="w-full min-w-[1000px] text-left border-collapse">
+                    <thead>
+                        <tr className="bg-[#3A506B]/20 text-[#C9B458] text-xs font-bold uppercase tracking-wider text-center">
+                            <th className="px-4 py-4 border border-gray-700">M</th>
+                            <th className="px-4 py-4 border border-gray-700">TARIKH</th>
+                            <th className="px-4 py-4 border border-gray-700">KUMPULAN</th>
+                            <th className="px-4 py-4 border border-gray-700">GURU BERUCAP</th>
+                            <th className="px-4 py-4 border border-gray-700">TAJUK</th>
+                            <th className="px-4 py-4 border border-gray-700">SIVIK/SUMUR</th>
+                            {isAdmin && <th className="px-4 py-4 border border-gray-700">AKSI</th>}
+                        </tr>
+                    </thead>
+                    <tbody className="text-sm font-poppins">
+                        {speechList.map((item) => (
+                            <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
+                                <td className="px-2 py-4 text-center font-normal text-white border border-gray-700">{item.week}</td>
+                                <td className="px-4 py-4 border border-gray-700 text-gray-300 text-xs text-center font-normal">{item.date}</td>
+                                <td className="px-4 py-4 border border-gray-700 text-[#C9B458] font-normal text-center">{toTitleCase(item.group)}</td>
+                                <td className="px-4 py-4 border border-gray-700 text-white font-normal">{item.speaker}</td>
+                                <td className="px-4 py-4 border border-gray-700 text-gray-400 italic text-xs font-normal">"{item.topic}"</td>
+                                <td className="px-4 py-4 border border-gray-700 text-center font-normal">
+                                    {item.civic && <div className="text-blue-400 text-[10px] font-normal">{toTitleCase(item.civic)}</div>}
+                                    {item.sumur && <div className="text-green-400 text-[10px] font-normal">{toTitleCase(item.sumur)}</div>}
+                                </td>
+                                {isAdmin && (
+                                    <td className="px-4 py-4 border border-gray-700 text-center">
+                                        <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => openEditModal('speech', item)} className="text-blue-400">✏️</button>
+                                            <button onClick={() => handleDeleteSpeech(item.id)} className="text-red-400">🗑️</button>
+                                        </div>
+                                    </td>
+                                )}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </div>
-    );
-  };
+    </div>
+  );
 
-  // 4. JADUAL PERSENDIRIAN (TIMETABLE GRID)
-  const JadualPersendirianView = () => {
-     return (
-       <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full">
-          <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex flex-col sm:flex-row justify-between items-center gap-4">
-             <h3 className="text-xl font-bold text-white">Jadual Waktu Persendirian</h3>
-             <select 
-                className="bg-[#1C2541] border border-gray-600 text-white rounded px-4 py-2 focus:border-[#C9B458] outline-none min-w-[250px]"
-                value={selectedTeacher}
-                onChange={(e) => setSelectedTeacher(e.target.value)}
-             >
-                {TEACHER_LIST.map((teacher) => (
-                  <option key={teacher} value={teacher}>{teacher}</option>
-                ))}
-             </select>
-          </div>
-          
-          <div className="overflow-x-auto p-4 custom-scrollbar">
-             <table className="w-full border-collapse min-w-[1200px]">
+  const JadualPersendirianView = () => (
+    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full">
+        <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h3 className="text-xl font-bold text-white">Jadual Waktu Persendirian</h3>
+            <select className="bg-[#1C2541] border border-gray-600 text-white rounded px-4 py-2 focus:border-[#C9B458] outline-none min-w-[250px]" value={selectedTeacher} onChange={(e) => setSelectedTeacher(e.target.value)}>
+                {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+        </div>
+        <div className="overflow-x-auto p-4 custom-scrollbar">
+            <table className="w-full border-collapse min-w-[1200px]">
                 <thead>
-                   <tr>
-                      <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-24 sticky left-0 z-10 text-center">HARI / MASA</th>
-                      {timeSlots.map(slot => (
-                         <th key={slot} className="p-2 border border-gray-700 bg-[#0B132B] text-gray-400 text-xs font-bold font-mono w-20 whitespace-nowrap text-center">
-                            {slot}
-                         </th>
-                      ))}
-                   </tr>
+                    <tr>
+                        <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-24 sticky left-0 z-10 text-center">HARI / MASA</th>
+                        {timeSlots.map(slot => <th key={slot} className="p-2 border border-gray-700 bg-[#0B132B] text-gray-400 text-xs font-bold font-mono w-20 whitespace-nowrap text-center">{slot}</th>)}
+                    </tr>
                 </thead>
                 <tbody>
-                   {days.map(day => (
-                      <tr key={day}>
-                         <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm">
-                            {day}
-                         </td>
+                    {days.map(day => (
+                        <tr key={day}>
+                            <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm">{day}</td>
+                            {timeSlots.map(slot => {
+                                const data = getPersonalSlotData(day, slot);
+                                return (
+                                    <td key={slot} className={`border border-gray-700 p-1 h-16 relative transition-colors ${isAdmin ? 'hover:bg-[#253252] cursor-pointer' : ''}`} onClick={() => isAdmin && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedTeacher })}>
+                                        {data && (
+                                            <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm`}>
+                                                <span className="font-bold truncate w-full text-center">{data.code}</span>
+                                                <span className="truncate w-full text-center opacity-80">{data.subject}</span>
+                                            </div>
+                                        )}
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    </div>
+  );
+
+  const JadualKelasView = () => {
+    const availableClasses = Array.from(new Set(classTeachers.map(ct => ct.class))).sort();
+    return (
+      <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full">
+         <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h3 className="text-xl font-bold text-white">Jadual Waktu Kelas</h3>
+            <div className="flex gap-2">
+                <select className="bg-[#1C2541] border border-gray-600 text-white rounded-l px-4 py-2 focus:border-[#C9B458] outline-none min-w-[200px]" value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
+                   {availableClasses.map(cls => <option key={cls} value={cls}>{cls}</option>)}
+                </select>
+                {isAdmin && <button onClick={() => openEditModal('addClass', null)} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-r font-bold hover:bg-yellow-400">+ Tambah Kelas</button>}
+            </div>
+         </div>
+         <div className="overflow-x-auto p-4 custom-scrollbar">
+            <table className="w-full border-collapse min-w-[1200px]">
+               <thead>
+                  <tr>
+                     <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-24 sticky left-0 z-10 text-center">HARI / MASA</th>
+                     {timeSlots.map(slot => <th key={slot} className="p-2 border border-gray-700 bg-[#0B132B] text-gray-400 text-xs font-bold font-mono w-20 whitespace-nowrap text-center">{slot}</th>)}
+                  </tr>
+               </thead>
+               <tbody>
+                  {days.map(day => (
+                     <tr key={day}>
+                        <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm">{day}</td>
                          {timeSlots.map(slot => {
-                            const data = getPersonalSlotData(day, slot);
+                            const data = getClassSlotData(day, slot);
                             return (
-                               <td 
-                                key={slot} 
-                                className={`border border-gray-700 p-1 h-16 relative transition-colors ${isAdmin ? 'hover:bg-[#253252] cursor-pointer' : ''}`}
-                                onClick={() => isAdmin && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedTeacher })}
-                               >
+                               <td key={slot} className={`border border-gray-700 p-1 h-16 relative transition-colors ${isAdmin ? 'hover:bg-[#253252] cursor-pointer' : ''}`} onClick={() => isAdmin && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedClass })}>
                                   {data && (
                                      <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm`}>
-                                        <span className="font-bold truncate w-full text-center">{data.code}</span>
-                                        <span className="truncate w-full text-center opacity-80">{data.subject}</span>
+                                        <span className="font-bold truncate w-full text-center">{data.subject}</span>
+                                        <span className="truncate w-full text-center opacity-80">{getShortName(data.teacher)}</span>
                                      </div>
                                   )}
-                                  {isAdmin && !data && <div className="w-full h-full flex items-center justify-center opacity-0 hover:opacity-100 text-xs text-gray-600">+</div>}
                                </td>
                             );
                          })}
@@ -805,456 +763,127 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
                 </tbody>
              </table>
           </div>
-          {isAdmin && <div className="px-6 py-2 text-xs text-gray-500 italic">* Klik pada kotak masa untuk mengedit (Admin Sahaja).</div>}
        </div>
-     );
+    );
   };
 
-  // 5. JADUAL KELAS (TIMETABLE GRID)
-  const JadualKelasView = () => {
-    // Filter unique class names from classTeachers for dropdown
-    const availableClasses = Array.from(new Set(classTeachers.map(ct => ct.class))).sort();
-
-    return (
-      <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full">
-         <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h3 className="text-xl font-bold text-white">Jadual Waktu Kelas</h3>
-            <div className="flex gap-2">
-                <select 
-                   className="bg-[#1C2541] border border-gray-600 text-white rounded-l px-4 py-2 focus:border-[#C9B458] outline-none min-w-[200px]"
-                   value={selectedClass}
-                   onChange={(e) => setSelectedClass(e.target.value)}
-                >
-                   {availableClasses.map(cls => (
-                       <option key={cls} value={cls}>{cls}</option>
-                   ))}
-                </select>
-                {isAdmin && (
-                    <button 
-                        onClick={() => openEditModal('addClass', null)}
-                        className="bg-[#C9B458] text-[#0B132B] px-3 py-2 rounded-r font-bold text-sm hover:bg-yellow-400 transition-colors flex items-center gap-1"
-                        title="Tambah Kelas Baru"
-                    >
-                        <span>+</span> Kelas
-                    </button>
-                )}
+  const JadualPemantauanView = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in">
+        {monitoringList.map((group) => (
+            <div key={group.id} className="bg-[#1C2541] rounded-xl border border-gray-700 shadow-lg overflow-hidden flex flex-col hover:border-[#C9B458] transition-colors group">
+                <div className="bg-[#0B132B] p-4 border-b border-[#C9B458] flex justify-between items-start">
+                    <div>
+                        <h4 className="font-bold text-white text-sm uppercase">{group.monitor}</h4>
+                        <p className="text-[10px] text-[#C9B458] font-bold tracking-widest">{group.position}</p>
+                    </div>
+                    {isAdmin && <button onClick={() => openEditModal('monitoring', group)} className="text-gray-500 hover:text-white">✏️</button>}
+                </div>
+                <div className="p-4 flex-1">
+                    <table className="w-full text-xs">
+                        <thead>
+                            <tr className="text-gray-500 border-b border-gray-800">
+                                <th className="text-left py-1">KOD</th>
+                                <th className="text-left py-1">NAMA GURU</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-gray-300">
+                            {group.items.map((item, idx) => (
+                                <tr key={idx} className="border-b border-gray-800/30">
+                                    <td className="py-2 font-mono text-[#C9B458]">{item.code}</td>
+                                    <td className="py-2">{item.name}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-         </div>
-         
-         <div className="overflow-x-auto p-4 custom-scrollbar">
-            <table className="w-full border-collapse min-w-[1200px]">
-               <thead>
-                  <tr>
-                     <th className="p-3 border border-gray-700 bg-[#0B132B] text-[#C9B458] text-sm font-extrabold w-24 sticky left-0 z-10 text-center">HARI / MASA</th>
-                     {timeSlots.map(slot => (
-                        <th key={slot} className="p-2 border border-gray-700 bg-[#0B132B] text-gray-400 text-xs font-bold font-mono w-20 whitespace-nowrap text-center">
-                           {slot}
-                        </th>
-                     ))}
-                  </tr>
-               </thead>
-               <tbody>
-                  {days.map(day => (
-                     <tr key={day}>
-                        <td className="p-3 border border-gray-700 bg-[#1C2541] font-bold text-white sticky left-0 z-10 text-sm">
-                           {day}
-                        </td>
-                        {timeSlots.map(slot => {
-                           const data = getClassSlotData(day, slot);
-                           return (
-                              <td 
-                                key={slot} 
-                                className={`border border-gray-700 p-1 h-20 relative transition-colors ${isAdmin ? 'hover:bg-[#253252] cursor-pointer' : ''}`}
-                                onClick={() => isAdmin && openEditModal('scheduleSlot', data, { day, time: slot, context: selectedClass })}
-                              >
-                                 {data && (
-                                    <div className={`w-full h-full rounded flex flex-col items-center justify-center text-[10px] p-1 border ${data.color} shadow-sm group`}>
-                                       <span className="font-bold truncate w-full text-center">{data.subject}</span>
-                                       {data.teacher && (
-                                           <span className="truncate w-full text-center opacity-80 mt-1">
-                                               {getShortName(data.teacher)}
-                                           </span>
-                                       )}
-                                    </div>
-                                 )}
-                                 {isAdmin && !data && <div className="w-full h-full flex items-center justify-center opacity-0 hover:opacity-100 text-xs text-gray-600">+</div>}
-                              </td>
-                           );
-                        })}
-                     </tr>
-                  ))}
-               </tbody>
-            </table>
-         </div>
-         {isAdmin && <div className="px-6 py-2 text-xs text-gray-500 italic">* Klik pada kotak masa untuk mengedit (Admin Sahaja).</div>}
-      </div>
-    );
- };
+        ))}
+    </div>
+  );
 
-  // 6. JADUAL PEMANTAUAN VIEW
-  const JadualPemantauanView = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const isSystemAdmin = user?.role === 'adminsistem';
-
-    const filteredData = monitoringList.filter(group => {
-      const monitorMatch = group.monitor.toLowerCase().includes(searchQuery.toLowerCase());
-      const superviseeMatch = group.items.some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      return monitorMatch || superviseeMatch;
-    });
-
-    return (
-      <div className="space-y-6 fade-in">
-         {/* Search Filter */}
-         <div className="bg-[#1C2541] p-6 rounded-xl shadow-lg border border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 className="text-xl font-bold text-white flex-1">Jadual Pemantauan Pengajaran & Pemudahcaraan</h3>
-            <div className="relative w-full md:w-1/3">
-               <input 
-                 type="text" 
-                 placeholder="Cari nama pemantau atau guru..."
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-                 className="w-full bg-[#0B132B] border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white focus:border-[#C9B458] outline-none"
-               />
-               <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
-            </div>
-         </div>
-
-         {/* Grid Cards (10 Cards) */}
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredData.map(group => (
-               <div key={group.id} className="bg-[#1C2541] rounded-xl overflow-hidden border border-gray-700 shadow-xl hover:shadow-2xl transition-shadow flex flex-col group relative">
-                  {isSystemAdmin && (
-                      <button onClick={() => openEditModal('monitoring', group)} className="absolute top-2 right-2 text-gray-400 hover:text-white z-20 bg-black/30 rounded-full p-1 w-8 h-8 flex items-center justify-center">✏️</button>
-                  )}
-                  {/* Header (Monitor) */}
-                  <div className="bg-[#0B132B] p-4 border-b border-[#C9B458] border-opacity-50 flex justify-between items-start relative overflow-hidden">
-                     <div className="z-10">
-                        <h4 className="text-[#C9B458] font-bold text-sm uppercase tracking-wide pr-2">{group.monitor}</h4>
-                        <p className="text-gray-400 text-xs font-semibold mt-1 uppercase tracking-wider">{group.position}</p>
-                     </div>
-                     <div className="flex flex-col items-center justify-center bg-[#3A506B] text-white w-12 h-12 rounded-lg font-bold shadow-lg z-10 border border-gray-600">
-                        <span className="text-[8px] uppercase">Kad</span>
-                        <span className="text-xl leading-none">{group.id}</span>
-                     </div>
-                     {/* Watermark Decoration */}
-                     <div className="absolute -right-4 -bottom-4 text-6xl opacity-5 pointer-events-none">
-                        📋
-                     </div>
-                  </div>
-
-                  {/* Body (Supervisees) - Left Code, Right Name */}
-                  <div className="p-4 flex-1 bg-[#1C2541] relative">
-                     <ul className="space-y-3">
-                        {group.items.map((item, idx) => (
-                           <li key={idx} className="flex items-center text-sm border-b border-gray-700 last:border-0 pb-2 last:pb-0 hover:bg-[#253252] rounded px-2 -mx-2 transition-colors">
-                              <span className="text-[#C9B458] font-mono text-xs font-bold w-12 flex-shrink-0 bg-[#0B132B] px-1 py-0.5 rounded text-center border border-gray-600">
-                                  {item.code}
-                              </span>
-                              <span className="text-gray-200 ml-3 truncate" title={item.name}>{item.name}</span>
-                           </li>
-                        ))}
-                     </ul>
-                  </div>
-               </div>
-            ))}
-         </div>
-
-         {filteredData.length === 0 && (
-            <div className="text-center py-12 text-gray-500 bg-[#1C2541] rounded-xl border border-gray-700 border-dashed">
-               Tiada rekod dijumpai untuk carian "{searchQuery}".
-            </div>
-         )}
-      </div>
-    );
+  const renderContent = () => {
+    switch (type) {
+      case 'Guru Ganti': return <GuruGantiView />;
+      case 'Guru Kelas': return <GuruKelasView />;
+      case 'Jadual Persendirian': return <JadualPersendirianView />;
+      case 'Jadual Kelas': return <JadualKelasView />;
+      case 'Jadual Berucap': return <JadualBerucapView />;
+      case 'Jadual Pemantauan': return <JadualPemantauanView />;
+      default: return <GuruGantiView />;
+    }
   };
 
   return (
     <div className="p-4 md:p-8 space-y-6 pb-20 fade-in">
-       {/* Breadcrumb Header */}
-       <div className="flex items-center gap-2 text-sm text-[#C9B458] font-mono mb-2">
-           <span>JADUAL</span>
-           <span>/</span>
-           <span className="uppercase">{type}</span>
-       </div>
-       
-       <h2 className="text-3xl font-bold text-white font-montserrat mb-6">
-         {type}
-       </h2>
-
-       {type === 'Guru Ganti' && <GuruGantiView />}
-       {type === 'Guru Kelas' && <GuruKelasView />}
-       {type === 'Jadual Persendirian' && <JadualPersendirianView />}
-       {type === 'Jadual Kelas' && <JadualKelasView />}
-       {type === 'Jadual Berucap' && <JadualBerucapView />}
-       {type === 'Jadual Pemantauan' && <JadualPemantauanView />}
-
-       {/* --- UNIVERSAL EDIT MODAL --- */}
-       {isModalOpen && (
-           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in px-4">
-             <div className="bg-[#1C2541] w-full max-w-md p-6 rounded-xl border border-[#C9B458] shadow-2xl max-h-[90vh] overflow-y-auto">
-                <h3 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">
-                    {modalType === 'scheduleSlot' ? `Edit Slot (${formData.day} ${formData.time})` : 
-                     modalType === 'addClass' ? 'Tambah Kelas Baru' : 
-                     modalType === 'speech' ? 'Jadual Berucap' : 
-                     modalType === 'monitoring' ? `Edit Kad Pemantauan #${editingItem.id}` : 'Kemaskini Maklumat'}
-                </h3>
-                
-                <form onSubmit={handleSave} className="space-y-4">
-                    {modalType === 'relief' && (
-                        <>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Masa</label>
-                              <input type="text" value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Kelas</label>
-                              <input type="text" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Subjek</label>
-                              <input type="text" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Guru Tidak Hadir</label>
-                              <select 
-                                className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                value={formData.absent}
-                                onChange={e => setFormData({...formData, absent: e.target.value})}
-                              >
-                                <option value="">-- Pilih Guru --</option>
-                                {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-                              </select>
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Guru Ganti</label>
-                              <select 
-                                className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                value={formData.relief}
-                                onChange={e => setFormData({...formData, relief: e.target.value})}
-                              >
-                                <option value="">-- Pilih Guru --</option>
-                                {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-                              </select>
-                           </div>
-                        </>
-                    )}
-
-                    {modalType === 'monitoring' && (
-                        <>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Pemantau</label>
-                              <select 
-                                className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                value={formData.monitor}
-                                onChange={e => setFormData({...formData, monitor: e.target.value})}
-                              >
-                                <option value="">-- Pilih Guru --</option>
-                                {TEACHER_LIST.map(t => <option key={t} value={t.toUpperCase()}>{t.toUpperCase()}</option>)}
-                              </select>
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Jawatan</label>
-                              <input type="text" value={formData.position} onChange={e => setFormData({...formData, position: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold mb-1 block">Senarai Guru Diselia (Format: Kod | Nama)</label>
-                              <textarea 
-                                value={formData.itemsStr} 
-                                onChange={e => setFormData({...formData, itemsStr: e.target.value})} 
-                                className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-48 font-mono text-sm"
-                                placeholder={`2.1 | Nama Guru A\n2.2 | Nama Guru B`}
-                              />
-                              <p className="text-[10px] text-gray-500 mt-1">* Gunakan simbol paip (|) untuk memisahkan kod dan nama. Satu guru per baris.</p>
-                           </div>
-                        </>
-                    )}
-
-                    {modalType === 'coordinator' && (
-                        <div>
-                             <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Penyelaras ({formData.form})</label>
-                             <select 
-                                className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                value={formData.name}
-                                onChange={e => setFormData({...formData, name: e.target.value})}
-                             >
-                                <option value="">-- Pilih Guru --</option>
-                                {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-                             </select>
-                        </div>
-                    )}
-
-                    {modalType === 'classTeacher' && (
-                         <div>
-                             <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Guru Kelas ({formData.class})</label>
-                             <select 
-                                className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                value={formData.teacher}
-                                onChange={e => setFormData({...formData, teacher: e.target.value})}
-                             >
-                                <option value="">-- Pilih Guru --</option>
-                                {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-                             </select>
-                        </div>
-                    )}
-
-                    {modalType === 'speech' && (
-                        <>
-                           <div className="grid grid-cols-2 gap-4">
-                               <div>
-                                  <label className="text-xs text-[#C9B458] uppercase font-bold">Minggu (M)</label>
-                                  <input type="text" value={formData.week} onChange={e => setFormData({...formData, week: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                                </div>
-                               <div>
-                                  <label className="text-xs text-[#C9B458] uppercase font-bold">Tarikh</label>
-                                  <input type="text" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                               </div>
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Kumpulan</label>
-                              <input type="text" value={formData.group} onChange={e => setFormData({...formData, group: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Guru Berucap</label>
-                              <input type="text" value={formData.speaker} onChange={e => setFormData({...formData, speaker: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Tajuk</label>
-                              <input type="text" value={formData.topic} onChange={e => setFormData({...formData, topic: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                           </div>
-                           <div className="grid grid-cols-2 gap-4">
-                               <div>
-                                  <label className="text-xs text-[#C9B458] uppercase font-bold">Sivik</label>
-                                  <input type="text" value={formData.civic} onChange={e => setFormData({...formData, civic: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                               </div>
-                               <div>
-                                  <label className="text-xs text-[#C9B458] uppercase font-bold">Sumur</label>
-                                  <input type="text" value={formData.sumur} onChange={e => setFormData({...formData, sumur: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
-                               </div>
-                           </div>
-                        </>
-                    )}
-
-                    {modalType === 'addClass' && (
-                         <>
-                            <div>
-                                <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Kelas (Cth: 4 Al-Hanafi)</label>
-                                <input required type="text" value={formData.className} onChange={e => setFormData({...formData, className: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" placeholder="Nama Kelas" />
-                            </div>
-                            <div>
-                                <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Guru Kelas</label>
-                                <select 
-                                    className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                    value={formData.teacherName}
-                                    onChange={e => setFormData({...formData, teacherName: e.target.value})}
-                                >
-                                    <option value="">-- Pilih Guru --</option>
-                                    {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-                                </select>
-                            </div>
-                         </>
-                    )}
-
-                    {modalType === 'scheduleSlot' && (
-                        <>
-                           <div>
-                              <label className="text-xs text-[#C9B458] uppercase font-bold">Subjek</label>
-                              
-                              {/* Logic for Dropdown in Jadual Kelas OR Jadual Persendirian */}
-                              {type === 'Jadual Kelas' ? (
-                                  <select 
-                                    className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                    value={formData.subject}
-                                    onChange={e => setFormData({...formData, subject: e.target.value})}
-                                  >
-                                      <option value="">-- Pilih Subjek --</option>
-                                      <option value="REHAT">REHAT</option>
-                                      {(getFormLevel(selectedClass) >= 4 ? SUBJECTS_UPPER : SUBJECTS_LOWER).map(sub => (
-                                          <option key={sub} value={sub}>{sub}</option>
-                                      ))}
-                                      {/* Fallback to custom value if it exists but isn't in list */}
-                                      {!SUBJECTS_LOWER.includes(formData.subject) && !SUBJECTS_UPPER.includes(formData.subject) && formData.subject !== 'REHAT' && formData.subject !== '' && (
-                                          <option value={formData.subject}>{formData.subject}</option>
-                                      )}
-                                  </select>
-                              ) : (
-                                  // For Personal Schedule, show all subjects in dropdown for convenience
-                                  <select 
-                                    className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                    value={formData.subject}
-                                    onChange={e => setFormData({...formData, subject: e.target.value})}
-                                  >
-                                      <option value="">-- Pilih Subjek / Aktiviti --</option>
-                                      <option value="REHAT">REHAT</option>
-                                      {ALL_SUBJECTS.map(sub => (
-                                          <option key={sub} value={sub}>{sub}</option>
-                                      ))}
-                                      {/* Allow keeping custom value if user manually entered it before */}
-                                      {!ALL_SUBJECTS.includes(formData.subject) && formData.subject !== 'REHAT' && formData.subject !== '' && (
-                                          <option value={formData.subject}>{formData.subject}</option>
-                                      )}
-                                  </select>
-                              )}
-                           </div>
-
-                           {/* If editing personal schedule, ask for Class Code. If Class schedule, ask for Teacher */}
-                           {type === 'Jadual Persendirian' ? (
-                               <div>
-                                  <label className="text-xs text-[#C9B458] uppercase font-bold">Kod Kelas / Catatan</label>
-                                  <select 
-                                    className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                    value={formData.code} 
-                                    onChange={e => setFormData({...formData, code: e.target.value})}
-                                  >
-                                      <option value="">-- Pilih Kod --</option>
-                                      {CLASS_CODES.map(code => (
-                                          <option key={code} value={code}>{code}</option>
-                                      ))}
-                                  </select>
-                                </div>
-                           ) : (
-                               <div>
-                                  <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Guru</label>
-                                  <select 
-                                    className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white"
-                                    value={formData.teacher}
-                                    onChange={e => setFormData({...formData, teacher: e.target.value})}
-                                  >
-                                    <option value="">-- Pilih Guru --</option>
-                                    {TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}
-                                  </select>
-                                </div>
-                           )}
-                           
-                           <div>
-                               <label className="text-xs text-[#C9B458] uppercase font-bold">Warna Label</label>
-                               <div className="grid grid-cols-1 gap-2 mt-1">
-                                   {colorOptions.map(opt => (
-                                       <label key={opt.label} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-[#0B132B]">
-                                           <input 
-                                             type="radio" 
-                                             name="color" 
-                                             value={opt.value} 
-                                             checked={formData.color === opt.value}
-                                             onChange={() => setFormData({...formData, color: opt.value})}
-                                             className="accent-[#C9B458]"
-                                           />
-                                           <span className={`w-4 h-4 rounded-full border ${opt.value.split(' ')[0]} ${opt.value.split(' ')[2]}`}></span>
-                                           <span className="text-sm text-gray-300">{opt.label}</span>
-                                       </label>
-                                   ))}
-                               </div>
-                           </div>
-                        </>
-                    )}
-
-                    <div className="flex gap-2 pt-4">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">Batal</button>
-                        <button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] font-bold rounded hover:bg-yellow-400">Simpan</button>
+      {renderContent()}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in px-4 py-6 overflow-y-auto">
+          <div className="bg-[#1C2541] w-full max-w-lg p-6 rounded-xl border border-[#C9B458] shadow-2xl max-h-full overflow-y-auto scrollbar-thin">
+            <h3 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2 capitalize">{editingItem ? 'Kemaskini' : 'Tambah'} {modalType.replace(/([A-Z])/g, ' $1')}</h3>
+            <form onSubmit={handleSave} className="space-y-4">
+               {modalType === 'relief' && (
+                 <>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Tarikh</label><input type="text" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Masa</label><input type="text" value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
                     </div>
-                </form>
-             </div>
-           </div>
-       )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kelas</label><input type="text" value={formData.class} onChange={e => setFormData({...formData, class: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Subjek</label><input type="text" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                    </div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Tidak Hadir</label><select value={formData.absent} onChange={e => setFormData({...formData, absent: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Ganti</label><select value={formData.relief} onChange={e => setFormData({...formData, relief: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                 </>
+               )}
+               {(modalType === 'coordinator' || modalType === 'classTeacher') && (
+                 <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Guru</label><select value={modalType === 'coordinator' ? formData.name : formData.teacher} onChange={e => setFormData({...formData, [modalType === 'coordinator' ? 'name' : 'teacher']: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm">{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+               )}
+               {modalType === 'addClass' && (
+                 <>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Kelas</label><input type="text" value={formData.className} onChange={e => setFormData({...formData, className: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" placeholder="Cth: 4 Al-Maliki" /></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Kelas</label><select value={formData.teacherName} onChange={e => setFormData({...formData, teacherName: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                 </>
+               )}
+               {modalType === 'speech' && (
+                 <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Minggu</label><input type="text" value={formData.week} onChange={e => setFormData({...formData, week: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Tarikh</label><input type="text" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                    </div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kumpulan</label><select value={formData.group} onChange={e => setFormData({...formData, group: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Kumpulan</option>{GROUP_MEMBERS_DATA.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Berucap</label><select value={formData.speaker} onChange={e => setFormData({...formData, speaker: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Pilih Guru</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Tajuk</label><input type="text" value={formData.topic} onChange={e => setFormData({...formData, topic: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Sivik</label><input type="text" value={formData.civic} onChange={e => setFormData({...formData, civic: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Sumur</label><input type="text" value={formData.sumur} onChange={e => setFormData({...formData, sumur: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                    </div>
+                 </div>
+               )}
+               {modalType === 'monitoring' && (
+                 <>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Nama Pemantau</label><input type="text" value={formData.monitor} onChange={e => setFormData({...formData, monitor: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                    <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Senarai Guru (Format: Kod|Nama)</label><textarea value={formData.itemsStr} onChange={e => setFormData({...formData, itemsStr: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-xs h-32 font-mono" /></div>
+                 </>
+               )}
+               {modalType === 'scheduleSlot' && (
+                 <>
+                    <div className="text-xs text-gray-400 mb-2">Mengedit: <span className="text-white">{formData.day} @ {formData.time}</span></div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Subjek</label><select value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Kosong</option><option value="REHAT">REHAT</option>{ALL_SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Warna</label><select value={formData.color} onChange={e => setFormData({...formData, color: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm">{colorOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}</select></div>
+                    </div>
+                    {formData.context === selectedTeacher ? (
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Kod Kelas / Aktiviti</label><input type="text" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm" /></div>
+                    ) : (
+                        <div><label className="text-[10px] text-[#C9B458] font-bold uppercase">Guru Mengajar</label><select value={formData.teacher} onChange={e => setFormData({...formData, teacher: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white text-sm"><option value="">Tiada</option>{TEACHER_LIST.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+                    )}
+                 </>
+               )}
+               <div className="flex gap-2 pt-4"><button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">Batal</button><button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] font-bold rounded hover:bg-yellow-400">Simpan</button></div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
