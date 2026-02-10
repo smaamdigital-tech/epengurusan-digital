@@ -99,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
     { 
       name: 'Kurikulum', 
       icon: <Icons.Kurikulum />,
-      subItems: ['Jawatankuasa', 'Takwim', 'Peperiksaan']
+      subItems: ['Jawatankuasa', 'Takwim', 'Guru Ganti', 'Peperiksaan']
     },
     { 
       name: 'Hal Ehwal Murid', 
@@ -117,17 +117,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
       subItems: [
         'Kalendar',
         'Kalendar Akademik',
+        'Minggu Persekolahan',
         'Cuti Perayaan',
         'Cuti Umum Johor',
-        'Minggu Persekolahan',
-        'Takwim Peperiksaan'
       ]
     },
     { 
       name: 'Jadual', 
       icon: <Icons.Calendar />,
       subItems: [
-        'Guru Ganti',
         'Guru Kelas',
         'Jadual Persendirian',
         'Jadual Kelas',

@@ -13,6 +13,7 @@ import { JadualModule } from './components/JadualModule';
 import { ProfilSekolah } from './components/ProfilSekolah';
 import { KurikulumPeperiksaan } from './components/KurikulumPeperiksaan';
 import { HemKehadiran } from './components/HemKehadiran';
+import { GuruGanti } from './components/GuruGanti';
 import { Footer } from './components/Footer';
 import { useApp } from './context/AppContext';
 
@@ -47,6 +48,10 @@ const App: React.FC = () => {
       
       if (parent === 'Kurikulum' && child === 'Peperiksaan') {
         return <KurikulumPeperiksaan />;
+      }
+
+      if (parent === 'Kurikulum' && child === 'Guru Ganti') {
+        return <GuruGanti />;
       }
 
       if (parent === 'Hal Ehwal Murid' && child === 'Kehadiran') {
@@ -94,7 +99,7 @@ const App: React.FC = () => {
       case 'Takwim': 
         return <TakwimPlanner type="Kalendar" />;
       case 'Jadual': 
-        return <JadualModule type="Guru Ganti" />;
+        return <JadualModule type="Guru Kelas" />;
       case 'Program': 
         return <ProgramView />;
       default:

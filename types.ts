@@ -1,4 +1,5 @@
 
+
 export type UserRole = 'adminsistem' | 'admin' | 'pengetua' | 'gpk_pentadbiran' | 'gpk_hem' | 'gpk_koko' | 'gkmp' | 'panitia' | 'guru' | 'su_pentadbir' | 'su_hem' | 'su_kuri' | 'su_koko' | null;
 
 export interface User {
@@ -40,6 +41,7 @@ export interface SchoolProfile {
   location: string;
   visi: string;
   misi: string;
+  piagam: string;
   moto: string;
   slogan: string;
   status: string;
@@ -109,4 +111,51 @@ export interface SiteConfig {
   schoolName: string;
   welcomeMessage: string;
   googleScriptUrl?: string;
+}
+
+export interface TeacherGroup {
+  id: number;
+  name: string;
+  members: string[];
+}
+
+export interface SpeechScheduleItem {
+  id: number;
+  week: string;
+  date: string;
+  group: string;
+  speaker: string;
+  topic: string;
+  civic: string;
+  sumur: string;
+}
+
+export interface KokoActivity {
+  id: number;
+  date: string;
+  activity: string;
+}
+
+export interface KokoAssemblyEvent {
+  id: number;
+  month: string;
+  date: string;
+  unit: string;
+  notes: string;
+}
+
+export interface SumurEvent {
+  id: number;
+  date: string;
+  program: string;
+  teacher: string;
+  activity: string;
+}
+
+export interface HipEvent {
+  id: number;
+  date: string;
+  program: string;
+  teacher: string;
+  activity: string;
 }

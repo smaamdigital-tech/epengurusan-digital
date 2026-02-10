@@ -5,7 +5,7 @@ export const Footer: React.FC = () => {
   return (
     <footer className="w-full bg-[#0B132B] py-6 mt-auto border-t border-[#C9B458]/30 shadow-2xl">
       <div className="container mx-auto px-6 text-center">
-        <h4 className="text-white font-bold text-sm md:text-base tracking-widest mb-1 uppercase">
+        <h4 className="text-white font-bold text-sm md:text-base tracking-widest mb-1">
           Hak Milik ePengurusan Digital SMAAM @ 2026
         </h4>
         <p className="text-gray-500 text-xs md:text-sm tracking-[0.2em] font-medium uppercase">

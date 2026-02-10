@@ -33,7 +33,23 @@ export const Header: React.FC = () => {
   };
 
   const formatHijriDate = (date: Date) => {
-    return "20 Sya'aban 1447 H";
+    try {
+      // Menggunakan Intl API untuk tarikh Hijrah dinamik (Umm al-Qura)
+      const formatted = new Intl.DateTimeFormat('ms-MY-u-ca-islamic-umalqura', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Asia/Kuala_Lumpur'
+      }).format(date);
+      
+      // Semak jika sudah ada H atau Hijrah untuk elak huruf ganda
+      if (formatted.match(/H|Hijrah/i)) {
+          return formatted;
+      }
+      return formatted + ' H';
+    } catch (error) {
+      return "Kalendar Hijrah H";
+    }
   };
 
   return (

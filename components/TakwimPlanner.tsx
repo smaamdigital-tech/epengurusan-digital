@@ -30,6 +30,21 @@ interface ExamWeekRow {
   isHoliday?: boolean;
 }
 
+interface JohorHolidayRow {
+  id: number;
+  date: string;
+  day: string;
+  name: string;
+}
+
+// Helper to identify system/locked data
+const isSystemData = (id: any) => {
+    if (typeof id === 'number') {
+        return id < 1000000000;
+    }
+    return false;
+};
+
 // --- DATA STRUCTURE FOR PDF CALENDAR 2026 ---
 interface CalendarEvent {
   day: number;
@@ -577,62 +592,100 @@ const initialExamWeeks: ExamWeekRow[] = [
     { id: 1004, week: '', date: '05.12.2026 – 31.12.2026', dalaman: 'CUTI AKHIR PERSEKOLAHAN TAHUN 2026', jaj: '', awam: '', isHoliday: true },
 ];
 
-const johorHolidays = [
-  { date: '1 Feb', day: 'Ahad', name: 'Hari Thaipusam' },
-  { date: '2 Feb', day: 'Isnin', name: 'Cuti Hari Thaipusam' },
-  { date: '17 Feb', day: 'Selasa', name: 'Tahun Baru Cina' },
-  { date: '18 Feb', day: 'Rabu', name: 'Tahun Baru Cina Hari Kedua' },
-  { date: '19 Feb', day: 'Khamis', name: 'Awal Ramadan' },
-  { date: '21 Mac', day: 'Sabtu', name: 'Hari Raya Aidilfitri' },
-  { date: '22 Mac', day: 'Ahad', name: 'Hari Raya Aidilfitri Hari Kedua' },
-  { date: '23 Mac', day: 'Isnin', name: 'Hari Keputeraan Sultan Johor' },
-  { date: '23 Mac', day: 'Isnin', name: 'Cuti Hari Raya Aidilfitri' },
-  { date: '1 Mei', day: 'Jumaat', name: 'Hari Pekerja' },
-  { date: '27 Mei', day: 'Rabu', name: 'Hari Raya Haji' },
-  { day: 'Ahad', date: '31 Mei', name: 'Hari Wesak' },
-  { date: '1 Jun', day: 'Isnin', name: 'Hari Keputeraan YDP Agong' },
-  { date: '1 Jun', day: 'Isnin', name: 'Cuti Hari Wesak' },
-  { date: '17 Jun', day: 'Rabu', name: 'Awal Muharram' },
-  { date: '21 Jul', day: 'Selasa', name: 'Hari Hol Almarhum Sultan Iskandar' },
-  { date: '25 Ogos', day: 'Selasa', name: 'Maulidur Rasul' },
-  { date: '31 Ogos', day: 'Isnin', name: 'Hari Kebangsaan' },
-  { date: '16 Sep', day: 'Rabu', name: 'Hari Malaysia' },
-  { date: '8 Nov', day: 'Ahad', name: 'Hari Deepavali' },
-  { date: '9 Nov', day: 'Isnin', name: 'Cuti Hari Deepavali' },
-  { date: '25 Dis', day: 'Jumaat', name: 'Hari Krismas' },
+const initialJohorHolidays: JohorHolidayRow[] = [
+  { id: 1, date: '1 Feb', day: 'Ahad', name: 'Hari Thaipusam' },
+  { id: 2, date: '2 Feb', day: 'Isnin', name: 'Cuti Hari Thaipusam' },
+  { id: 3, date: '17 Feb', day: 'Selasa', name: 'Tahun Baru Cina' },
+  { id: 4, date: '18 Feb', day: 'Rabu', name: 'Tahun Baru Cina Hari Kedua' },
+  { id: 5, date: '19 Feb', day: 'Khamis', name: 'Awal Ramadan' },
+  { id: 6, date: '21 Mac', day: 'Sabtu', name: 'Hari Raya Aidilfitri' },
+  { id: 7, date: '22 Mac', day: 'Ahad', name: 'Hari Raya Aidilfitri Hari Kedua' },
+  { id: 8, date: '23 Mac', day: 'Isnin', name: 'Hari Keputeraan Sultan Johor' },
+  { id: 9, date: '23 Mac', day: 'Isnin', name: 'Cuti Hari Raya Aidilfitri' },
+  { id: 10, date: '1 Mei', day: 'Jumaat', name: 'Hari Pekerja' },
+  { id: 11, date: '27 Mei', day: 'Rabu', name: 'Hari Raya Haji' },
+  { id: 12, day: 'Ahad', date: '31 Mei', name: 'Hari Wesak' },
+  { id: 13, date: '1 Jun', day: 'Isnin', name: 'Hari Keputeraan YDP Agong' },
+  { id: 14, date: '1 Jun', day: 'Isnin', name: 'Cuti Hari Wesak' },
+  { id: 15, date: '17 Jun', day: 'Rabu', name: 'Awal Muharram' },
+  { id: 16, date: '21 Jul', day: 'Selasa', name: 'Hari Hol Almarhum Sultan Iskandar' },
+  { id: 17, date: '25 Ogos', day: 'Selasa', name: 'Maulidur Rasul' },
+  { id: 18, date: '31 Ogos', day: 'Isnin', name: 'Hari Kebangsaan' },
+  { id: 19, date: '16 Sep', day: 'Rabu', name: 'Hari Malaysia' },
+  { id: 20, date: '8 Nov', day: 'Ahad', name: 'Hari Deepavali' },
+  { id: 21, date: '9 Nov', day: 'Isnin', name: 'Cuti Hari Deepavali' },
+  { id: 22, date: '25 Dis', day: 'Jumaat', name: 'Hari Krismas' },
 ];
 
 export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
   const { user, showToast } = useApp();
   const isAdmin = user?.role === 'admin' || user?.role === 'adminsistem';
+  const isSuperAdmin = user?.role === 'adminsistem';
   
   const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth());
 
   // --- STATE FOR EDITABLE TABLES ---
   const [schoolWeeks, setSchoolWeeks] = useState<SchoolWeekRow[]>(initialSchoolWeeks);
   const [examWeeks, setExamWeeks] = useState<ExamWeekRow[]>(initialExamWeeks);
+  const [johorHolidayList, setJohorHolidayList] = useState<JohorHolidayRow[]>(initialJohorHolidays);
   
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editType, setEditType] = useState<'school' | 'exam'>('school');
+  const [editType, setEditType] = useState<'school' | 'exam' | 'johorHoliday'>('school');
   const [editingRow, setEditingRow] = useState<any>(null);
 
   // --- HANDLERS ---
-  const handleOpenEdit = (type: 'school' | 'exam', row: any) => {
+  const handleOpenEdit = (type: 'school' | 'exam' | 'johorHoliday', row: any) => {
+      // Allow if not system data OR if user is SuperAdmin
+      if (isSystemData(row?.id) && !isSuperAdmin) {
+           // Do nothing or show toast, but the button should be disabled in UI
+           return;
+      }
       setEditType(type);
-      setEditingRow(row);
+      setEditingRow(row || {}); // Pass empty obj for new items
       setIsEditModalOpen(true);
+  };
+
+  const handleDelete = (type: 'johorHoliday', id: number) => {
+      if (isSystemData(id) && !isSuperAdmin) {
+          showToast("Akses Ditolak: Data sistem.");
+          return;
+      }
+      if (confirm("Adakah anda pasti ingin memadam data ini?")) {
+          if (type === 'johorHoliday') {
+              setJohorHolidayList(johorHolidayList.filter(item => item.id !== id));
+              showToast("Cuti berjaya dipadam.");
+          }
+      }
   };
 
   const handleSaveEdit = (e: React.FormEvent) => {
       e.preventDefault();
+      
+      // BLOCK SAVING SYSTEM DATA ONLY IF NOT SUPERADMIN
+      if (editingRow.id && isSystemData(editingRow.id) && !isSuperAdmin) {
+          showToast("Akses Ditolak: Data asal sistem dikunci dan tidak boleh diubah.");
+          setIsEditModalOpen(false);
+          return;
+      }
+
       if (editType === 'school') {
           setSchoolWeeks(schoolWeeks.map(row => row.id === editingRow.id ? editingRow : row));
-      } else {
+          showToast("Data Minggu Persekolahan dikemaskini.");
+      } else if (editType === 'exam') {
           setExamWeeks(examWeeks.map(row => row.id === editingRow.id ? editingRow : row));
+           showToast("Data Takwim Peperiksaan dikemaskini.");
+      } else if (editType === 'johorHoliday') {
+          if (editingRow.id) {
+              setJohorHolidayList(johorHolidayList.map(row => row.id === editingRow.id ? editingRow : row));
+              showToast("Data Cuti Umum dikemaskini.");
+          } else {
+              const newId = Date.now(); // Simple ID generation
+              setJohorHolidayList([...johorHolidayList, { ...editingRow, id: newId }]);
+              showToast("Cuti Umum ditambah.");
+          }
       }
       setIsEditModalOpen(false);
-      showToast("Data berjaya dikemaskini.");
   };
 
   // Helper for Hijri Date Label
@@ -732,7 +785,7 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
     );
   };
 
-  // --- ACADEMIC CALENDAR TABLE (Refactored to match Lampiran B) ---
+  // --- ACADEMIC CALENDAR TABLE ---
   const AcademicCalendarView = () => {
      return (
         <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in text-white">
@@ -922,7 +975,15 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                             <td className="border border-gray-600 py-2">{item.week}</td><td className="border border-gray-600 py-2 px-2 whitespace-nowrap">{item.date}</td><td className="border border-gray-600 py-2 px-2 text-left">{item.notes}</td>
                             {item.totalDays && <td rowSpan={item.rowSpan || 1} className={`border border-gray-600 py-2 font-semibold ${item.isHoliday ? 'bg-[#C9B458]' : 'bg-[#1C2541] text-white'}`}>{item.totalDays}</td>}
                             {item.totalWeeks && <td rowSpan={item.rowSpan || 1} className={`border border-gray-600 py-2 font-semibold ${item.isHoliday ? 'bg-[#C9B458]' : 'bg-[#1C2541] text-white'}`}>{item.totalWeeks}</td>}
-                            {isAdmin && <td className="border border-gray-600 py-2 px-2"><button onClick={() => handleOpenEdit('school', item)} className="text-blue-400 hover:text-white">✏️</button></td>}
+                            {isAdmin && <td className="border border-gray-600 py-2 px-2">
+                                <button 
+                                    onClick={() => handleOpenEdit('school', item)} 
+                                    className={`${isSystemData(item.id) && !isSuperAdmin ? 'text-gray-500 cursor-not-allowed' : 'text-blue-400 hover:text-white'}`}
+                                    title={isSystemData(item.id) && !isSuperAdmin ? 'Dikunci' : 'Kemaskini'}
+                                >
+                                    {isSystemData(item.id) && !isSuperAdmin ? '🔒' : '✏️'}
+                                </button>
+                            </td>}
                         </tr>
                     ))}
                 </tbody>
@@ -953,7 +1014,11 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                              <tr key={item.id} className="bg-[#C9B458] text-[#0B132B] font-bold uppercase border-b border-gray-600">
                                  <td colSpan={2} className="border border-gray-600 py-2 px-1 text-center">{item.date}</td>
                                  <td colSpan={3} className="border border-gray-600 py-2 px-1 text-center truncate">{item.dalaman}</td>
-                                 {isAdmin && <td className="border border-gray-600 py-2 px-1 bg-[#0B132B]"><button onClick={() => handleOpenEdit('exam', item)} className="text-[#C9B458] hover:text-white">✏️</button></td>}
+                                 {isAdmin && <td className="border border-gray-600 py-2 px-1 bg-[#0B132B]">
+                                     <button onClick={() => handleOpenEdit('exam', item)} className={`${isSystemData(item.id) && !isSuperAdmin ? 'text-gray-500' : 'text-[#C9B458] hover:text-white'}`}>
+                                         {isSystemData(item.id) && !isSuperAdmin ? '🔒' : '✏️'}
+                                     </button>
+                                 </td>}
                              </tr>
                         ) : (
                             <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
@@ -962,7 +1027,14 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                                 <td className="border border-gray-600 py-2 px-1 md:px-2 text-left align-top leading-tight break-words">{item.dalaman}</td>
                                 <td className="border border-gray-600 py-2 px-1 md:px-2 text-left align-top leading-tight break-words">{item.jaj}</td>
                                 <td className="border border-gray-600 py-2 px-1 md:px-2 text-left align-top leading-tight break-words">{item.awam}</td>
-                                {isAdmin && <td className="border border-gray-600 py-2 px-1 text-center"><button onClick={() => handleOpenEdit('exam', item)} className="text-gray-500 hover:text-[#C9B458]">✏️</button></td>}
+                                {isAdmin && <td className="border border-gray-600 py-2 px-1 text-center">
+                                    <button 
+                                        onClick={() => handleOpenEdit('exam', item)} 
+                                        className={`${isSystemData(item.id) && !isSuperAdmin ? 'text-gray-600 cursor-not-allowed' : 'text-gray-500 hover:text-[#C9B458]'}`}
+                                    >
+                                        {isSystemData(item.id) && !isSuperAdmin ? '🔒' : '✏️'}
+                                    </button>
+                                </td>}
                             </tr>
                         )
                     ))}
@@ -1107,25 +1179,37 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
     const getMonthFromDate = (dateStr: string) => {
         const parts = dateStr.split(' ');
         if (parts.length < 2) return -1;
-        const m = parts[1].toLowerCase(); // e.g., "feb", "mac"
+        const m = parts[1].toLowerCase().substring(0, 3); // e.g., "feb", "mac" (taking first 3 chars)
         
         const map: Record<string, number> = {
             'jan': 0, 'feb': 1, 'mac': 2, 'apr': 3, 'mei': 4, 'jun': 5,
-            'jul': 6, 'ogos': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'dis': 11
+            'jul': 6, 'ogo': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'dis': 11
         };
-        // The data uses "Ogos".
+        // Special handle for Ogos if data uses full name or 'ogo'
+        if (parts[1].toLowerCase().startsWith('ogo')) return 7;
+        
         return map[m] !== undefined ? map[m] : -1;
     };
 
-    const currentMonthHolidays = johorHolidays.filter(h => getMonthFromDate(h.date) === currentMonthIndex);
+    const currentMonthHolidays = johorHolidayList.filter(h => getMonthFromDate(h.date) === currentMonthIndex);
 
      return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 fade-in items-start">
-            {/* LEFT: MAIN LIST (Follows CUTI PERAYAAN style) */}
+            {/* LEFT: MAIN LIST */}
             <div className="lg:col-span-2 bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700">
-                <div className="p-6 bg-[#0B132B] border-b border-gray-700">
-                    <h3 className="text-xl font-bold text-white font-montserrat uppercase">CUTI UMUM NEGERI JOHOR 2026</h3>
-                    <p className="text-sm text-gray-400">Senarai Hari Kelepasan Am Negeri Johor</p>
+                <div className="p-6 bg-[#0B132B] border-b border-gray-700 flex justify-between items-center">
+                    <div>
+                        <h3 className="text-xl font-bold text-white font-montserrat uppercase">CUTI UMUM NEGERI JOHOR 2026</h3>
+                        <p className="text-sm text-gray-400">Senarai Hari Kelepasan Am Negeri Johor</p>
+                    </div>
+                    {isAdmin && (
+                        <button 
+                            onClick={() => handleOpenEdit('johorHoliday', null)}
+                            className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-lg font-bold text-xs hover:bg-yellow-400 shadow-lg"
+                        >
+                            + Tambah
+                        </button>
+                    )}
                 </div>
                 
                 <div className="overflow-x-auto p-4">
@@ -1135,14 +1219,30 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                                 <th className="px-4 py-3 border border-gray-600 w-1/4">TARIKH</th>
                                 <th className="px-4 py-3 border border-gray-600 w-1/4">HARI</th>
                                 <th className="px-4 py-3 border border-gray-600">CUTI</th>
+                                {isAdmin && <th className="px-4 py-3 border border-gray-600 w-24">TINDAKAN</th>}
                             </tr>
                         </thead>
                         <tbody className="text-sm text-gray-300">
-                            {johorHolidays.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-[#253252] transition-colors">
+                            {johorHolidayList.map((item) => (
+                                <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
                                     <td className="px-4 py-3 border border-gray-600 font-bold text-white bg-[#1C2541]">{item.date}</td>
                                     <td className="px-4 py-3 border border-gray-600">{item.day}</td>
-                                    <td className="px-4 py-3 border border-gray-600 text-left uppercase pl-6">{item.name}</td>
+                                    <td className="px-4 py-3 border border-gray-600 text-left pl-6">{item.name}</td>
+                                    {isAdmin && (
+                                        <td className="px-4 py-3 border border-gray-600">
+                                            <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button 
+                                                    onClick={() => handleOpenEdit('johorHoliday', item)}
+                                                    className={`${isSystemData(item.id) && !isSuperAdmin ? 'text-gray-500 cursor-not-allowed' : 'text-blue-400 hover:text-white'}`}
+                                                >
+                                                    {isSystemData(item.id) && !isSuperAdmin ? '🔒' : '✏️'}
+                                                </button>
+                                                {!isSystemData(item.id) && (
+                                                     <button onClick={() => handleDelete('johorHoliday', item.id)} className="text-red-400 hover:text-white">🗑️</button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>
@@ -1181,7 +1281,7 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                                          </div>
                                      </div>
                                      <div className="h-px bg-white/10 w-full my-2"></div>
-                                     <p className="text-white font-bold text-sm uppercase leading-tight group-hover:text-[#C9B458] transition-colors">
+                                     <p className="text-white font-bold text-sm leading-tight group-hover:text-[#C9B458] transition-colors">
                                         {h.name}
                                      </p>
                                  </div>
@@ -1230,7 +1330,10 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in px-4">
               <div className="bg-[#1C2541] w-full max-w-lg p-6 rounded-xl border border-[#C9B458] shadow-2xl max-h-[90vh] overflow-y-auto">
                   <h3 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">
-                      Edit {editType === 'school' ? 'Minggu Persekolahan' : 'Takwim Peperiksaan'}
+                      {isSystemData(editingRow.id) && !isSuperAdmin 
+                        ? 'Maklumat (Dikunci)' 
+                        : editType === 'johorHoliday' ? (editingRow.id ? 'Edit Cuti Umum' : 'Tambah Cuti Umum') : `Edit ${editType === 'school' ? 'Minggu Persekolahan' : 'Takwim Peperiksaan'}`
+                      }
                   </h3>
                   <form onSubmit={handleSaveEdit} className="space-y-4">
                       {editType === 'school' ? (
@@ -1238,67 +1341,178 @@ export const TakwimPlanner: React.FC<TakwimPlannerProps> = ({ type }) => {
                               <div className="grid grid-cols-2 gap-4">
                                   <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Minggu</label>
-                                      <input type="text" value={editingRow.week} onChange={e => setEditingRow({...editingRow, week: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.week} 
+                                        onChange={e => setEditingRow({...editingRow, week: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                      />
                                   </div>
                                   <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Tarikh</label>
-                                      <input type="text" value={editingRow.date} onChange={e => setEditingRow({...editingRow, date: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.date} 
+                                        onChange={e => setEditingRow({...editingRow, date: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                      />
                                   </div>
                               </div>
                               <div>
                                   <label className="text-xs text-[#C9B458] uppercase font-bold">Perkara / Catatan</label>
-                                  <textarea value={editingRow.notes} onChange={e => setEditingRow({...editingRow, notes: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-24" />
+                                  <textarea 
+                                    value={editingRow.notes} 
+                                    onChange={e => setEditingRow({...editingRow, notes: e.target.value})} 
+                                    className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-24 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                    disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                  />
                               </div>
                               <div className="grid grid-cols-2 gap-4">
                                   <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Jum. Hari</label>
-                                      <input type="text" value={editingRow.totalDays} onChange={e => setEditingRow({...editingRow, totalDays: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.totalDays} 
+                                        onChange={e => setEditingRow({...editingRow, totalDays: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                      />
                                   </div>
                                   <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Jum. Minggu</label>
-                                      <input type="text" value={editingRow.totalWeeks} onChange={e => setEditingRow({...editingRow, totalWeeks: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.totalWeeks} 
+                                        onChange={e => setEditingRow({...editingRow, totalWeeks: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                      />
                                   </div>
                               </div>
                           </>
-                      ) : (
+                      ) : editType === 'exam' ? (
                           <>
                               <div className="grid grid-cols-2 gap-4">
                                   <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Minggu (M)</label>
-                                      <input type="text" value={editingRow.week} onChange={e => setEditingRow({...editingRow, week: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" disabled={editingRow.isHoliday} />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.week} 
+                                        onChange={e => setEditingRow({...editingRow, week: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={editingRow.isHoliday || (isSystemData(editingRow.id) && !isSuperAdmin)} 
+                                      />
                                   </div>
                                   <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Tarikh</label>
-                                      <input type="text" value={editingRow.date} onChange={e => setEditingRow({...editingRow, date: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.date} 
+                                        onChange={e => setEditingRow({...editingRow, date: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                      />
                                   </div>
                               </div>
                               {editingRow.isHoliday ? (
                                    <div>
                                       <label className="text-xs text-[#C9B458] uppercase font-bold">Keterangan Cuti</label>
-                                      <input type="text" value={editingRow.dalaman} onChange={e => setEditingRow({...editingRow, dalaman: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white" />
+                                      <input 
+                                        type="text" 
+                                        value={editingRow.dalaman} 
+                                        onChange={e => setEditingRow({...editingRow, dalaman: e.target.value})} 
+                                        className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed" 
+                                        disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                      />
                                    </div>
                               ) : (
                                   <>
                                     <div>
                                         <label className="text-xs text-[#C9B458] uppercase font-bold">Peperiksaan Dalaman</label>
-                                        <textarea value={editingRow.dalaman} onChange={e => setEditingRow({...editingRow, dalaman: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-20" />
+                                        <textarea 
+                                            value={editingRow.dalaman} 
+                                            onChange={e => setEditingRow({...editingRow, dalaman: e.target.value})} 
+                                            className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-20 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                            disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                        />
                                     </div>
                                     <div>
                                         <label className="text-xs text-[#C9B458] uppercase font-bold">Peperiksaan JAJ</label>
-                                        <textarea value={editingRow.jaj} onChange={e => setEditingRow({...editingRow, jaj: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-20" />
+                                        <textarea 
+                                            value={editingRow.jaj} 
+                                            onChange={e => setEditingRow({...editingRow, jaj: e.target.value})} 
+                                            className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-20 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                            disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                        />
                                     </div>
                                     <div>
                                         <label className="text-xs text-[#C9B458] uppercase font-bold">Peperiksaan Awam</label>
-                                        <textarea value={editingRow.awam} onChange={e => setEditingRow({...editingRow, awam: e.target.value})} className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-20" />
+                                        <textarea 
+                                            value={editingRow.awam} 
+                                            onChange={e => setEditingRow({...editingRow, awam: e.target.value})} 
+                                            className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white h-20 disabled:opacity-50 disabled:cursor-not-allowed" 
+                                            disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                        />
                                     </div>
                                   </>
                               )}
                           </>
+                      ) : (
+                          // Johor Holiday Edit Form
+                          <>
+                             <div>
+                                <label className="text-xs text-[#C9B458] uppercase font-bold">Nama Cuti</label>
+                                <input 
+                                   type="text" 
+                                   value={editingRow.name || ''} 
+                                   onChange={e => setEditingRow({...editingRow, name: e.target.value})} 
+                                   className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                   disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                />
+                             </div>
+                             <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs text-[#C9B458] uppercase font-bold">Tarikh</label>
+                                    <input 
+                                       type="text" 
+                                       value={editingRow.date || ''} 
+                                       onChange={e => setEditingRow({...editingRow, date: e.target.value})} 
+                                       className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                       placeholder="Cth: 1 Feb"
+                                       disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-[#C9B458] uppercase font-bold">Hari</label>
+                                    <select 
+                                       value={editingRow.day || ''} 
+                                       onChange={e => setEditingRow({...editingRow, day: e.target.value})} 
+                                       className="w-full bg-[#0B132B] border border-gray-700 rounded p-2 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                       disabled={isSystemData(editingRow.id) && !isSuperAdmin}
+                                    >
+                                        <option value="">Pilih Hari</option>
+                                        <option value="Ahad">Ahad</option>
+                                        <option value="Isnin">Isnin</option>
+                                        <option value="Selasa">Selasa</option>
+                                        <option value="Rabu">Rabu</option>
+                                        <option value="Khamis">Khamis</option>
+                                        <option value="Jumaat">Jumaat</option>
+                                        <option value="Sabtu">Sabtu</option>
+                                    </select>
+                                </div>
+                             </div>
+                          </>
                       )}
                       
                       <div className="flex gap-2 pt-4">
-                          <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">Batal</button>
-                          <button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] font-bold rounded hover:bg-yellow-400">Simpan</button>
+                          <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">
+                              {isSystemData(editingRow.id) && !isSuperAdmin ? 'Tutup' : 'Batal'}
+                          </button>
+                          {(!isSystemData(editingRow.id) || isSuperAdmin) && (
+                              <button type="submit" className="flex-1 py-2 bg-[#C9B458] text-[#0B132B] font-bold rounded hover:bg-yellow-400">Simpan</button>
+                          )}
                       </div>
                   </form>
               </div>
