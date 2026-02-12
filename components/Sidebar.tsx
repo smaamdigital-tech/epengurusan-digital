@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
     { 
       name: 'Hal Ehwal Murid', 
       icon: <Icons.HEM />,
-      subItems: ['Jawatankuasa', 'Takwim', 'Kehadiran']
+      subItems: ['Jawatankuasa', 'Takwim', 'Guru Kelas', 'Enrolmen Murid']
     },
     { 
       name: 'Kokurikulum', 
@@ -126,7 +126,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
       name: 'Jadual', 
       icon: <Icons.Calendar />,
       subItems: [
-        'Guru Kelas',
         'Jadual Persendirian',
         'Jadual Kelas',
         'Jadual Berucap',

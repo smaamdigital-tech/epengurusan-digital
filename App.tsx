@@ -54,8 +54,12 @@ const App: React.FC = () => {
         return <GuruGanti />;
       }
 
-      if (parent === 'Hal Ehwal Murid' && child === 'Kehadiran') {
+      if (parent === 'Hal Ehwal Murid' && child === 'Enrolmen Murid') {
         return <HemKehadiran />;
+      }
+
+      if (parent === 'Hal Ehwal Murid' && child === 'Guru Kelas') {
+        return <JadualModule type="Guru Kelas" />;
       }
 
       if (standardUnits.includes(parent) && (child === 'Jawatankuasa' || child === 'Takwim')) {
@@ -99,7 +103,7 @@ const App: React.FC = () => {
       case 'Takwim': 
         return <TakwimPlanner type="Kalendar" />;
       case 'Jadual': 
-        return <JadualModule type="Guru Kelas" />;
+        return <JadualModule type="Jadual Persendirian" />;
       case 'Program': 
         return <ProgramView />;
       default:
