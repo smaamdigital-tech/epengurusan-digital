@@ -87,6 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
     }
   }, [activeTab]);
 
+  // MENU ITEMS DEFINITION (Matched to App.tsx mapping)
   const menuItems: MenuItem[] = [
     { name: 'Dashboard', icon: <Icons.Dashboard /> },
     { name: 'Profil Sekolah', icon: <Icons.Profile /> },
@@ -104,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
     { 
       name: 'Hal Ehwal Murid', 
       icon: <Icons.HEM />,
-      subItems: ['Jawatankuasa', 'Takwim', 'Guru Kelas', 'Enrolmen Murid']
+      subItems: ['Jawatankuasa', 'Takwim', 'Pengurusan Kelas', 'Pengurusan Murid']
     },
     { 
       name: 'Kokurikulum', 
@@ -162,6 +163,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
   };
 
   const handleSubItemClick = (parentName: string, subName: string) => {
+    // This string format matches the parsing logic in App.tsx
     setActiveTab(`${parentName} - ${subName}`);
     if(onCloseMobile) onCloseMobile();
   };

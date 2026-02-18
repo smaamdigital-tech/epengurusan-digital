@@ -85,6 +85,17 @@ export const ProgramView: React.FC = () => {
       return dateStr;
   };
 
+  // Helper for display date
+  const formatDisplayDate = (dateStr: string | undefined) => {
+      if (!dateStr) return '';
+      // Check if YYYY-MM-DD (length 10, starts with 4 digits)
+      const parts = dateStr.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+          return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return dateStr;
+  };
+
   return (
     <div className="p-8 space-y-8 fade-in pb-20">
       <div className="flex flex-col md:flex-row justify-between items-end border-b border-gray-700 pb-4 gap-4">
@@ -125,7 +136,7 @@ export const ProgramView: React.FC = () => {
             {/* Content */}
             <div className="p-5 flex-1 flex flex-col">
               <div className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-                 <span>📅 {prog.date}</span>
+                 <span>📅 {formatDisplayDate(prog.date)}</span>
                  {prog.time && <span>• ⏰ {prog.time}</span>}
               </div>
               <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">{prog.title}</h3>
@@ -209,7 +220,7 @@ export const ProgramView: React.FC = () => {
                   
                   <div className="flex flex-wrap gap-4 text-sm text-[#C9B458] mb-6 font-mono border-b border-gray-700 pb-4">
                       <div className="flex items-center gap-2">
-                          <span>🗓️</span> {selectedProgram.date}
+                          <span>🗓️</span> {formatDisplayDate(selectedProgram.date)}
                       </div>
                       {selectedProgram.time && (
                           <div className="flex items-center gap-2">

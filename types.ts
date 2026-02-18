@@ -1,5 +1,4 @@
 
-
 export type UserRole = 'adminsistem' | 'admin' | 'pengetua' | 'gpk_pentadbiran' | 'gpk_hem' | 'gpk_koko' | 'gkmp' | 'panitia' | 'guru' | 'su_pentadbir' | 'su_hem' | 'su_kuri' | 'su_koko' | null;
 
 export interface User {
@@ -73,7 +72,7 @@ export interface RolePermission {
   // HEM
   canUpdateHEMJK: boolean;
   canUpdateHEMTakwim: boolean;
-  canUpdateHEMKehadiran: boolean;
+  canUpdateHEMEnrolmen: boolean;
   // Kokurikulum
   canUpdateKokoJK: boolean;
   canUpdateKokoTakwim: boolean;

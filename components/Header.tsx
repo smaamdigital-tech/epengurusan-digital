@@ -14,18 +14,39 @@ export const Header: React.FC = () => {
   }, []);
 
   const formatDate = (date: Date) => {
-    const d = date.getDate().toString().padStart(2, '0');
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const y = date.getFullYear();
-    return `${d}/${m}/${y}`;
+    // Format: dd Januari YYYY
+    return date.toLocaleDateString('ms-MY', { 
+      day: '2-digit', 
+      month: 'long', 
+      year: 'numeric' 
+    });
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ms-MY', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      hour12: true 
-    }).toUpperCase();
+  const formatTimeCustom = (date: Date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    let suffix = 'mlm'; // Default covers 19:00 - 00:59 (7pm - 12am+)
+
+    // 1 pagi sampai 11.59 pagi - guna pagi
+    if (hours >= 1 && hours < 12) {
+      suffix = 'pagi';
+    } 
+    // 12.00 - 1.59 - guna tghr
+    else if (hours >= 12 && hours < 14) {
+      suffix = 'tghr';
+    } 
+    // 2.00 - 6.59 - guna ptg
+    else if (hours >= 14 && hours < 19) {
+      suffix = 'ptg';
+    }
+    // 7.00 - 12.00 (dan seterusnya hingga 1 pagi) - guna mlm (covered by default)
+
+    // Convert to 12-hour format
+    let displayHour = hours % 12;
+    if (displayHour === 0) displayHour = 12;
+
+    return `${displayHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${suffix}`;
   };
 
   const getDayName = (date: Date) => {
@@ -34,19 +55,28 @@ export const Header: React.FC = () => {
 
   const formatHijriDate = (date: Date) => {
     try {
+      // Pelarasan Kalendar Hijri -1 Hari
+      // Untuk memastikan 1 Ramadan 1447H jatuh pada 19 Februari 2026 (Standard: 18 Feb)
+      const adjustedDate = new Date(date);
+      adjustedDate.setDate(adjustedDate.getDate() - 1);
+
       // Menggunakan Intl API untuk tarikh Hijrah dinamik (Umm al-Qura)
       const formatted = new Intl.DateTimeFormat('ms-MY-u-ca-islamic-umalqura', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
         timeZone: 'Asia/Kuala_Lumpur'
-      }).format(date);
+      }).format(adjustedDate);
       
+      let finalDate = formatted;
+      // Replace Syaaban with Sya'aban if present
+      finalDate = finalDate.replace(/Syaaban/gi, "Sya'aban");
+
       // Semak jika sudah ada H atau Hijrah untuk elak huruf ganda
-      if (formatted.match(/H|Hijrah/i)) {
-          return formatted;
+      if (finalDate.match(/H|Hijrah/i)) {
+          return finalDate;
       }
-      return formatted + ' H';
+      return finalDate + ' H';
     } catch (error) {
       return "Kalendar Hijrah H";
     }
@@ -81,10 +111,10 @@ export const Header: React.FC = () => {
         
         {/* Jam Digital */}
         <div className="flex flex-col items-center md:items-end border-r-0 md:border-r border-[#1C2541] pr-0 md:pr-8 leading-tight">
-          <div className="flex items-center gap-2 font-bold text-lg md:text-xl text-white tracking-tight tabular-nums">
-            <span>{formatDate(time)}</span>
+          <div className="flex items-center gap-2 tracking-tight tabular-nums">
+            <span className="text-[#4FD1C5] font-medium text-sm md:text-base">{formatDate(time)}</span>
             <span className="text-[#006D77] mx-1">|</span>
-            <span className="text-[#4FD1C5]">{formatTime(time)}</span>
+            <span className="text-[#4FD1C5] font-medium text-sm md:text-base">{formatTimeCustom(time)}</span>
           </div>
           <div className="flex items-center gap-2 mt-1 justify-center md:justify-end">
              <span className="text-[0.65rem] md:text-xs bg-[#1C2541] px-2 py-0.5 rounded text-[#C9B458] font-bold uppercase border border-[#C9B458]/30 tracking-wider">

@@ -6,18 +6,41 @@ import { Dashboard } from './components/Dashboard';
 import { AdminSettings } from './components/AdminSettings';
 import { LoginModal } from './components/LoginModal';
 import { Toast } from './components/Toast';
-import { UnitContent } from './components/UnitContent';
-import { TakwimPlanner } from './components/TakwimPlanner';
 import { ProgramView } from './components/ProgramView';
-import { JadualModule } from './components/JadualModule';
 import { ProfilSekolah } from './components/ProfilSekolah';
-import { KurikulumPeperiksaan } from './components/KurikulumPeperiksaan';
-import { HemKehadiran } from './components/HemKehadiran';
-import { GuruGanti } from './components/GuruGanti';
 import { Footer } from './components/Footer';
 import { useApp } from './context/AppContext';
 
-// Enhanced placeholder to show hierarchy
+// --- IMPORTS: UNIT PENTADBIRAN ---
+import { PentadbiranJawatankuasa } from './components/Pentadbiran/PentadbiranJawatankuasa';
+import { PentadbiranTakwim } from './components/Pentadbiran/PentadbiranTakwim';
+
+// --- IMPORTS: UNIT KURIKULUM ---
+import { KurikulumJawatankuasa } from './components/Kurikulum/KurikulumJawatankuasa';
+import { KurikulumTakwim } from './components/Kurikulum/KurikulumTakwim';
+import { KurikulumPeperiksaan } from './components/Kurikulum/KurikulumPeperiksaan';
+import { GuruGanti } from './components/Kurikulum/GuruGanti';
+
+// --- IMPORTS: UNIT HAL EHWAL MURID ---
+import { HEMJawatankuasa } from './components/HEM/HEMJawatankuasa';
+import { HEMTakwim } from './components/HEM/HEMTakwim';
+import { PengurusanMurid } from './components/HEM/PengurusanMurid';
+import { PengurusanKelas } from './components/HEM/PengurusanKelas';
+
+// --- IMPORTS: UNIT KOKURIKULUM ---
+import { KokoJawatankuasa } from './components/Kokurikulum/KokoJawatankuasa';
+import { KokoTakwim } from './components/Kokurikulum/KokoTakwim';
+
+// --- IMPORTS: TAKWIM (GLOBAL) ---
+import { TakwimPlanner } from './components/Takwim/TakwimPlanner';
+
+// --- IMPORTS: JADUAL ---
+import { JadualPersendirian } from './components/Jadual/JadualPersendirian';
+import { JadualKelas } from './components/Jadual/JadualKelas';
+import { JadualBerucap } from './components/Jadual/JadualBerucap';
+import { JadualPemantauan } from './components/Jadual/JadualPemantauan';
+
+// Placeholder untuk modul yang belum siap
 const PlaceholderPage: React.FC<{ title: string, subtitle?: string, icon: string }> = ({ title, subtitle, icon }) => (
   <div className="p-10 flex flex-col items-center justify-center min-h-[60vh] text-gray-700 fade-in">
     <div className="text-6xl mb-4 opacity-20 text-[#006D77]">{icon}</div>
@@ -39,83 +62,69 @@ const App: React.FC = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // --- PEMETAAN KOMPONEN (COMPONENT MAPPING) ---
+  // Ini memastikan setiap tab yang dipilih di Sidebar mempunyai komponen yang tepat.
   const renderContent = () => {
-    // Handle Submenus (Pattern: "Parent - Child")
-    if (activeTab.includes(' - ')) {
-      const [parent, child] = activeTab.split(' - ');
-      
-      const standardUnits = ['Pentadbiran', 'Kurikulum', 'Hal Ehwal Murid', 'Kokurikulum'];
-      
-      if (parent === 'Kurikulum' && child === 'Peperiksaan') {
-        return <KurikulumPeperiksaan />;
-      }
+    
+    // 1. Modul Utama
+    if (activeTab === 'Dashboard') return <Dashboard />;
+    if (activeTab === 'Profil Sekolah') return <ProfilSekolah />;
+    if (activeTab === 'Program') return <ProgramView />;
+    if (activeTab === 'Tetapan Admin') return <AdminSettings />;
 
-      if (parent === 'Kurikulum' && child === 'Guru Ganti') {
-        return <GuruGanti />;
-      }
-
-      if (parent === 'Hal Ehwal Murid' && child === 'Enrolmen Murid') {
-        return <HemKehadiran />;
-      }
-
-      if (parent === 'Hal Ehwal Murid' && child === 'Guru Kelas') {
-        return <JadualModule type="Guru Kelas" />;
-      }
-
-      if (standardUnits.includes(parent) && (child === 'Jawatankuasa' || child === 'Takwim')) {
-        return <UnitContent unit={parent} type={child} />;
-      }
-
-      if (parent === 'Jadual') {
-        return <JadualModule type={child} />;
-      }
-
-      if (parent === 'Takwim') {
-        return <TakwimPlanner type={child} />;
-      }
-      
-      let icon = '📂';
-      if (parent === 'Pentadbiran') icon = '👔';
-      if (parent === 'Kurikulum') icon = '📚';
-      if (parent === 'Hal Ehwal Murid') icon = '👨‍🎓';
-      if (parent === 'Kokurikulum') icon = '🏆';
-      if (parent === 'Jadual') icon = '🗓️';
-      if (parent === 'Takwim') icon = '📅';
-
-      return <PlaceholderPage title={parent} subtitle={child} icon={icon} />;
+    // 2. Modul Takwim (Menggunakan Props Dynamic)
+    // Format: "Takwim - [Jenis Takwim]"
+    if (activeTab.startsWith('Takwim - ')) {
+       const takwimType = activeTab.split(' - ')[1];
+       return <TakwimPlanner type={takwimType} key={activeTab} />;
     }
 
+    // 3. Pemetaan Modul Spesifik
     switch (activeTab) {
-      case 'Dashboard':
-        return <Dashboard />;
-      case 'Tetapan Admin':
-        return <AdminSettings />;
-      case 'Profil Sekolah': 
-        return <ProfilSekolah />;
-      case 'Pentadbiran': 
-        return <PlaceholderPage title="Pentadbiran" subtitle="Menu Utama" icon="👔" />;
-      case 'Kurikulum': 
-        return <PlaceholderPage title="Kurikulum" subtitle="Menu Utama" icon="📚" />;
-      case 'Hal Ehwal Murid': 
-        return <PlaceholderPage title="Hal Ehwal Murid" subtitle="Menu Utama" icon="👨‍🎓" />;
-      case 'Kokurikulum': 
-        return <PlaceholderPage title="Kokurikulum" subtitle="Menu Utama" icon="🏆" />;
-      case 'Takwim': 
-        return <TakwimPlanner type="Kalendar" />;
-      case 'Jadual': 
-        return <JadualModule type="Jadual Persendirian" />;
-      case 'Program': 
-        return <ProgramView />;
+      // --- PENTADBIRAN ---
+      case 'Pentadbiran - Jawatankuasa': return <PentadbiranJawatankuasa />;
+      case 'Pentadbiran - Takwim': return <PentadbiranTakwim />;
+
+      // --- KURIKULUM ---
+      case 'Kurikulum - Jawatankuasa': return <KurikulumJawatankuasa />;
+      case 'Kurikulum - Takwim': return <KurikulumTakwim />;
+      case 'Kurikulum - Guru Ganti': return <GuruGanti />;
+      case 'Kurikulum - Peperiksaan': return <KurikulumPeperiksaan />;
+
+      // --- HAL EHWAL MURID ---
+      case 'Hal Ehwal Murid - Jawatankuasa': return <HEMJawatankuasa />;
+      case 'Hal Ehwal Murid - Takwim': return <HEMTakwim />;
+      case 'Hal Ehwal Murid - Pengurusan Kelas': return <PengurusanKelas />;
+      case 'Hal Ehwal Murid - Pengurusan Murid': return <PengurusanMurid />;
+
+      // --- KOKURIKULUM ---
+      case 'Kokurikulum - Jawatankuasa': return <KokoJawatankuasa />;
+      case 'Kokurikulum - Takwim': return <KokoTakwim />;
+
+      // --- JADUAL ---
+      case 'Jadual - Jadual Persendirian': return <JadualPersendirian />;
+      case 'Jadual - Jadual Kelas': return <JadualKelas />;
+      case 'Jadual - Jadual Berucap': return <JadualBerucap />;
+      case 'Jadual - Jadual Pemantauan': return <JadualPemantauan />;
+
+      // Fallback untuk route yang tidak dijumpai atau masih dalam pembinaan
       default:
-        return <Dashboard />;
+        // Cuba dapatkan nama induk untuk paparan placeholder
+        const [parent, child] = activeTab.includes(' - ') ? activeTab.split(' - ') : [activeTab, ''];
+        let icon = '📂';
+        if (parent === 'Pentadbiran') icon = '👔';
+        if (parent === 'Kurikulum') icon = '📚';
+        if (parent === 'Hal Ehwal Murid') icon = '👨‍🎓';
+        if (parent === 'Kokurikulum') icon = '🏆';
+        if (parent === 'Jadual') icon = '🗓️';
+        
+        return <PlaceholderPage title={parent} subtitle={child} icon={icon} />;
     }
   };
 
   return (
-    // Main App Container - Restored to Standard Scrolling Layout
     <div className="flex min-h-screen w-full bg-app-layer text-[#1C2541] font-sans">
       
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
@@ -123,7 +132,6 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* Sidebar - Sticky on Desktop */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex-shrink-0 shadow-2xl`}>
         <Sidebar 
           onOpenLogin={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} 
@@ -131,26 +139,18 @@ const App: React.FC = () => {
         />
       </div>
 
-      {/* Main Layout Column (Header + Content) */}
       <div className="flex-1 flex flex-col min-w-0 relative">
-        
-        {/* Header - Sticky Top */}
         <div className="sticky top-0 z-40 shadow-md">
-           {/* Mobile Header Bar */}
            <div className="md:hidden p-4 bg-[#0B132B] border-b border-[#006D77] flex justify-between items-center">
-               <button onClick={() => setIsMobileMenuOpen(true)} className="text-[#006D77] text-2xl">
-                 ☰
-               </button>
+               <button onClick={() => setIsMobileMenuOpen(true)} className="text-[#006D77] text-2xl">☰</button>
                <span className="font-bold text-white font-montserrat uppercase tracking-tight">SMAAM DIGITAL</span>
                <div className="w-8"></div>
            </div>
-           {/* Desktop Header */}
            <div className="hidden md:block">
                <Header />
            </div>
         </div>
         
-        {/* Main Content Area */}
         <main className="flex-1 flex flex-col bg-[#A9CCE3]/80 backdrop-blur-sm">
           <div className="flex-grow p-0">
             {renderContent()}

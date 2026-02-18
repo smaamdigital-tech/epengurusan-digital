@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { 
   User, UserRole, Announcement, Program, SchoolProfile, 
@@ -59,7 +58,7 @@ const defaultRolePermission: RolePermission = {
   canUpdateKurikulumPeperiksaan: false,
   canUpdateHEMJK: false,
   canUpdateHEMTakwim: false,
-  canUpdateHEMKehadiran: false,
+  canUpdateHEMEnrolmen: false,
   canUpdateKokoJK: false,
   canUpdateKokoTakwim: false,
   canUpdateTakwimGlobal: false,
@@ -85,7 +84,7 @@ const initialRolePermissions: Record<string, RolePermission> = {
     canUpdateKurikulumPeperiksaan: true,
     canUpdateHEMJK: true,
     canUpdateHEMTakwim: true,
-    canUpdateHEMKehadiran: true,
+    canUpdateHEMEnrolmen: true,
     canUpdateKokoJK: true,
     canUpdateKokoTakwim: true,
     canUpdateTakwimGlobal: true,
@@ -111,7 +110,7 @@ const initialRolePermissions: Record<string, RolePermission> = {
     ...defaultRolePermission,
     canUpdateHEMJK: true,
     canUpdateHEMTakwim: true,
-    canUpdateHEMKehadiran: true,
+    canUpdateHEMEnrolmen: true,
     canUpdateJadualGuruKelas: true,
   },
   gpk_koko: {
@@ -124,7 +123,7 @@ const initialRolePermissions: Record<string, RolePermission> = {
   panitia: { ...defaultRolePermission, canUpdateKurikulumJK: true },
   guru: { ...defaultRolePermission, canUpdateJadualPersendirian: true, canUpdateJadualKelas: true },
   su_pentadbir: { ...defaultRolePermission, canUpdatePentadbiranJK: true, canUpdatePentadbiranTakwim: true, canUpdateTakwimGlobal: true, canUpdateJadualGanti: true },
-  su_hem: { ...defaultRolePermission, canUpdateHEMJK: true, canUpdateHEMKehadiran: true, canUpdateJadualGuruKelas: true },
+  su_hem: { ...defaultRolePermission, canUpdateHEMJK: true, canUpdateHEMEnrolmen: true, canUpdateJadualGuruKelas: true },
   su_kuri: { ...defaultRolePermission, canUpdateKurikulumJK: true, canUpdateKurikulumPeperiksaan: true, canUpdateJadualKelas: true },
   su_koko: { ...defaultRolePermission, canUpdateKokoJK: true, canUpdateKokoTakwim: true, canUpdateJadualBerucap: true },
 };
@@ -140,48 +139,48 @@ const INITIAL_GROUP_MEMBERS_DATA: TeacherGroup[] = [
 
 const INITIAL_SPEECH_SCHEDULE_DATA: SpeechScheduleItem[] = [
   { id: 1, week: "1", date: "12 – 16 Jan 2026", group: "KUMPULAN 1", speaker: "Pengetua", topic: "Ahlan wa Sahlan wa Marhaban bikum", civic: "KASIH SAYANG", sumur: "MUTADAYYIN" },
-  { id: 2, week: "2", date: "19 – 23 Jan 2026", group: "KUMPULAN 2", speaker: "Muhammad Hafiz bin Jalil", topic: "Sekolah Penyayang Murid Gemilang", civic: "", sumur: "" },
-  { id: 3, week: "3", date: "26 – 30 Jan 2026", group: "KUMPULAN 3", speaker: "Ahmad Fikruddin bin Ahmad Raza'i", topic: "Fizikal Cergas Mental Sihat", civic: "", sumur: "" },
-  { id: 4, week: "4", date: "2 – 6 Feb 2026", group: "KUMPULAN 4", speaker: "Mohamad Sukri bin Ali", topic: "Kasihi Yang Muda Hormati Yang Tua", civic: "", sumur: "" },
-  { id: 5, week: "5", date: "9 – 13 Feb 2026", group: "KUMPULAN 5", speaker: "Mohd Nur bin Ahmad", topic: "Ramadhan Kareem", civic: "", sumur: "" },
-  { id: 6, week: "6", date: "16 – 20 Feb 2026", group: "KUMPULAN 6", speaker: "Mohamad Nasreen Hakim bin Che Mohamed", topic: "Hormat Membina Hubungan Mengukuhkan Persahabatan", civic: "HORMAT MENGHORMATI", sumur: "" },
-  { id: 7, week: "7", date: "23 – 27 Feb 2026", group: "KUMPULAN 1", speaker: "Salman bin A Rahman", topic: "Eid Mubarak", civic: "", sumur: "" },
-  { id: 8, week: "8", date: "2 – 6 Mac 2026", group: "KUMPULAN 2", speaker: "Norashidah binti A Wahab", topic: "Adab dengan rakan", civic: "", sumur: "" },
-  { id: 9, week: "9", date: "9 – 13 Mac 2026", group: "KUMPULAN 3", speaker: "Nooraind binti Ali", topic: "Adab dan akhlak sebelum ilmu", civic: "", sumur: "" },
-  { id: 10, week: "10", date: "16 – 20 Mac 2026", group: "KUMPULAN 4", speaker: "Mazuin binti Mat", topic: "Keutamaan sifat malu", civic: "BERTANGGUNG JAWAB", sumur: "" },
-  { id: 11, week: "11", date: "30 Mac – 3 Apr 2026", group: "KUMPULAN 5", speaker: "Rosmawati binti Hussin", topic: "Amar Makruf Nahi Munkar", civic: "", sumur: "" },
-  { id: 12, week: "12", date: "6 – 10 Apr 2026", group: "KUMPULAN 6", speaker: "Mohd Nur bin Salikin", topic: "Hargai Diri", civic: "", sumur: "" },
-  { id: 13, week: "13", date: "13 – 17 Apr 2026", group: "KUMPULAN 1", speaker: "Mohammad Firros bin Rosool Gani", topic: "Sayangi Sekolah", civic: "", sumur: "" },
+  { id: 2, week: "2", date: "19 – 23 Jan 2026", group: "KUMPULAN 2", speaker: "Muhammad Hafiz bin Jalil", topic: "Sekolah Penyayang Murid Gemilang", civic: "KASIH SAYANG", sumur: "MUTADAYYIN" },
+  { id: 3, week: "3", date: "26 – 30 Jan 2026", group: "KUMPULAN 3", speaker: "Ahmad Fikruddin bin Ahmad Raza'i", topic: "Fizikal Cergas Mental Sihat", civic: "KASIH SAYANG", sumur: "MUTADAYYIN" },
+  { id: 4, week: "4", date: "2 – 6 Feb 2026", group: "KUMPULAN 4", speaker: "Mohamad Sukri bin Ali", topic: "Kasihi Yang Muda Hormati Yang Tua", civic: "KASIH SAYANG", sumur: "MUTADAYYIN" },
+  { id: 5, week: "5", date: "9 – 13 Feb 2026", group: "KUMPULAN 5", speaker: "Mohd Nur bin Ahmad", topic: "Ramadhan Kareem", civic: "KASIH SAYANG", sumur: "MUTADAYYIN" },
+  { id: 6, week: "6", date: "16 – 20 Feb 2026", group: "KUMPULAN 6", speaker: "Mohamad Nasreen Hakim bin Che Mohamed", topic: "Hormat Membina Hubungan Mengukuhkan Persahabatan", civic: "HORMAT MENGHORMATI", sumur: "MUTADAYYIN" },
+  { id: 7, week: "7", date: "23 – 27 Feb 2026", group: "KUMPULAN 1", speaker: "Salman bin A Rahman", topic: "Eid Mubarak", civic: "HORMAT MENGHORMATI", sumur: "MUTADAYYIN" },
+  { id: 8, week: "8", date: "2 – 6 Mac 2026", group: "KUMPULAN 2", speaker: "Norashidah binti A Wahab", topic: "Adab dengan rakan", civic: "HORMAT MENGHORMATI", sumur: "MUTADAYYIN" },
+  { id: 9, week: "9", date: "9 – 13 Mac 2026", group: "KUMPULAN 3", speaker: "Nooraind binti Ali", topic: "Adab dan akhlak sebelum ilmu", civic: "HORMAT MENGHORMATI", sumur: "MUTADAYYIN" },
+  { id: 10, week: "10", date: "16 – 20 Mac 2026", group: "KUMPULAN 4", speaker: "Mazuin binti Mat", topic: "Keutamaan sifat malu", civic: "BERTANGGUNG JAWAB", sumur: "MUTADAYYIN" },
+  { id: 11, week: "11", date: "30 Mac – 3 Apr 2026", group: "KUMPULAN 5", speaker: "Rosmawati binti Hussin", topic: "Amar Makruf Nahi Munkar", civic: "BERTANGGUNG JAWAB", sumur: "MUTADAYYIN" },
+  { id: 12, week: "12", date: "6 – 10 Apr 2026", group: "KUMPULAN 6", speaker: "Mohd Nur bin Salikin", topic: "Hargai Diri", civic: "BERTANGGUNG JAWAB", sumur: "MUTADAYYIN" },
+  { id: 13, week: "13", date: "13 – 17 Apr 2026", group: "KUMPULAN 1", speaker: "Mohammad Firros bin Rosool Gani", topic: "Sayangi Sekolah", civic: "BERTANGGUNG JAWAB", sumur: "MUTADAYYIN" },
   { id: 14, week: "14", date: "20 – 24 Apr 2026", group: "KUMPULAN 2", speaker: "Syahidatun Najihah binti Aziz", topic: "Kejayaan tidak datang bergolek", civic: "KEGEMBIRAAN", sumur: "BUDI BAHASA" },
-  { id: 15, week: "15", date: "27 Apr – 1 Mei 2026", group: "KUMPULAN 3", speaker: "Siti Aminah binti Mohamed", topic: "Mensyukuri Nikmat Sang Pencipta", civic: "", sumur: "" },
-  { id: 16, week: "16", date: "4 – 8 Mei 2026", group: "KUMPULAN 4", speaker: "Siti Nurul Liza binti Sidin", topic: "Terima Kasih Warga Sekolah", civic: "", sumur: "" },
-  { id: 17, week: "17", date: "11 – 15 Mei 2026", group: "KUMPULAN 5", speaker: "Saemah binti Supandi", topic: "Kegembiraan Adalah Pilihan Kita", civic: "", sumur: "" },
-  { id: 18, week: "18", date: "18 – 22 Mei 2026", group: "KUMPULAN 6", speaker: "Zahrah Khairiah Nasution binti Saleh", topic: "Budi Bahasa Budaya Kita", civic: "KASIH SAYANG", sumur: "" },
-  { id: 19, week: "19", date: "8 – 12 Jun 2026", group: "KUMPULAN 1", speaker: "Norliyana binti Mhd Amin", topic: "Sayangi Sahabat", civic: "", sumur: "" },
-  { id: 20, week: "20", date: "15 – 19 Jun 2026", group: "KUMPULAN 2", speaker: "Nik Noorizati binti Ab Kahar", topic: "Teguran Tanda Sayang", civic: "", sumur: "" },
+  { id: 15, week: "15", date: "27 Apr – 1 Mei 2026", group: "KUMPULAN 3", speaker: "Siti Aminah binti Mohamed", topic: "Mensyukuri Nikmat Sang Pencipta", civic: "KEGEMBIRAAN", sumur: "BUDI BAHASA" },
+  { id: 16, week: "16", date: "4 – 8 Mei 2026", group: "KUMPULAN 4", speaker: "Siti Nurul Liza binti Sidin", topic: "Terima Kasih Warga Sekolah", civic: "KEGEMBIRAAN", sumur: "BUDI BAHASA" },
+  { id: 17, week: "17", date: "11 – 15 Mei 2026", group: "KUMPULAN 5", speaker: "Saemah binti Supandi", topic: "Kegembiraan Adalah Pilihan Kita", civic: "KEGEMBIRAAN", sumur: "BUDI BAHASA" },
+  { id: 18, week: "18", date: "18 – 22 Mei 2026", group: "KUMPULAN 6", speaker: "Zahrah Khairiah Nasution binti Saleh", topic: "Budi Bahasa Budaya Kita", civic: "KASIH SAYANG", sumur: "BUDI BAHASA" },
+  { id: 19, week: "19", date: "8 – 12 Jun 2026", group: "KUMPULAN 1", speaker: "Norliyana binti Mhd Amin", topic: "Sayangi Sahabat", civic: "KASIH SAYANG", sumur: "BUDI BAHASA" },
+  { id: 20, week: "20", date: "15 – 19 Jun 2026", group: "KUMPULAN 2", speaker: "Nik Noorizati binti Ab Kahar", topic: "Teguran Tanda Sayang", civic: "KASIH SAYANG", sumur: "BUDI BAHASA" },
   { id: 21, week: "21", date: "22 – 26 Jun 2026", group: "KUMPULAN 3", speaker: "Masyitah binti Razali", topic: "Memuliakan Orang Tua", civic: "HORMAT MENGHORMATI", sumur: "JATI DIRI" },
-  { id: 22, week: "22", date: "29 Jun – 3 Jul 2026", group: "KUMPULAN 4", speaker: "Zarith Najiha binti Jamal", topic: "Sikap Saling Menghormati", civic: "", sumur: "" },
-  { id: 23, week: "23", date: "6 – 10 Jul 2026", group: "KUMPULAN 5", speaker: "Annur Ayuni binti Mohamed", topic: "Pengurusan Masa Yang Sistematik", civic: "", sumur: "" },
+  { id: 22, week: "22", date: "29 Jun – 3 Jul 2026", group: "KUMPULAN 4", speaker: "Zarith Najiha binti Jamal", topic: "Sikap Saling Menghormati", civic: "HORMAT MENGHORMATI", sumur: "JATI DIRI" },
+  { id: 23, week: "23", date: "6 – 10 Jul 2026", group: "KUMPULAN 5", speaker: "Annur Ayuni binti Mohamed", topic: "Pengurusan Masa Yang Sistematik", civic: "HORMAT MENGHORMATI", sumur: "JATI DIRI" },
   { id: 24, week: "24", date: "13 – 17 Jul 2026", group: "KUMPULAN 6", speaker: "Nor Hidayah binti Mahadun", topic: "Tanggungjawab Seorang Pemimpin", civic: "BERTANGGUNG JAWAB", sumur: "JATI DIRI" },
-  { id: 25, week: "25", date: "20 – 24 Jul 2026", group: "KUMPULAN 1", speaker: "Liyana binti Iskandar", topic: "", civic: "", sumur: "" },
-  { id: 26, week: "26", date: "27 – 31 Jul 2026", group: "KUMPULAN 2", speaker: "Noorlela binti Zainudin", topic: "Sayangi Buku Teks Anda", civic: "", sumur: "" },
-  { id: 27, week: "27", date: "3 – 7 Ogos 2026", group: "KUMPULAN 3", speaker: "Nor Ain binti Mohamed Jori", topic: "Tanggungjawab Anak Terhadap Ibu bapa", civic: "", sumur: "" },
+  { id: 25, week: "25", date: "20 – 24 Jul 2026", group: "KUMPULAN 1", speaker: "Liyana binti Iskandar", topic: "Tanggungjawab Pelajar", civic: "BERTANGGUNG JAWAB", sumur: "JATI DIRI" },
+  { id: 26, week: "26", date: "27 – 31 Jul 2026", group: "KUMPULAN 2", speaker: "Noorlela binti Zainudin", topic: "Sayangi Buku Teks Anda", civic: "BERTANGGUNG JAWAB", sumur: "JATI DIRI" },
+  { id: 27, week: "27", date: "3 – 7 Ogos 2026", group: "KUMPULAN 3", speaker: "Nor Ain binti Mohamed Jori", topic: "Tanggungjawab Anak Terhadap Ibu bapa", civic: "BERTANGGUNG JAWAB", sumur: "JATI DIRI" },
   { id: 28, week: "28", date: "10 – 14 Ogos 2026", group: "KUMPULAN 4", speaker: "Nurul Izzati binti Roslin", topic: "Sayangilah Alam Sekitar", civic: "KEGEMBIRAAN", sumur: "PENAMPILAN DIRI" },
-  { id: 29, week: "29", date: "17 – 21 Ogos 2026", group: "KUMPULAN 5", speaker: "Nuurul Amira binti Razak", topic: "Interkasi Sihat", civic: "", sumur: "" },
-  { id: 30, week: "30", date: "24 – 28 Ogos 2026", group: "KUMPULAN 6", speaker: "Nurul Syafiqah binti Husin", topic: "Jasamu Dikenang", civic: "", sumur: "" },
-  { id: 31, week: "31", date: "7 – 11 Sep 2026", group: "KUMPULAN 1", speaker: "Nor Azean binti Ismail", topic: "Pengorbanan Yang Berbaloi", civic: "", sumur: "" },
-  { id: 32, week: "32", date: "14 – 18 Sep 2026", group: "KUMPULAN 2", speaker: "Muhammad Hafiz bin Jalil", topic: "Pengurusan Emosi Menjelang Peperiksaan", civic: "KASIH SAYANG", sumur: "" },
-  { id: 33, week: "33", date: "21 – 25 Sep 2026", group: "KUMPULAN 3", speaker: "Ahmad Fikruddin bin Ahmad Raza'i", topic: "Cintai Malaysia", civic: "", sumur: "" },
-  { id: 34, week: "34", date: "28 Sep – 2 Okt 2026", group: "KUMPULAN 4", speaker: "Mohamad Sukri bin Ali", topic: "Indahnya Menutup Aurat", civic: "", sumur: "" },
-  { id: 35, week: "35", date: "5 – 9 Okt 2026", group: "KUMPULAN 5", speaker: "Mohd Nur bin Ahmad", topic: "Rasulullah Qudwah Hasanah", civic: "", sumur: "" },
-  { id: 36, week: "36", date: "12 – 16 Okt 2026", group: "KUMPULAN 6", speaker: "Mohamad Nasreen Hakim bin Che Mohamed", topic: "Toleransi Sesama Manusia", civic: "HORMAT MENGHORMATI", sumur: "" },
-  { id: 37, week: "37", date: "19 – 23 Okt 2026", group: "KUMPULAN 1", speaker: "Salman bin A Rahman", topic: "Santuni al-Quran", civic: "", sumur: "" },
-  { id: 38, week: "38", date: "26 – 30 Okt 2026", group: "KUMPULAN 2", speaker: "Norashidah binti A Wahab", topic: "Menjaga Ikhtilat", civic: "", sumur: "" },
-  { id: 39, week: "39", date: "2 – 6 Nov 2026", group: "KUMPULAN 3", speaker: "Nooraind binti Ali", topic: "Patriotisme Asas Kemajuan Negara", civic: "", sumur: "" },
-  { id: 40, week: "40", date: "9 – 13 Nov 2026", group: "KUMPULAN 4", speaker: "Mazuin binti Mat", topic: "Sayangi Harta Benda", civic: "BERTANGGUNG JAWAB", sumur: "" },
-  { id: 41, week: "41", date: "16 – 20 Nov 2026", group: "KUMPULAN 5", speaker: "Rosmawati binti Hussin", topic: "Membazir Amalan Syaitan", civic: "", sumur: "" },
-  { id: 42, week: "42", date: "23 – 27 Nov 2026", group: "KUMPULAN 6", speaker: "Mohd Nur bin Salikin", topic: "Tarbiah Asas Kecemerlangan", civic: "", sumur: "" },
-  { id: 43, week: "43", date: "30 Nov – 4 Dis 2026", group: "", speaker: "", topic: "", civic: "", sumur: "" },
+  { id: 29, week: "29", date: "17 – 21 Ogos 2026", group: "KUMPULAN 5", speaker: "Nuurul Amira binti Razak", topic: "Interaksi Sihat", civic: "KEGEMBIRAAN", sumur: "PENAMPILAN DIRI" },
+  { id: 30, week: "30", date: "24 – 28 Ogos 2026", group: "KUMPULAN 6", speaker: "Nurul Syafiqah binti Husin", topic: "Jasamu Dikenang", civic: "KEGEMBIRAAN", sumur: "PENAMPILAN DIRI" },
+  { id: 31, week: "31", date: "7 – 11 Sep 2026", group: "KUMPULAN 1", speaker: "Nor Azean binti Ismail", topic: "Pengorbanan Yang Berbaloi", civic: "KEGEMBIRAAN", sumur: "PENAMPILAN DIRI" },
+  { id: 32, week: "32", date: "14 – 18 Sep 2026", group: "KUMPULAN 2", speaker: "Muhammad Hafiz bin Jalil", topic: "Pengurusan Emosi Menjelang Peperiksaan", civic: "KASIH SAYANG", sumur: "PENAMPILAN DIRI" },
+  { id: 33, week: "33", date: "21 – 25 Sep 2026", group: "KUMPULAN 3", speaker: "Ahmad Fikruddin bin Ahmad Raza'i", topic: "Cintai Malaysia", civic: "KASIH SAYANG", sumur: "PENAMPILAN DIRI" },
+  { id: 34, week: "34", date: "28 Sep – 2 Okt 2026", group: "KUMPULAN 4", speaker: "Mohamad Sukri bin Ali", topic: "Indahnya Menutup Aurat", civic: "KASIH SAYANG", sumur: "PENAMPILAN DIRI" },
+  { id: 35, week: "35", date: "5 – 9 Okt 2026", group: "KUMPULAN 5", speaker: "Mohd Nur bin Ahmad", topic: "Rasulullah Qudwah Hasanah", civic: "KASIH SAYANG", sumur: "PENAMPILAN DIRI" },
+  { id: 36, week: "36", date: "12 – 16 Okt 2026", group: "KUMPULAN 6", speaker: "Mohamad Nasreen Hakim bin Che Mohamed", topic: "Toleransi Sesama Manusia", civic: "HORMAT MENGHORMATI", sumur: "PENAMPILAN DIRI" },
+  { id: 37, week: "37", date: "19 – 23 Okt 2026", group: "KUMPULAN 1", speaker: "Salman bin A Rahman", topic: "Santuni al-Quran", civic: "HORMAT MENGHORMATI", sumur: "PENAMPILAN DIRI" },
+  { id: 38, week: "38", date: "26 – 30 Okt 2026", group: "KUMPULAN 2", speaker: "Norashidah binti A Wahab", topic: "Menjaga Ikhtilat", civic: "HORMAT MENGHORMATI", sumur: "PENAMPILAN DIRI" },
+  { id: 39, week: "39", date: "2 – 6 Nov 2026", group: "KUMPULAN 3", speaker: "Nooraind binti Ali", topic: "Patriotisme Asas Kemajuan Negara", civic: "HORMAT MENGHORMATI", sumur: "PENAMPILAN DIRI" },
+  { id: 40, week: "40", date: "9 – 13 Nov 2026", group: "KUMPULAN 4", speaker: "Mazuin binti Mat", topic: "Sayangi Harta Benda", civic: "BERTANGGUNG JAWAB", sumur: "PENAMPILAN DIRI" },
+  { id: 41, week: "41", date: "16 – 20 Nov 2026", group: "KUMPULAN 5", speaker: "Rosmawati binti Hussin", topic: "Membazir Amalan Syaitan", civic: "BERTANGGUNG JAWAB", sumur: "PENAMPILAN DIRI" },
+  { id: 42, week: "42", date: "23 – 27 Nov 2026", group: "KUMPULAN 6", speaker: "Mohd Nur bin Salikin", topic: "Tarbiah Asas Kecemerlangan", civic: "BERTANGGUNG JAWAB", sumur: "PENAMPILAN DIRI" },
+  { id: 43, week: "43", date: "30 Nov – 4 Dis 2026", group: "KUMPULAN 1", speaker: "Mohammad Firros bin Rosool Gani", topic: "Masa Itu Emas", civic: "BERTANGGUNG JAWAB", sumur: "PENAMPILAN DIRI" },
 ];
 
 const INITIAL_KOKO_WEEKLY_DATA: KokoActivity[] = [
@@ -229,60 +228,73 @@ const INITIAL_KOKO_ASSEMBLY_DATA: KokoAssemblyEvent[] = [
   { id: 8, month: 'Ogos', date: '17 Ogos 2026', unit: 'Pergerakan Pandu Puteri Malaysia', notes: 'Pakaian: Uniform Lengkap' },
   { id: 9, month: 'September', date: '14 Sep 2026', unit: 'Kadet Remaja Sekolah', notes: 'Pakaian: Uniform No. 3 / Lengkap' },
   { id: 10, month: 'Oktober', date: '19 Okt 2026', unit: 'Pergerakan Puteri Islam Malaysia', notes: 'Pakaian: Uniform Lengkap' },
-  { id: 11, month: 'November', date: '16 Nov 2026', unit: 'Pergerakan Pengakap Malaysia', notes: 'Pakaian: Uniform Lengkap' },
-  { id: 12, month: 'Disember', date: '14 Dis 2026', unit: 'Cuti Sekolah', notes: '-' },
+  { id: 11, month: 'November', date: '16 Nov 2026', unit: 'Pergerakan Pengakap Malaysia', notes: 'Pakaian: Uniform Lengkap' }
 ];
 
 const INITIAL_SUMUR_DATA: SumurEvent[] = [
-  { id: 1, date: '15 Jan 2026', program: 'SUMUR', teacher: '', activity: '' },
+  { id: 1, date: '15 Jan 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
   { id: 2, date: '22 Jan 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.LIYANA, U.AZEAN, U.AYUNI', activity: 'HIWAR' },
-  { id: 3, date: '29 Jan 2026', program: 'SUMUR', teacher: '', activity: '' },
-  { id: 4, date: '5 Feb 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: '' },
-  { id: 5, date: '12 Feb 2026', program: 'SUMUR', teacher: '', activity: '' },
-  { id: 6, date: '19 Feb 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.M.NOR (S), U.HIDAYAH, U.JIHA', activity: 'PERTANDINGAN HIWAR SPONTAN' },
-  { id: 7, date: '26 Feb 2026', program: 'SUMUR', teacher: '', activity: '' },
-  { id: 8, date: '5 Mac 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: '' },
-  { id: 9, date: '12 Mac 2026', program: 'SUMUR', teacher: '', activity: '' },
-  { id: 10, date: '19 Mac 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.ZARITH, U.AMINAH, U.M.NUR (A)', activity: 'GAME SAMBUNG PERKATAAN' },
+  { id: 3, date: '29 Jan 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 4, date: '12 Feb 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 5, date: '19 Feb 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.M.NOR (S), U.HIDAYAH, U.JIHA', activity: 'PERTANDINGAN HIWAR SPONTAN' },
+  { id: 6, date: '26 Feb 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 7, date: '12 Mac 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 8, date: '19 Mac 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.ZARITH, U.AMINAH, U.M.NUR (A)', activity: 'GAME SAMBUNG PERKATAAN' },
+  { id: 9, date: '9 Apr 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 10, date: '16 Apr 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.LIYANA, U.AZEAN, U.AYUNI', activity: 'CERITA BERANTAI' },
+  { id: 11, date: '23 Apr 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 12, date: '7 Mei 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 13, date: '14 Mei 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.M.NOR (S), U.HIDAYAH, U.JIHA', activity: 'JOM NYANYI (TASRIF)' },
+  { id: 14, date: '18 Jun 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 15, date: '25 Jun 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.ZARITH, U.AMINAH, U.M.NUR (A)', activity: 'PERTANDINGAN NYANYIAN TASRIF' },
+  { id: 16, date: '2 Jul 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 17, date: '16 Jul 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 18, date: '23 Jul 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.LIYANA, U.AZEAN, U.AYUNI', activity: 'KHUTBAH' },
+  { id: 19, date: '30 Jul 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 20, date: '13 Ogos 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 21, date: '20 Ogos 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.M.NOR (S), U.HIDAYAH, U.JIHA', activity: 'PERTANDINGAN KHUTBAH' },
+  { id: 22, date: '27 Ogos 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 24, date: '17 Sep 2026', program: 'UASA HAYYA BIL ARABIAH', teacher: 'U.ZARITH, U.AMINAH, U.M.NUR (A)', activity: 'TEKA – TEKI BAHASA ARAB' },
+  { id: 26, date: '8 Okt 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
+  { id: 27, date: '15 Okt 2026', program: 'HAYYA BIL ARABIAH', teacher: 'U.LIYANA, U.AZEAN, U.AYUNI', activity: 'PERTANDINGAN IMLAIAH' },
+  { id: 28, date: '22 Okt 2026', program: 'SUMUR', teacher: '', activity: 'BACAAN KITAB TURATH & USRAH' },
 ];
 
 const INITIAL_HIP_DATA: HipEvent[] = [
-  { id: 1, date: '19 Jan 2026', program: 'English Assembly', teacher: 'Puan Siti Aminah binti Rahmat', activity: 'Public Speaking & Storytelling' },
-  { id: 2, date: '16 Feb 2026', program: 'Speaker Corner', teacher: 'Cikgu Zarith Najiha binti Jamal', activity: 'Topic: My Ambition' },
-  { id: 3, date: '23 Mac 2026', program: 'English Camp Launch', teacher: 'Panitia Bahasa Inggeris', activity: 'Opening Ceremony & Briefing' },
-  { id: 4, date: '20 Apr 2026', program: 'Scrabble Competition', teacher: 'Cikgu Nurul Izzati binti Roslin', activity: 'Inter-class competition' },
+  { id: 1, date: '5 Feb 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'INTRODUCTION TO HIPMAX CIE' },
+  { id: 2, date: '5 Mac 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'CEO HOT SEAT' },
+  { id: 3, date: '2 Apr 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'COLLABORATIVE STORY TELLING RELAY RACE' },
+  { id: 4, date: '30 Apr 2026', program: 'UPSA OH MY ENGLISH !', teacher: 'KP BI', activity: 'PODCAST PRO' },
+  { id: 5, date: '11 Jun 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'LET’S TALK' },
+  { id: 6, date: '9 Jul 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'CARRY A ROLE' },
+  { id: 7, date: '6 Ogos 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'THE SECRET WORD' },
+  { id: 8, date: '1 Okt 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'LANGUAGE BUILDING BLOCK' },
+  { id: 9, date: '29 Okt 2026', program: 'OH MY ENGLISH !', teacher: 'KP BI', activity: 'MYSTERY BAG SPEECH ADVENTURE' },
 ];
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState('Dashboard');
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+const INITIAL_USER_CREDENTIALS: Record<string, UserCredential> = {
+    adminsistem: { username: 'adminsistem', password: '123', label: 'Super Admin' },
+    admin: { username: 'admin', password: '123', label: 'Admin' },
+    pengetua: { username: 'pengetua', password: '123', label: 'Pengetua' },
+    gpk_pentadbiran: { username: 'gpk_pentadbiran', password: '123', label: 'GPK Pentadbiran' },
+    gpk_hem: { username: 'gpk_hem', password: '123', label: 'GPK HEM' },
+    gpk_koko: { username: 'gpk_koko', password: '123', label: 'GPK Kokurikulum' },
+    gkmp: { username: 'gkmp', password: '123', label: 'GKMP' },
+    panitia: { username: 'panitia', password: '123', label: 'Ketua Panitia' },
+    guru: { username: 'guru', password: '123', label: 'Guru' },
+    su_pentadbir: { username: 'su_pentadbir', password: '123', label: 'SU Pentadbiran' },
+    su_hem: { username: 'su_hem', password: '123', label: 'SU HEM' },
+    su_kuri: { username: 'su_kuri', password: '123', label: 'SU Kurikulum' },
+    su_koko: { username: 'su_koko', password: '123', label: 'SU Kokurikulum' },
+};
 
-  // Data States
-  const [teacherGroups, setTeacherGroups] = useState<TeacherGroup[]>(INITIAL_GROUP_MEMBERS_DATA);
-  const [speechSchedule, setSpeechSchedule] = useState<SpeechScheduleItem[]>(INITIAL_SPEECH_SCHEDULE_DATA);
-  const [kokoWeeklyData, setKokoWeeklyData] = useState<KokoActivity[]>(INITIAL_KOKO_WEEKLY_DATA);
-  const [kokoAssemblyData, setKokoAssemblyData] = useState<KokoAssemblyEvent[]>(INITIAL_KOKO_ASSEMBLY_DATA);
-  const [sumurSchedule, setSumurSchedule] = useState<SumurEvent[]>(INITIAL_SUMUR_DATA);
-  const [hipSchedule, setHipSchedule] = useState<HipEvent[]>(INITIAL_HIP_DATA);
-
-  const [announcements, setAnnouncements] = useState<Announcement[]>([
-    { id: 1, title: 'Mesyuarat Agung PIBG', date: '2026-03-15', summary: 'Semua ibu bapa dijemput hadir ke Dewan Utama.', views: 0, likes: 0 },
-    { id: 2, title: 'Cuti Perayaan Tahun Baru Cina', date: '2026-02-17', summary: 'Sekolah akan bercuti selama seminggu sempena TBC.', views: 0, likes: 0 },
-  ]);
-
-  const [programs, setPrograms] = useState<Program[]>([
-    { id: 1, title: 'Kejohanan Olahraga Tahunan', date: '2026-04-20', category: 'Sukan', description: 'Acara balapan dan padang antara rumah sukan.', time: '8:00 PG', location: 'Padang Sekolah' },
-    { id: 2, title: 'Minggu Bahasa', date: '2026-05-10', category: 'Kurikulum', description: 'Pertandingan pidato, sajak dan bercerita.', time: '10:00 PG', location: 'Dewan Terbuka' },
-  ]);
-
-  const [siteConfig, setSiteConfig] = useState<SiteConfig>({
+const INITIAL_SITE_CONFIG: SiteConfig = {
     systemTitle: 'SISTEM PENGURUSAN DIGITAL',
     schoolName: 'SMA AL-KHAIRIAH AL-ISLAMIAH MERSING',
     welcomeMessage: 'SELAMAT DATANG KE ePENGURUSAN DIGITAL SMAAM',
-  });
+};
 
-  const [schoolProfile, setSchoolProfile] = useState<SchoolProfile>({
+const INITIAL_SCHOOL_PROFILE: SchoolProfile = {
     pengetuaName: 'Zulkeffle bin Muhammad',
     pengetuaQuote: `Segala puji dan syukur ke hadrat Allah SWT, selawat dan salam ke atas junjungan besar Nabi Muhammad SAW, penghulu sekalian umat, pembawa rahmat dan hidayah untuk seluruh alam.
 
@@ -340,25 +352,104 @@ Sekolah Menengah Agama Al-Khairiah Al-Islamiah Mersing`,
       muridLelaki: 156,
       muridPerempuan: 160,
     }
+};
+
+export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // --- LAZY INITIALIZATION WITH DEEP MERGE (SAFETY) ---
+
+  const [rolePermissions, setRolePermissions] = useState<Record<string, RolePermission>>(() => {
+      try {
+          const saved = localStorage.getItem('smaam_role_permissions');
+          if (saved) {
+              const parsed = JSON.parse(saved);
+              // Deep merge: Apply saved permissions over default ones to ensure new keys exist
+              const merged = { ...initialRolePermissions };
+              Object.keys(merged).forEach(role => {
+                  if (parsed[role]) {
+                      merged[role] = { ...merged[role], ...parsed[role] };
+                  }
+              });
+              return merged;
+          }
+      } catch (e) { console.error("Error loading permissions", e); }
+      return initialRolePermissions;
   });
 
-  const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
-
-  const [userCredentials, setUserCredentials] = useState<Record<string, UserCredential>>({
-    adminsistem: { username: 'adminsistem', password: '123', label: 'Super Admin' },
-    admin: { username: 'admin', password: '123', label: 'Admin' },
-    pengetua: { username: 'pengetua', password: '123', label: 'Pengetua' },
-    gpk_pentadbiran: { username: 'gpk_pentadbiran', password: '123', label: 'GPK Pentadbiran' },
-    gpk_hem: { username: 'gpk_hem', password: '123', label: 'GPK HEM' },
-    gpk_koko: { username: 'gpk_koko', password: '123', label: 'GPK Kokurikulum' },
-    gkmp: { username: 'gkmp', password: '123', label: 'GKMP' },
-    panitia: { username: 'panitia', password: '123', label: 'Ketua Panitia' },
-    guru: { username: 'guru', password: '123', label: 'Guru' },
-    su_pentadbir: { username: 'su_pentadbir', password: '123', label: 'SU Pentadbiran' },
-    su_hem: { username: 'su_hem', password: '123', label: 'SU HEM' },
-    su_kuri: { username: 'su_kuri', password: '123', label: 'SU Kurikulum' },
-    su_koko: { username: 'su_koko', password: '123', label: 'SU Kokurikulum' },
+  const [userCredentials, setUserCredentials] = useState<Record<string, UserCredential>>(() => {
+      try {
+          const saved = localStorage.getItem('smaam_user_credentials');
+          if (saved) {
+              const parsed = JSON.parse(saved);
+              // Simple merge for credentials
+              return { ...INITIAL_USER_CREDENTIALS, ...parsed };
+          }
+      } catch (e) { console.error("Error loading credentials", e); }
+      return INITIAL_USER_CREDENTIALS;
   });
+
+  const [siteConfig, setSiteConfig] = useState<SiteConfig>(() => {
+      const saved = localStorage.getItem('smaam_site_config');
+      return saved ? JSON.parse(saved) : INITIAL_SITE_CONFIG;
+  });
+
+  const [schoolProfile, setSchoolProfile] = useState<SchoolProfile>(() => {
+      const saved = localStorage.getItem('smaam_school_profile');
+      return saved ? JSON.parse(saved) : INITIAL_SCHOOL_PROFILE;
+  });
+
+  // --- OTHER DATA STATES ---
+  
+  const [teacherGroups, setTeacherGroups] = useState<TeacherGroup[]>(() => {
+      const saved = localStorage.getItem('smaam_teacher_groups');
+      return saved ? JSON.parse(saved) : INITIAL_GROUP_MEMBERS_DATA;
+  });
+
+  const [speechSchedule, setSpeechSchedule] = useState<SpeechScheduleItem[]>(() => {
+      const saved = localStorage.getItem('smaam_speech_schedule');
+      return saved ? JSON.parse(saved) : INITIAL_SPEECH_SCHEDULE_DATA;
+  });
+
+  const [kokoWeeklyData, setKokoWeeklyData] = useState<KokoActivity[]>(() => {
+      const saved = localStorage.getItem('smaam_koko_weekly');
+      return saved ? JSON.parse(saved) : INITIAL_KOKO_WEEKLY_DATA;
+  });
+
+  const [kokoAssemblyData, setKokoAssemblyData] = useState<KokoAssemblyEvent[]>(() => {
+      const saved = localStorage.getItem('smaam_koko_assembly');
+      return saved ? JSON.parse(saved) : INITIAL_KOKO_ASSEMBLY_DATA;
+  });
+
+  const [sumurSchedule, setSumurSchedule] = useState<SumurEvent[]>(() => {
+      const saved = localStorage.getItem('smaam_sumur_schedule');
+      return saved ? JSON.parse(saved) : INITIAL_SUMUR_DATA;
+  });
+
+  const [hipSchedule, setHipSchedule] = useState<HipEvent[]>(() => {
+      const saved = localStorage.getItem('smaam_hip_schedule');
+      return saved ? JSON.parse(saved) : INITIAL_HIP_DATA;
+  });
+
+  const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
+      const saved = localStorage.getItem('smaam_announcements');
+      return saved ? JSON.parse(saved) : [
+        { id: 1, title: 'Mesyuarat Agung PIBG', date: '2026-03-15', summary: 'Semua ibu bapa dijemput hadir ke Dewan Utama.', views: 0, likes: 0 },
+        { id: 2, title: 'Cuti Perayaan Tahun Baru Cina', date: '2026-02-17', summary: 'Sekolah akan bercuti selama seminggu sempena TBC.', views: 0, likes: 0 },
+      ];
+  });
+
+  const [programs, setPrograms] = useState<Program[]>(() => {
+      const saved = localStorage.getItem('smaam_programs');
+      return saved ? JSON.parse(saved) : [
+        { id: 1, title: 'Kejohanan Olahraga Tahunan', date: '2026-04-20', category: 'Sukan', description: 'Acara balapan dan padang antara rumah sukan.', time: '8:00 PG', location: 'Padang Sekolah' },
+        { id: 2, title: 'Minggu Bahasa', date: '2026-05-10', category: 'Kurikulum', description: 'Pertandingan pidato, sajak dan bercerita.', time: '10:00 PG', location: 'Dewan Terbuka' },
+      ];
+  });
+
+  // --- ACTIONS ---
 
   const login = (username: string, role: UserRole) => {
     setUser({ username, role, name: username.toUpperCase() });
@@ -395,25 +486,96 @@ Sekolah Menengah Agama Al-Khairiah Al-Islamiah Mersing`,
     jadual: true,
   };
 
-  const addAnnouncement = (a: Announcement) => setAnnouncements([a, ...announcements]);
-  const updateAnnouncement = (a: Announcement) => setAnnouncements(announcements.map(item => item.id === a.id ? a : item));
-  const deleteAnnouncement = (id: number) => setAnnouncements(announcements.filter(item => item.id !== id));
-  
-  const addProgram = (p: Program) => setPrograms([p, ...programs]);
-  const updateProgram = (p: Program) => setPrograms(programs.map(prog => prog.id === p.id ? p : prog));
-  const deleteProgram = (id: number) => setPrograms(programs.filter(p => p.id !== id));
-  
-  const updateSiteConfig = (c: Partial<SiteConfig>) => setSiteConfig({ ...siteConfig, ...c });
-  const updateSchoolProfile = (p: SchoolProfile) => setSchoolProfile(p);
-  const updateUserCredentials = (role: string, creds: UserCredential) => setUserCredentials({ ...userCredentials, [role]: creds });
-  const updateRolePermissions = (role: string, perms: RolePermission) => setRolePermissions({ ...rolePermissions, [role]: perms });
+  // --- UPDATERS WITH PERSISTENCE ---
 
-  const updateTeacherGroups = (groups: TeacherGroup[]) => setTeacherGroups(groups);
-  const updateSpeechSchedule = (schedule: SpeechScheduleItem[]) => setSpeechSchedule(schedule);
-  const updateKokoWeeklyData = (data: KokoActivity[]) => setKokoWeeklyData(data);
-  const updateKokoAssemblyData = (data: KokoAssemblyEvent[]) => setKokoAssemblyData(data);
-  const updateSumurSchedule = (data: SumurEvent[]) => setSumurSchedule(data);
-  const updateHipSchedule = (data: HipEvent[]) => setHipSchedule(data);
+  const persist = (key: string, data: any) => {
+      localStorage.setItem(key, JSON.stringify(data));
+  };
+
+  const addAnnouncement = (a: Announcement) => {
+      const newData = [a, ...announcements];
+      setAnnouncements(newData);
+      persist('smaam_announcements', newData);
+  };
+  const updateAnnouncement = (a: Announcement) => {
+      const newData = announcements.map(item => item.id === a.id ? a : item);
+      setAnnouncements(newData);
+      persist('smaam_announcements', newData);
+  };
+  const deleteAnnouncement = (id: number) => {
+      const newData = announcements.filter(item => item.id !== id);
+      setAnnouncements(newData);
+      persist('smaam_announcements', newData);
+  };
+  
+  const addProgram = (p: Program) => {
+      const newData = [p, ...programs];
+      setPrograms(newData);
+      persist('smaam_programs', newData);
+  };
+  const updateProgram = (p: Program) => {
+      const newData = programs.map(prog => prog.id === p.id ? p : prog);
+      setPrograms(newData);
+      persist('smaam_programs', newData);
+  };
+  const deleteProgram = (id: number) => {
+      const newData = programs.filter(p => p.id !== id);
+      setPrograms(newData);
+      persist('smaam_programs', newData);
+  };
+  
+  const updateSiteConfig = (c: Partial<SiteConfig>) => {
+      const newData = { ...siteConfig, ...c };
+      setSiteConfig(newData);
+      persist('smaam_site_config', newData);
+  };
+
+  const updateSchoolProfile = (p: SchoolProfile) => {
+      setSchoolProfile(p);
+      persist('smaam_school_profile', p);
+  };
+
+  const updateUserCredentials = (role: string, creds: UserCredential) => {
+      const newData = { ...userCredentials, [role]: creds };
+      setUserCredentials(newData);
+      persist('smaam_user_credentials', newData);
+  };
+
+  const updateRolePermissions = (role: string, perms: RolePermission) => {
+      const newData = { ...rolePermissions, [role]: perms };
+      setRolePermissions(newData);
+      persist('smaam_role_permissions', newData);
+  };
+
+  const updateTeacherGroups = (groups: TeacherGroup[]) => {
+      setTeacherGroups(groups);
+      persist('smaam_teacher_groups', groups);
+  };
+
+  const updateSpeechSchedule = (schedule: SpeechScheduleItem[]) => {
+      setSpeechSchedule(schedule);
+      persist('smaam_speech_schedule', schedule);
+  };
+
+  const updateKokoWeeklyData = (data: KokoActivity[]) => {
+      setKokoWeeklyData(data);
+      persist('smaam_koko_weekly', data);
+  };
+
+  const updateKokoAssemblyData = (data: KokoAssemblyEvent[]) => {
+      setKokoAssemblyData(data);
+      persist('smaam_koko_assembly', data);
+  };
+
+  const updateSumurSchedule = (data: SumurEvent[]) => {
+      setSumurSchedule(data);
+      persist('smaam_sumur_schedule', data);
+  };
+
+  const updateHipSchedule = (data: HipEvent[]) => {
+      setHipSchedule(data);
+      persist('smaam_hip_schedule', data);
+  };
 
   return (
     <AppContext.Provider value={{

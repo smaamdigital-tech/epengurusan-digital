@@ -754,7 +754,7 @@ export const Dashboard: React.FC = () => {
 
       {/* VIEW ALL TEACHERS MODAL */}
       {showTeachersModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in px-4" onClick={() => setShowTeachersModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm fade-in px-4 pt-24" onClick={() => setShowTeachersModal(false)}>
             <div className="bg-[#1C2541] w-full max-w-sm p-6 rounded-xl border-2 border-[#2DD4BF] shadow-2xl relative overflow-hidden" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center mb-4 border-b border-[#2DD4BF]/30 pb-3">
                     <h3 className="text-lg font-bold text-white uppercase tracking-wide">Guru Bertugas</h3>
