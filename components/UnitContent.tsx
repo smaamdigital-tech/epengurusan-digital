@@ -1819,7 +1819,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                                 </div>
                               </td>
                             );
-                          })}))}</tbody>
+                          })}</tr>))}</tbody>
                       </table>
                   </div>
               </div>
@@ -1841,7 +1841,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             {canEdit && <button onClick={() => handleOpenModal(item)} className="p-2 bg-[#3A506B] text-white rounded" title="Edit">✏️</button>}
-                                            {canDelete && <button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds) : handleDelete(item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button>
+                                            {canDelete && <button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds) : handleDelete(item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button>}
                                         </div>
                                     </td>
                                 )}

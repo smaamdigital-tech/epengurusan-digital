@@ -535,7 +535,7 @@ export const HEMTakwim: React.FC = () => {
                         </div>
                       </td>
                     );
-                  })}))}</tbody>
+                  })}</tr>))}</tbody>
               </table>
           </div>
       </div>

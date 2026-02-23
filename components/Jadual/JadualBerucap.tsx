@@ -236,8 +236,8 @@ export const JadualBerucap: React.FC = () => {
         {/* RIGHT: KUMPULAN BERTUGAS (List) */}
         <div className="xl:col-span-4 flex flex-col gap-4">
             <div className="bg-[#0B132B] p-4 rounded-xl border-l-4 border-[#C9B458] shadow-lg flex justify-between items-center">
-                <div>
-                    <EditableHeader tKey="list" className="text-lg font-bold text-white uppercase tracking-wide text-left" />
+                <div className="text-center">
+                    <EditableHeader tKey="list" className="text-lg font-bold text-white uppercase tracking-wide" />
                     <p className="text-xs text-gray-400">Anggota kumpulan bertugas mingguan.</p>
                 </div>
                 {canEdit && (
@@ -272,8 +272,9 @@ export const JadualBerucap: React.FC = () => {
                 ))}
             </div>
         </div>
+      </div>
 
-        {isModalOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm px-4 py-6 overflow-y-auto pt-20">
           <div className="bg-[#1C2541] w-full max-w-lg p-6 rounded-xl border border-[#C9B458] shadow-2xl">
             <h3 className="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2 capitalize">{editingItem ? 'Kemaskini' : 'Tambah'} {modalType === 'speech' ? 'Jadual' : 'Kumpulan'}</h3>
