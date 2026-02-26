@@ -313,7 +313,7 @@ export const PentadbiranJawatankuasa: React.FC = () => {
                       {(() => {
                         let counter = 0;
                         return activeTasks.map((task, index) => {
-                          const isHeader = task.endsWith(':');
+                          const isHeader = task.endsWith(':') || /^(\([A-Z0-9]+\))/.test(task);
                           if (isHeader) {
                             counter = 0;
                             return (

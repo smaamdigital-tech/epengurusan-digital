@@ -416,7 +416,7 @@ export const KokoTakwim: React.FC = () => {
           {viewMode === 'weekly' && (
             <>
                 <div className="p-5 border-b border-gray-700 bg-[#0B132B] flex flex-col md:flex-row justify-between items-center gap-4">
-                    <h4 className="text-white font-bold text-base md:text-lg uppercase tracking-wide text-center md:text-left">
+                    <h4 className="text-[#C9B458] font-bold text-base md:text-lg uppercase tracking-wide text-center md:text-left">
                         {kokoTitles.weekly}
                     </h4>
                     {canEdit && (
@@ -444,7 +444,7 @@ export const KokoTakwim: React.FC = () => {
                                     <td className="px-6 py-3 text-gray-300 font-medium">{item.activity}</td>
                                     {canEdit && (
                                         <td className="px-6 py-3 text-center">
-                                            <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className={`flex justify-center gap-2 ${isSystemAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
                                                 <button onClick={() => handleOpenModal('weekly', item)} className="text-blue-400 hover:text-white p-1 rounded hover:bg-blue-900/30" title="Kemaskini">✏️</button>
                                                 <button onClick={() => handleDelete('weekly', item.id)} className="text-red-400 hover:text-white p-1 rounded hover:bg-red-900/30" title="Hapus">🗑️</button>
                                             </div>
@@ -465,7 +465,7 @@ export const KokoTakwim: React.FC = () => {
           {viewMode === 'monthly' && (
             <>
                 <div className="p-5 border-b border-gray-700 bg-[#0B132B] flex flex-col md:flex-row justify-between items-center gap-4">
-                    <h4 className="text-white font-bold text-base md:text-lg uppercase tracking-wide text-center md:text-left">
+                    <h4 className="text-[#C9B458] font-bold text-base md:text-lg uppercase tracking-wide text-center md:text-left">
                         {kokoTitles.monthly}
                     </h4>
                     {canEdit && (
@@ -501,7 +501,7 @@ export const KokoTakwim: React.FC = () => {
                                     <td className="px-6 py-4 text-gray-400 text-xs italic">{item.notes || '-'}</td>
                                     {canEdit && (
                                         <td className="px-6 py-3 text-center">
-                                            <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className={`flex justify-center gap-2 ${isSystemAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
                                                 <button onClick={() => handleOpenModal('monthly', item)} className="text-blue-400 hover:text-white p-1 rounded hover:bg-blue-900/30" title="Kemaskini">✏️</button>
                                                 <button onClick={() => handleDelete('monthly', item.id)} className="text-red-400 hover:text-white p-1 rounded hover:bg-red-900/30" title="Hapus">🗑️</button>
                                             </div>

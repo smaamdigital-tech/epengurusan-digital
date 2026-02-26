@@ -13,11 +13,11 @@ export const TakwimAkademik: React.FC = () => {
                 </p>
              </div>
 
-             <div className="overflow-x-auto p-4 md:p-8 flex justify-center bg-white/5">
-                 <table className="w-full max-w-5xl text-center border-collapse border border-gray-800 bg-[#1C2541] text-sm shadow-2xl">
+             <div className="overflow-x-auto p-4 md:p-8 bg-white/5">
+                 <table className="w-full min-w-[800px] lg:min-w-full text-center border-separate border-spacing-0 border border-gray-800 bg-[#1C2541] text-sm shadow-2xl">
                      <thead>
                          <tr className="bg-[#C9B458] text-[#0B132B] font-extrabold text-base uppercase tracking-tight">
-                             <th className="p-3 border border-gray-800 w-24">PENGGAL</th>
+                             <th className="p-3 border border-gray-800 w-24 bg-[#C9B458]">PENGGAL</th>
                              <th className="p-3 border border-gray-800">MULA<br/>PERSEKOLAHAN</th>
                              <th className="p-3 border border-gray-800">AKHIR<br/>PERSEKOLAHAN</th>
                              <th className="p-3 border border-gray-800 w-24">JUMLAH<br/>HARI</th>
@@ -27,7 +27,7 @@ export const TakwimAkademik: React.FC = () => {
                      <tbody className="text-gray-300">
                          {/* PENGGAL 1 - BLOCK 1 */}
                          <tr>
-                             <td rowSpan={4} className="border border-gray-700 font-bold text-lg text-white bg-[#0B132B]">1</td>
+                             <td rowSpan={4} className="border border-gray-700 font-bold text-lg text-white bg-[#0B132B] sticky left-0 z-10">1</td>
                              <td className="border border-gray-700 p-2">12.01.2026</td>
                              <td className="border border-gray-700 p-2">31.01.2026</td>
                              <td className="border border-gray-700 p-2">15</td>
@@ -50,10 +50,11 @@ export const TakwimAkademik: React.FC = () => {
 
                          {/* CUTI PENGGAL 1 */}
                          <tr className="bg-[#C9B458] text-[#0B132B] font-bold">
-                             <td colSpan={5} className="border border-gray-800 p-2 uppercase">CUTI PENGGAL 1, TAHUN 2026</td>
+                             <td className="sticky left-0 z-10 bg-[#C9B458] border border-gray-800"></td>
+                             <td colSpan={4} className="border border-gray-800 p-2 uppercase">CUTI PENGGAL 1, TAHUN 2026</td>
                          </tr>
                          <tr className="bg-[#C9B458]/10 text-white">
-                             <td className="border border-gray-700 p-2 bg-[#0B132B]"></td>
+                             <td className="border border-gray-700 p-2 bg-[#0B132B] sticky left-0 z-10"></td>
                              <td className="border border-gray-700 p-2">21.03.2026</td>
                              <td className="border border-gray-700 p-2">29.03.2026</td>
                              <td className="border border-gray-700 p-2">9</td>
@@ -62,7 +63,7 @@ export const TakwimAkademik: React.FC = () => {
 
                          {/* PENGGAL 1 - BLOCK 2 */}
                          <tr>
-                             <td rowSpan={4} className="border border-gray-700 font-bold text-lg text-white bg-[#0B132B]">1</td>
+                             <td rowSpan={4} className="border border-gray-700 font-bold text-lg text-white bg-[#0B132B] sticky left-0 z-10">1</td>
                              <td className="border border-gray-700 p-2">30.03.2026</td>
                              <td className="border border-gray-700 p-2">31.03.2026</td>
                              <td className="border border-gray-700 p-2">2</td>
@@ -85,10 +86,11 @@ export const TakwimAkademik: React.FC = () => {
 
                          {/* CUTI PERTENGAHAN TAHUN */}
                          <tr className="bg-[#C9B458] text-[#0B132B] font-bold">
-                             <td colSpan={5} className="border border-gray-800 p-2 uppercase">CUTI PERTENGAHAN TAHUN 2026</td>
+                             <td className="sticky left-0 z-10 bg-[#C9B458] border border-gray-800"></td>
+                             <td colSpan={4} className="border border-gray-800 p-2 uppercase">CUTI PERTENGAHAN TAHUN 2026</td>
                          </tr>
                          <tr className="bg-[#C9B458]/10 text-white">
-                             <td className="border border-gray-700 p-2 bg-[#0B132B]"></td>
+                             <td className="border border-gray-700 p-2 bg-[#0B132B] sticky left-0 z-10"></td>
                              <td className="border border-gray-700 p-2">23.05.2026</td>
                              <td className="border border-gray-700 p-2">07.06.2026</td>
                              <td className="border border-gray-700 p-2">16</td>
@@ -120,10 +122,11 @@ export const TakwimAkademik: React.FC = () => {
 
                          {/* CUTI PENGGAL 2 */}
                          <tr className="bg-[#C9B458] text-[#0B132B] font-bold">
-                             <td colSpan={5} className="border border-gray-800 p-2 uppercase">CUTI PENGGAL 2, TAHUN 2026</td>
+                             <td className="sticky left-0 z-10 bg-[#C9B458] border border-gray-800"></td>
+                             <td colSpan={4} className="border border-gray-800 p-2 uppercase">CUTI PENGGAL 2, TAHUN 2026</td>
                          </tr>
                          <tr className="bg-[#C9B458]/10 text-white">
-                             <td className="border border-gray-700 p-2 bg-[#0B132B]"></td>
+                             <td className="border border-gray-700 p-2 bg-[#0B132B] sticky left-0 z-10"></td>
                              <td className="border border-gray-700 p-2">29.08.2026</td>
                              <td className="border border-gray-700 p-2">06.09.2026</td>
                              <td className="border border-gray-700 p-2">9</td>
@@ -160,10 +163,11 @@ export const TakwimAkademik: React.FC = () => {
 
                          {/* CUTI AKHIR PERSEKOLAHAN */}
                          <tr className="bg-[#C9B458] text-[#0B132B] font-bold">
-                             <td colSpan={5} className="border border-gray-800 p-2 uppercase">CUTI AKHIR PERSEKOLAHAN TAHUN 2026</td>
+                             <td className="sticky left-0 z-10 bg-[#C9B458] border border-gray-800"></td>
+                             <td colSpan={4} className="border border-gray-800 p-2 uppercase">CUTI AKHIR PERSEKOLAHAN TAHUN 2026</td>
                          </tr>
                          <tr className="bg-[#C9B458]/10 text-white">
-                             <td className="border border-gray-700 p-2 bg-[#0B132B]"></td>
+                             <td className="border border-gray-700 p-2 bg-[#0B132B] sticky left-0 z-10"></td>
                              <td className="border border-gray-700 p-2">05.12.2026</td>
                              <td className="border border-gray-700 p-2">31.12.2026</td>
                              <td className="border border-gray-700 p-2">27</td>

@@ -98,7 +98,7 @@ export const PengurusanMurid: React.FC = () => {
   const SHEET_NAME_DATA_MURID = 'DATA_MURID';
 
   // --- Helper: Aggressive Sanitization (Fixes Ghost Data & Filtering) ---
-  const sanitizeStudentData = (data: any[]): { data: Student[], wasFixed: boolean } => {
+  const sanitizeStudentData = (data: Student[]): { data: Student[], wasFixed: boolean } => {
       if (!Array.isArray(data)) return { data: [], wasFixed: false };
       
       const seenIds = new Set<number>();
@@ -223,6 +223,7 @@ export const PengurusanMurid: React.FC = () => {
     }, 60000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -451,7 +452,7 @@ export const PengurusanMurid: React.FC = () => {
           
           let studentClass = selectedClass === 'Semua' ? CLASS_LIST[1] : selectedClass;
           if (classIndex !== -1 && parts[classIndex]) {
-              let rawClass = parts[classIndex];
+              const rawClass = parts[classIndex];
               const match = CLASS_LIST.find(c => c.toLowerCase() === rawClass.toLowerCase().trim());
               if (match) studentClass = match;
               else studentClass = rawClass.trim();
@@ -505,7 +506,7 @@ export const PengurusanMurid: React.FC = () => {
 
   const handleExportExcel = () => {
       let tableContent = '<table border="1"><thead><tr>';
-      const headers = ['Bil', 'Nama Murid', 'No. KP', 'Status Kediaman', 'Kelas', ...customColumns];
+      const headers = ['Bil', 'Nama Murid', ...(isSystemAdmin ? ['No. KP'] : []), 'Status Kediaman', 'Kelas', ...customColumns];
       headers.forEach(h => {
           tableContent += `<th style="background-color: #f0f0f0; font-weight: bold;">${h}</th>`;
       });
@@ -516,7 +517,9 @@ export const PengurusanMurid: React.FC = () => {
           tableContent += '<tr>';
           tableContent += `<td>${index + 1}</td>`;
           tableContent += `<td>${s.name}</td>`;
-          tableContent += `<td style="mso-number-format:'@'">${s.kp}</td>`;
+          if (isSystemAdmin) {
+              tableContent += `<td style="mso-number-format:'@'">${s.kp}</td>`;
+          }
           tableContent += `<td>${s.status}</td>`;
           tableContent += `<td>${s.className}</td>`;
           dynamic.forEach(val => {
@@ -605,7 +608,7 @@ export const PengurusanMurid: React.FC = () => {
               <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-bold uppercase tracking-wide">
                 <th className="px-6 py-4 w-12 text-center">Bil</th>
                 <th className="px-6 py-4 min-w-[200px]">Nama Murid</th>
-                <th className="px-6 py-4 w-[150px]">No. KP</th>
+                {isSystemAdmin && <th className="px-6 py-4 w-[150px]">No. KP</th>}
                 <th className="px-6 py-4 text-center w-[180px]">Status Kediaman</th>
                 <th className="px-6 py-4 min-w-[150px] text-center">Kelas</th>
                 {customColumns.map(col => (<th key={col} className="px-6 py-4 min-w-[120px]"><div className="flex items-center justify-between gap-2">{col}{isSystemAdmin && (<button type="button" onClick={(e) => handleDeleteColumn(e, col)} className="text-red-400 hover:text-red-200 text-xs font-bold bg-[#0B132B] w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-900/50 transition-colors" title="Padam Kolum">×</button>)}</div></th>))}
@@ -613,14 +616,20 @@ export const PengurusanMurid: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700 text-sm">
-              {filteredStudents.length === 0 && (<tr><td colSpan={5 + customColumns.length + (canEdit ? 1 : 0)} className="px-6 py-8 text-center text-gray-500 italic">Tiada rekod ditemui.</td></tr>)}
+              {filteredStudents.length === 0 && (<tr><td colSpan={(isSystemAdmin ? 5 : 4) + customColumns.length + (canEdit ? 1 : 0)} className="px-6 py-8 text-center text-gray-500 italic">Tiada rekod ditemui.</td></tr>)}
               {filteredStudents.map((student, idx) => {
                 const isEditing = editingRowId === student.id;
                 return (
                   <tr key={student.id} className={`transition-colors group ${isEditing ? 'bg-[#253252] border-l-4 border-[#C9B458]' : 'hover:bg-[#253252]'}`}>
                     <td className="px-6 py-3 text-center text-gray-400">{idx + 1}</td>
                     <td className="px-6 py-3 font-medium text-white">{isEditing ? (<input type="text" value={tempRowData?.name || ''} onChange={(e) => handleEditChange('name', e.target.value)} className="bg-[#0B132B] border border-gray-600 rounded px-2 py-1 text-white w-full focus:border-[#C9B458] outline-none"/>) : student.name}</td>
-                    <td className="px-6 py-3 text-gray-400 font-mono text-xs">{isEditing ? (<input type="text" value={tempRowData?.kp || ''} onChange={(e) => handleEditChange('kp', e.target.value)} className="bg-[#0B132B] border border-gray-600 rounded px-2 py-1 text-white w-full focus:border-[#C9B458] outline-none font-mono"/>) : student.kp}</td>
+                    {isSystemAdmin && (
+                      <td className="px-6 py-3 text-gray-400 font-mono text-xs">
+                        {isEditing ? (
+                          <input type="text" value={tempRowData?.kp || ''} onChange={(e) => handleEditChange('kp', e.target.value)} className="bg-[#0B132B] border border-gray-600 rounded px-2 py-1 text-white w-full focus:border-[#C9B458] outline-none font-mono"/>
+                        ) : student.kp}
+                      </td>
+                    )}
                     <td className="px-6 py-3"><div className="flex justify-center gap-2"><button disabled={!canEdit} onClick={() => handleStatusChange(student.id, 'Luar')} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${student.status === 'Luar' ? 'bg-green-600 text-white shadow-lg' : 'bg-[#0B132B] text-gray-400 border border-gray-600'} ${canEdit ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed'}`}>Luar</button><button disabled={!canEdit} onClick={() => handleStatusChange(student.id, 'Asrama')} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${student.status === 'Asrama' ? 'bg-blue-600 text-white shadow-lg' : 'bg-[#0B132B] text-gray-400 border border-gray-600'} ${canEdit ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed'}`}>Asrama</button></div></td>
                     <td className="px-6 py-3 text-center">{isEditing ? (<select value={tempRowData?.className || ''} onChange={(e) => handleEditChange('className', e.target.value)} className="bg-[#0B132B] border border-gray-600 rounded px-2 py-1 text-white text-xs outline-none">{CLASS_LIST.map(c => <option key={c} value={c}>{c}</option>)}</select>) : (<span className="text-white font-semibold text-xs bg-[#3A506B] px-2 py-1 rounded border border-[#C9B458]/30">{student.className}</span>)}</td>
                     {customColumns.map(col => (<td key={col} className="px-6 py-3 text-gray-300">{isEditing ? (<input type="text" value={tempRowData?.dynamicData?.[col] || ''} onChange={(e) => handleEditDynamicChange(col, e.target.value)} className="bg-[#0B132B] border border-gray-600 rounded px-2 py-1 text-white w-full focus:border-[#C9B458] outline-none text-xs"/>) : (<span>{student.dynamicData?.[col] || '-'}</span>)}</td>))}

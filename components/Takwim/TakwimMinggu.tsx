@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 
 interface SchoolWeekRow {
@@ -144,10 +144,10 @@ export const TakwimMinggu: React.FC = () => {
         {/* PADDING ADJUSTMENT: 1cm (approx 2.5rem or p-10) applied to container */}
         <div className="p-8 md:p-10 flex justify-center bg-[#1C2541]">
             <div className="overflow-x-auto w-full">
-                <table className="w-full text-center border-collapse border border-gray-600 text-xs md:text-sm">
+                <table className="w-full min-w-[800px] lg:min-w-full text-center border-separate border-spacing-0 border border-gray-600 text-xs md:text-sm">
                     <thead>
-                        <tr className="bg-[#C9B458] text-[#0B132B] font-bold uppercase">
-                            <th className="border border-gray-600 px-4 py-3 w-20">MINGGU</th>
+                        <tr className="bg-yellow-400 text-black font-bold uppercase">
+                            <th className="border border-gray-600 px-4 py-3 w-20 bg-yellow-400">MINGGU</th>
                             <th className="border border-gray-600 px-4 py-3 w-48">TARIKH</th>
                             <th className="border border-gray-600 px-4 py-3">CATATAN</th>
                             <th className="border border-gray-600 px-4 py-3 w-24">BIL HARI</th>
@@ -159,37 +159,37 @@ export const TakwimMinggu: React.FC = () => {
                         {schoolWeeks.map((row) => (
                             <tr key={row.id} className={`${row.isHoliday ? 'bg-[#0B132B]' : 'hover:bg-[#253252]'} transition-colors`}>
                                 {/* MINGGU */}
-                                <td className={`border border-gray-600 p-2 font-bold ${row.isHoliday ? 'bg-yellow-600 text-black border-yellow-700' : 'text-[#C9B458]'}`}>
+                                <td className={`border border-gray-600 p-2 font-bold ${row.isHoliday ? 'bg-[#C9B458] text-[#0B132B] border-[#C9B458]' : 'bg-[#1C2541] text-[#C9B458]'}`}>
                                     {row.isHoliday ? '' : row.week}
                                 </td>
                                 
                                 {/* TARIKH */}
-                                <td className={`border border-gray-600 p-2 font-mono whitespace-nowrap ${row.isHoliday ? 'bg-yellow-600 text-black font-bold border-yellow-700' : ''}`}>
+                                <td className={`border border-gray-600 p-2 font-mono whitespace-nowrap ${row.isHoliday ? 'bg-[#C9B458] text-[#0B132B] font-bold border-[#C9B458]' : ''}`}>
                                     {row.date}
                                 </td>
                                 
                                 {/* CATATAN - CENTER ALIGNMENT */}
-                                <td className={`border border-gray-600 p-2 text-center whitespace-pre-wrap ${row.isHoliday ? 'bg-yellow-600 text-black font-bold uppercase border-yellow-700' : ''}`}>
+                                <td className={`border border-gray-600 p-2 text-center whitespace-pre-wrap ${row.isHoliday ? 'bg-[#C9B458] text-[#0B132B] font-bold uppercase border-[#C9B458]' : ''}`}>
                                     {row.notes}
                                 </td>
                                 
                                 {/* BIL HARI (RowSpan) */}
                                 {(row.rowSpan || (row.totalDays && !row.rowSpan)) && (
-                                     <td rowSpan={row.rowSpan || 1} className={`border border-gray-600 p-2 font-bold align-middle ${row.isHoliday ? 'bg-yellow-600 text-black border-yellow-700' : 'bg-[#253252] text-white text-lg'}`}>
+                                     <td rowSpan={row.rowSpan || 1} className={`border border-gray-600 p-2 font-bold align-middle ${row.isHoliday ? 'bg-[#C9B458] text-[#0B132B] border-[#C9B458]' : 'bg-[#253252] text-white text-lg'}`}>
                                         {row.totalDays}
                                      </td>
                                 )}
 
                                 {/* BIL MINGGU (RowSpan) */}
                                 {(row.rowSpan || (row.totalWeeks && !row.rowSpan)) && (
-                                     <td rowSpan={row.rowSpan || 1} className={`border border-gray-600 p-2 font-bold align-middle ${row.isHoliday ? 'bg-yellow-600 text-black border-yellow-700' : 'bg-[#253252] text-[#C9B458] text-lg'}`}>
+                                     <td rowSpan={row.rowSpan || 1} className={`border border-gray-600 p-2 font-bold align-middle ${row.isHoliday ? 'bg-[#C9B458] text-[#0B132B] border-[#C9B458]' : 'bg-[#253252] text-[#C9B458] text-lg'}`}>
                                         {row.totalWeeks}
                                      </td>
                                 )}
 
                                 {/* AKSI */}
                                 {isAdmin && (
-                                    <td className={`border border-gray-600 p-2 ${row.isHoliday ? 'bg-yellow-600 border-yellow-700' : ''}`}>
+                                    <td className={`border border-gray-600 p-2 ${row.isHoliday ? 'bg-[#C9B458] border-[#C9B458]' : ''}`}>
                                         <button onClick={() => handleOpenEdit(row)} className={`text-xs ${row.isHoliday ? 'text-black hover:text-white' : 'text-gray-400 hover:text-white'}`}>✏️</button>
                                     </td>
                                 )}

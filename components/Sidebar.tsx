@@ -78,40 +78,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
   const { activeTab, setActiveTab, user, logout, permissions, schoolProfile } = useApp();
   const [expanded, setExpanded] = useState<string[]>([]);
 
-  useEffect(() => {
-    const activeParent = menuItems.find(item => 
-      item.subItems && activeTab.startsWith(item.name)
-    );
-    if (activeParent && !expanded.includes(activeParent.name)) {
-      setExpanded(prev => [...prev, activeParent.name]);
-    }
-  }, [activeTab]);
-
   // MENU ITEMS DEFINITION (Matched to App.tsx mapping)
-  const menuItems: MenuItem[] = [
+  const menuItems: MenuItem[] = React.useMemo(() => [
     { name: 'Dashboard', icon: <Icons.Dashboard /> },
     { name: 'Profil Sekolah', icon: <Icons.Profile /> },
-    { name: 'Program', icon: <Icons.Program /> },
-    { 
-      name: 'Pentadbiran', 
-      icon: <Icons.Admin />,
-      subItems: ['Jawatankuasa', 'Takwim']
-    },
-    { 
-      name: 'Kurikulum', 
-      icon: <Icons.Kurikulum />,
-      subItems: ['Jawatankuasa', 'Takwim', 'Guru Ganti', 'Peperiksaan']
-    },
-    { 
-      name: 'Hal Ehwal Murid', 
-      icon: <Icons.HEM />,
-      subItems: ['Jawatankuasa', 'Takwim', 'Pengurusan Kelas', 'Pengurusan Murid']
-    },
-    { 
-      name: 'Kokurikulum', 
-      icon: <Icons.Koko />,
-      subItems: ['Jawatankuasa', 'Takwim']
-    },
     { 
       name: 'Takwim', 
       icon: <Icons.Takwim />,
@@ -133,9 +103,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
         'Jadual Pemantauan'
       ]
     },
+    { name: 'Program', icon: <Icons.Program /> },
+    { 
+      name: 'Pentadbiran', 
+      icon: <Icons.Admin />,
+      subItems: ['Jawatankuasa', 'Takwim']
+    },
+    { 
+      name: 'Kurikulum', 
+      icon: <Icons.Kurikulum />,
+      subItems: ['Jawatankuasa', 'Takwim', 'Guru Ganti', 'Peperiksaan'].filter(sub => {
+        if (sub === 'Guru Ganti') {
+          const allowedRoles = ['adminsistem', 'admin', 'pengetua', 'gpk_pentadbiran', 'gpk_hem', 'gpk_koko', 'gkmp', 'panitia'];
+          return user && allowedRoles.includes(user.role);
+        }
+        return true;
+      })
+    },
+    { 
+      name: 'Hal Ehwal Murid', 
+      icon: <Icons.HEM />,
+      subItems: ['Jawatankuasa', 'Takwim', 'Pengurusan Kelas', 'Pengurusan Murid']
+    },
+    { 
+      name: 'Kokurikulum', 
+      icon: <Icons.Koko />,
+      subItems: ['Jawatankuasa', 'Takwim']
+    },
   ].filter(item => {
     const pKey = item.name.toLowerCase();
-    if (pKey === 'dashboard' || pKey === 'profil sekolah' || pKey === 'program') return true;
+    if (user?.role === 'adminsistem') return true;
+    if (pKey === 'program') return user?.role === 'adminsistem';
+    if (pKey === 'dashboard' || pKey === 'profil sekolah') return true;
     if (pKey === 'pentadbiran') return permissions.pentadbiran;
     if (pKey === 'kurikulum') return permissions.kurikulum;
     if (pKey === 'hal ehwal murid') return permissions.hem;
@@ -143,7 +142,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
     if (pKey === 'takwim') return permissions.takwim;
     if (pKey === 'jadual') return permissions.jadual;
     return true;
-  });
+  }), [user, permissions]);
+
+  useEffect(() => {
+    const activeParent = menuItems.find(item => 
+      item.subItems && activeTab.startsWith(item.name)
+    );
+    if (activeParent) {
+      setExpanded(prev => prev.includes(activeParent.name) ? prev : [...prev, activeParent.name]);
+    }
+  }, [activeTab, menuItems]);
 
   const toggleExpand = (name: string) => {
     if (expanded.includes(name)) {

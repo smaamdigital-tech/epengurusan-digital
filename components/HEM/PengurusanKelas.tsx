@@ -55,18 +55,21 @@ export const PengurusanKelas: React.FC = () => {
   const canEdit = checkPermission('canUpdateJadualGuruKelas');
   const isSuperAdmin = user?.role === 'adminsistem';
 
-  const [classTeachers, setClassTeachers] = useState<ClassTeacher[]>(INITIAL_CLASS_TEACHERS);
-  const [coordinators, setCoordinators] = useState<Coordinator[]>(INITIAL_COORDINATORS);
+  const [classTeachers, setClassTeachers] = useState<ClassTeacher[]>(() => {
+    const savedCT = localStorage.getItem('smaam_class_teachers');
+    return savedCT ? JSON.parse(savedCT) : INITIAL_CLASS_TEACHERS;
+  });
+  const [coordinators, setCoordinators] = useState<Coordinator[]>(() => {
+    const savedCoord = localStorage.getItem('smaam_coordinators');
+    return savedCoord ? JSON.parse(savedCoord) : INITIAL_COORDINATORS;
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'classTeacher' | 'coordinator' | null>(null);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
-    const savedCT = localStorage.getItem('smaam_class_teachers');
-    const savedCoord = localStorage.getItem('smaam_coordinators');
-    if (savedCT) setClassTeachers(JSON.parse(savedCT));
-    if (savedCoord) setCoordinators(JSON.parse(savedCoord));
+    // Sync to storage is handled in handleSave and handleDelete
   }, []);
 
   const saveToStorage = () => {
@@ -136,8 +139,13 @@ export const PengurusanKelas: React.FC = () => {
   return (
     <div className="p-4 md:p-8 space-y-6 fade-in pb-20">
       <div className="border-b border-gray-400 pb-4">
+        <div className="flex items-center gap-2 text-sm text-[#0B132B] font-mono mb-2">
+          <span className="font-bold">HEM</span>
+          <span className="opacity-50">/</span>
+          <span className="uppercase font-bold opacity-80">PENGURUSAN KELAS</span>
+        </div>
         <h2 className="text-3xl font-bold text-black font-montserrat uppercase flex items-center gap-3">
-          🎓 Pengurusan Kelas
+          PENGURUSAN KELAS
         </h2>
         <p className="text-black font-medium mt-1 opacity-80">Senarai Guru Kelas dan Penyelaras Tingkatan.</p>
       </div>
@@ -148,7 +156,7 @@ export const PengurusanKelas: React.FC = () => {
         <div className="lg:col-span-8 order-2 lg:order-1">
             <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 h-full">
                 <div className="p-6 border-b border-gray-700 bg-[#0B132B] flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white">Senarai Guru Kelas</h3>
+                <h3 className="text-xl font-bold text-[#C9B458] uppercase">SENARAI GURU KELAS</h3>
                 {canEdit && (
                     <button onClick={() => openEditModal('classTeacher', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1.5 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah Kelas</button>
                 )}
@@ -157,7 +165,7 @@ export const PengurusanKelas: React.FC = () => {
                 {[1, 2, 3, 4, 5].map(formLevel => (
                     <div key={formLevel} className="space-y-3">
                         <div className="flex items-center gap-2 border-b border-gray-700 pb-2">
-                            <span className="bg-[#3A506B] text-white text-xs font-bold px-2 py-1 rounded">Tingkatan {formLevel}</span>
+                            <span className="bg-[#3A506B] text-white text-xs font-bold px-2 py-1 rounded uppercase">TINGKATAN {formLevel}</span>
                         </div>
                         <div className="grid grid-cols-1 gap-2">
                             {classTeachers.filter(t => t.form === formLevel.toString()).map((ct, idx) => (
@@ -166,7 +174,7 @@ export const PengurusanKelas: React.FC = () => {
                                     <div className="w-8 h-8 rounded-full bg-[#2DD4BF]/20 text-[#2DD4BF] border border-[#2DD4BF]/50 flex items-center justify-center font-bold text-xs shadow-sm">
                                         {idx + 1}
                                     </div>
-                                    <span className="font-mono text-white font-bold text-sm">{ct.class}</span>
+                                    <span className="font-mono text-white font-bold text-sm uppercase">{ct.class}</span>
                                 </div>
                                 
                                 <div className="flex items-center gap-3 mt-2 sm:mt-0 w-full sm:w-auto justify-between sm:justify-end">
@@ -203,7 +211,7 @@ export const PengurusanKelas: React.FC = () => {
         <div className="lg:col-span-4 order-1 lg:order-2">
             <div className="bg-[#1C2541] rounded-xl border-l-4 border-[#C9B458] p-6 shadow-lg sticky top-6">
                 <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                    <h3 className="text-lg font-bold text-white tracking-wide">Penyelaras Tingkatan</h3>
+                    <h3 className="text-lg font-bold text-[#C9B458] tracking-wide uppercase">PENYELARAS TINGKATAN</h3>
                     {canEdit && (
                         <button onClick={() => openEditModal('coordinator', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded text-[10px] font-bold hover:bg-yellow-400">+ Tambah</button>
                     )}

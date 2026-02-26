@@ -4,6 +4,17 @@ import { useApp } from '../../context/AppContext';
 import { apiService } from '../../services/api';
 
 // --- INTERFACES ---
+interface TakwimItem {
+    id: number;
+    event: string;
+    date: string;
+    status: string;
+    isGroup?: boolean;
+    dateDisplay?: string;
+    originalIds?: number[];
+    type?: string;
+}
+
 interface SumurEvent {
   id: number;
   date: string;
@@ -28,7 +39,7 @@ const generateRangeItems = (start: string, end: string, event: string) => {
     const eDate = new Date(eParts[2], eParts[1]-1, eParts[0]);
     const items = [];
     
-    let loop = new Date(sDate);
+    const loop = new Date(sDate);
     while (loop <= eDate) {
         const d = String(loop.getDate()).padStart(2, '0');
         const m = String(loop.getMonth() + 1).padStart(2, '0');
@@ -56,7 +67,7 @@ const dateToISO = (dateStr: string) => {
         'jul': '07', 'ogos': '08', 'ogo': '08', 'sep': '09', 'okt': '10', 'nov': '11', 'dis': '12'
     };
     
-    let day = parts[0].padStart(2, '0');
+    const day = parts[0].padStart(2, '0');
     const monthStr = parts[1].toLowerCase().substring(0, 3);
     const year = parts[2];
     
@@ -238,7 +249,7 @@ export const HEMTakwim: React.FC = () => {
   const canEdit = checkPermission('canUpdateHEMTakwim');
   const isSystemAdmin = user?.role === 'adminsistem';
 
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<TakwimItem[]>([]);
   const [view, setView] = useState<'list' | 'annual' | 'sumur_schedule'>('list');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -264,31 +275,34 @@ export const HEMTakwim: React.FC = () => {
         if (remoteTakwim) setItems(remoteTakwim);
     };
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveItems = (newItems: any[]) => {
+  const saveItems = (newItems: TakwimItem[]) => {
       setItems(newItems);
       localStorage.setItem('smaam_data_Hal Ehwal Murid_Takwim', JSON.stringify(newItems));
       apiService.write('smaam_data_Hal Ehwal Murid_Takwim', newItems);
   };
 
-  const handleOpenModal = (type: 'item' | 'sumur' | 'hip', item?: any) => {
+  const handleOpenModal = (type: 'item' | 'sumur' | 'hip', item?: TakwimItem | SumurEvent | HipEvent) => {
       setEditingType(type);
       setEditingId(item ? item.id : null);
       if (type === 'item') {
+          const takwimItem = item as TakwimItem;
           setFormData({
-              event: item?.event || '',
-              date: item?.date || '',
-              status: item?.status || 'Akan Datang',
+              event: takwimItem?.event || '',
+              date: takwimItem?.date || '',
+              status: takwimItem?.status || 'Akan Datang',
               program: '', teacher: '', activity: ''
           });
       } else {
+          const eventItem = item as SumurEvent | HipEvent;
           setFormData({
               event: '', status: '',
-              date: item?.date || '',
-              program: item?.program || '',
-              teacher: item?.teacher || '',
-              activity: item?.activity || ''
+              date: eventItem?.date || '',
+              program: eventItem?.program || '',
+              teacher: eventItem?.teacher || '',
+              activity: eventItem?.activity || ''
           });
       }
       setIsModalOpen(true);
@@ -352,7 +366,7 @@ export const HEMTakwim: React.FC = () => {
   };
 
   // --- HELPER FOR LIST VIEW GROUPING ---
-  const getConsolidatedItems = (rawItems: any[]) => {
+  const getConsolidatedItems = (rawItems: TakwimItem[]) => {
     if (!rawItems.length) return [];
 
     const parseDate = (d: string) => {
@@ -362,31 +376,31 @@ export const HEMTakwim: React.FC = () => {
     };
 
     const sorted = [...rawItems].sort((a, b) => parseDate(a.date) - parseDate(b.date));
-    const grouped: any[] = [];
+    const grouped: TakwimItem[] = [];
     
     if (sorted.length === 0) return [];
 
-    let currentGroup: any = { 
+    const currentGroup: TakwimItem = { 
         ...sorted[0], 
-        endDate: sorted[0].date, 
+        dateDisplay: sorted[0].date, 
         originalIds: [sorted[0].id] 
     };
 
     for (let i = 1; i < sorted.length; i++) {
         const item = sorted[i];
-        const prevDate = parseDate(currentGroup.endDate);
+        const prevDate = parseDate(currentGroup.dateDisplay || currentGroup.date);
         const currDate = parseDate(item.date);
         const diffDays = (currDate - prevDate) / (1000 * 60 * 60 * 24);
 
         if (item.event === currentGroup.event && item.status === currentGroup.status && diffDays <= 1.5) {
-             currentGroup.endDate = item.date;
-             currentGroup.originalIds.push(item.id);
+             currentGroup.dateDisplay = item.date;
+             if (currentGroup.originalIds) currentGroup.originalIds.push(item.id);
         } else {
-            grouped.push(currentGroup);
-            currentGroup = { ...item, endDate: item.date, originalIds: [item.id] };
+            grouped.push({ ...currentGroup });
+            Object.assign(currentGroup, { ...item, dateDisplay: item.date, originalIds: [item.id] });
         }
     }
-    grouped.push(currentGroup);
+    grouped.push({ ...currentGroup });
 
     // --- UPDATE: RENAME & NUMBERING ---
     const renamed = grouped.map(g => {
@@ -395,16 +409,16 @@ export const HEMTakwim: React.FC = () => {
         if (displayEvent === 'PPT') displayEvent = 'Peperiksaan Pertengahan Tahun';
         
         let dateDisplay = g.date;
-        if (g.date !== g.endDate) {
-            dateDisplay = `${g.date} hingga ${g.endDate}`;
+        if (g.date !== g.dateDisplay) {
+            dateDisplay = `${g.date} hingga ${g.dateDisplay}`;
         }
         
         const status = getDynamicStatus(g.date);
 
-        return { ...g, event: displayEvent, dateDisplay, status, isGroup: g.originalIds.length > 1 };
+        return { ...g, event: displayEvent, dateDisplay, status, isGroup: (g.originalIds?.length || 0) > 1 };
     });
 
-    const finalItems: any[] = [];
+    const finalItems: TakwimItem[] = [];
     const eventCounts: Record<string, number> = {};
     const eventOccurrences: Record<string, number> = {};
 
@@ -545,7 +559,7 @@ export const HEMTakwim: React.FC = () => {
     return (
     <div id="sumur-container" className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
         <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex flex-col md:flex-row justify-between items-center gap-2">
-            <h4 className="text-white font-bold flex items-center gap-2 text-[16px]"><span className="text-[#C9B458]"></span> TAKWIM PENGGILIRAN HIP, HA & SUMUR 2026</h4>
+            <h4 className="text-[#C9B458] font-bold flex items-center gap-2 text-[16px]">TAKWIM PENGGILIRAN HIP, HA & SUMUR 2026</h4>
             {canEdit && (
                 <div className="flex gap-2">
                     <button onClick={() => handleOpenModal('sumur')} className="bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded font-bold text-xs hover:bg-yellow-400">+ SUMUR</button>
@@ -609,7 +623,7 @@ export const HEMTakwim: React.FC = () => {
           <div className="flex items-center gap-2 text-[13px] text-black font-mono mb-1 font-inter">
              <span className="font-bold">HEM</span><span className="opacity-50">/</span><span className="font-bold opacity-80">TAKWIM</span>
           </div>
-          <h2 className="text-[22px] md:text-3xl font-bold text-black font-montserrat">Pengurusan Takwim HEM</h2>
+          <h2 className="text-[22px] md:text-3xl font-bold text-black font-montserrat uppercase">PENGURUSAN TAKWIM HEM</h2>
           <p className="text-black/80 mt-1 text-[13px] font-inter font-medium">Kalendar aktiviti, program HIP, HA dan SUMUR.</p>
         </div>
         <div className="flex gap-3">
@@ -633,7 +647,7 @@ export const HEMTakwim: React.FC = () => {
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[700px]">
                     <thead><tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter"><th className="px-6 py-4">Nama Program / Aktiviti</th><th className="px-6 py-4">Tarikh Pelaksanaan</th><th className="px-6 py-4">Status</th>{canEdit && <th className="px-6 py-4 text-right">Tindakan</th>}</tr></thead>
-                    <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">{consolidatedList.length > 0 ? (consolidatedList.map((item: any) => (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="px-6 py-4 font-medium text-white">{item.event}</td><td className="px-6 py-4 text-gray-300 font-mono">{item.dateDisplay || item.date}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs font-semibold ${item.status === 'Selesai' ? 'bg-green-900/50 text-green-400' : item.status === 'Sedang Berjalan' ? 'bg-blue-900/50 text-blue-400' :'bg-yellow-900/30 text-yellow-500'}`}>{item.status}</span></td>{canEdit && (<td className="px-6 py-4 text-right"><div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => handleOpenModal('item', item)} className="p-2 bg-[#3A506B] text-white rounded" title="Edit">✏️</button><button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds) : handleDelete('item', item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button></div></td>)}</tr>))) : (<tr><td colSpan={canEdit ? 4 : 3} className="px-6 py-12 text-center text-gray-500 italic">Tiada aktiviti direkodkan.</td></tr>)}</tbody>
+                    <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">{consolidatedList.length > 0 ? (consolidatedList.map((item: any) => (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="px-6 py-4 font-medium text-white">{item.event}</td><td className="px-6 py-4 text-gray-300 font-mono">{item.dateDisplay || item.date}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs font-semibold ${item.status === 'Selesai' ? 'bg-green-900/50 text-green-400' : item.status === 'Sedang Berjalan' ? 'bg-blue-900/50 text-blue-400' :'bg-yellow-900/30 text-yellow-500'}`}>{item.status}</span></td>{canEdit && (<td className="px-6 py-4 text-right"><div className={`flex justify-end gap-2 ${isSystemAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}><button onClick={() => handleOpenModal('item', item)} className="p-2 bg-[#3A506B] text-white rounded" title="Edit">✏️</button><button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds) : handleDelete('item', item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button></div></td>)}</tr>))) : (<tr><td colSpan={canEdit ? 4 : 3} className="px-6 py-12 text-center text-gray-500 italic">Tiada aktiviti direkodkan.</td></tr>)}</tbody>
                 </table>
             </div>
         </div>

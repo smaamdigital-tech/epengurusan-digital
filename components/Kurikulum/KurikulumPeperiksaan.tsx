@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 
 type Tab = 'info' | 'jadual' | 'analisis' | 'laporan';
@@ -200,8 +200,9 @@ export const KurikulumPeperiksaan: React.FC = () => {
 
   const handleAddExam = () => {
     if (!isAdmin) return;
+    const timestamp = Date.now();
     const newExam: Exam = {
-      id: Date.now(),
+      id: timestamp,
       name: 'Ujian Baru',
       code: 'NEW',
       dateStart: 'DD-MM-YYYY',
@@ -300,7 +301,7 @@ export const KurikulumPeperiksaan: React.FC = () => {
       setEditData(newData);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = useCallback((e: React.FormEvent) => {
       e.preventDefault();
       if (editType === 'header') {
           setScheduleTitle(editData.title);
@@ -311,9 +312,10 @@ export const KurikulumPeperiksaan: React.FC = () => {
           setExamNotes(editData.text.split('\n').filter((n: string) => n.trim() !== ''));
           showToast("Nota dikemaskini.");
       } else if (editType === 'slot') {
+          const timestamp = Date.now();
           const timeDisplay = `${formatTimeDisplay(editData.startTime)} - ${formatTimeDisplay(editData.endTime)}`;
           const newSlot: ScheduleSlot = {
-              id: editData.isNew ? Date.now() : editData.slotId,
+              id: editData.isNew ? timestamp : editData.slotId,
               waktu: timeDisplay,
               waktuMula: editData.startTime,
               waktuTamat: editData.endTime,
@@ -340,7 +342,7 @@ export const KurikulumPeperiksaan: React.FC = () => {
               newSchedule[dayIndex].slots.sort((a, b) => a.waktuMula.localeCompare(b.waktuMula));
           } else {
               newSchedule.push({
-                  id: Date.now(),
+                  id: timestamp,
                   tarikh: editData.date,
                   hari: getMalayDay(editData.date),
                   tarikhDisplay: formatDateDisplay(editData.date).toUpperCase(),
@@ -349,11 +351,11 @@ export const KurikulumPeperiksaan: React.FC = () => {
           }
           newSchedule.sort((a, b) => a.tarikh.localeCompare(b.tarikh));
           
-          setSchedules({ ...schedules, [selectedForm]: newSchedule });
+          setSchedules(prev => ({ ...prev, [selectedForm]: newSchedule }));
           showToast(editData.isNew ? "Slot ditambah." : "Slot dikemaskini.");
       }
       setIsEditModalOpen(false);
-  };
+  }, [editType, editData, currentScheduleData, selectedForm, showToast, schedules]);
 
   // --- MULTI-PAGE PDF GENERATION (HIGH RESOLUTION) ---
   const handlePrintSchedule = async () => {
@@ -481,7 +483,7 @@ export const KurikulumPeperiksaan: React.FC = () => {
                       <th rowSpan={2} className="px-6 py-6 border border-gray-300 w-56 align-middle text-center">Sesi / Masa</th>
                       <th rowSpan={2} className="px-6 py-6 border border-gray-300 align-middle text-center">Mata Pelajaran Peperiksaan</th>
                       <th rowSpan={2} className="px-6 py-6 border border-gray-300 w-36 align-middle text-center">Tempoh</th>
-                      <th colSpan={2} className="px-6 py-4 border border-gray-300 bg-gray-300 text-gray-900 align-middle text-center">Guru Bertugas Mengawas</th>
+                      <th colSpan={2} className="px-6 py-4 border border-gray-300 bg-gray-300 text-gray-900 align-middle text-center">Guru Bertugas</th>
                       {canEdit && <th rowSpan={2} className="px-4 py-6 border border-gray-300 w-20 bg-gray-100 align-middle text-center">Aksi</th>}
                     </tr>
                     <tr className="bg-gray-100 text-gray-700 text-[11px] font-black uppercase tracking-[0.2em]">
@@ -506,7 +508,7 @@ export const KurikulumPeperiksaan: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 fade-in">
+    <div className="p-4 md:p-8 space-y-6 fade-in pb-20">
       {/* HEADER SECTION */}
       <div className="border-b border-gray-400 pb-4">
         <div className="flex items-center gap-2 text-sm text-[#0B132B] font-mono mb-2">
@@ -516,13 +518,16 @@ export const KurikulumPeperiksaan: React.FC = () => {
         <p className="text-black mt-1 opacity-70 font-semibold">Portal rasmi pengurusan takwim, jadual, dan analisis peperiksaan SMAAM.</p>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-gray-400 scrollbar-thin">
+      <div className="flex border-b border-slate-blue mb-8">
         {[{ key: 'info', label: 'Maklumat', icon: 'ℹ️' }, { key: 'jadual', label: 'Jadual Waktu', icon: '📅' }, { key: 'analisis', label: 'Analisis', icon: '📈' }, { key: 'laporan', label: 'Pelaporan', icon: '📑' }].map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key as Tab)} className={`px-6 py-3 rounded-t-lg font-bold text-sm flex items-center gap-2 transition-all whitespace-nowrap font-poppins ${activeTab === tab.key ? 'bg-[#1C2541] text-[#C9B458] border-t-2 border-[#C9B458]' : 'text-[#1C2541] hover:text-black hover:bg-white/30'}`}><span>{tab.icon}</span>{tab.label}</button>
+          <button key={tab.key} onClick={() => setActiveTab(tab.key as Tab)} className={`px-6 py-3 font-medium text-sm transition-all relative ${activeTab === tab.key ? 'text-gold' : 'text-gray-400 hover:text-white'}`}>
+            <span className="mr-2">{tab.icon}</span>{tab.label}
+            {activeTab === tab.key && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gold shadow-[0_0_10px_rgba(201,180,88,0.5)]"></div>}
+          </button>
         ))}
       </div>
 
-      <div className="min-h-[400px]">{renderTabContent()}</div>
+      <div>{renderTabContent()}</div>
 
       {/* --- PRINTABLE CONTAINER (HIDDEN BUT VISIBLE OFF-SCREEN) --- */}
       {/* 
@@ -594,7 +599,7 @@ export const KurikulumPeperiksaan: React.FC = () => {
                                     <th rowSpan={2} className="px-2 py-3 border border-black text-center align-middle font-black" style={{width: '12%'}}>Sesi / Masa</th>
                                     <th rowSpan={2} className="px-2 py-3 border border-black font-black text-center align-middle" style={{width: '28%'}}>Mata Pelajaran Peperiksaan</th>
                                     <th rowSpan={2} className="px-2 py-3 border border-black text-center align-middle font-black" style={{width: '10%'}}>Tempoh</th>
-                                    <th colSpan={2} className="px-2 py-2 border border-black bg-gray-200 text-center align-middle font-black" style={{width: '40%'}}>Guru Bertugas Mengawas</th>
+                                    <th colSpan={2} className="px-2 py-2 border border-black bg-gray-200 text-center align-middle font-black" style={{width: '40%'}}>Guru Bertugas</th>
                                 </tr>
                                 <tr>
                                     <th className="px-2 py-2 border border-black text-center align-middle text-[10px] font-bold" style={{width: '20%'}}>{selectedForm} AL-HANAFI</th>

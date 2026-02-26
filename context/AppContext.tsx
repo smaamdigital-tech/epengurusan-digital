@@ -189,7 +189,7 @@ const INITIAL_KOKO_WEEKLY_DATA: KokoActivity[] = [
   { id: 3, date: '28 Jan 2026', activity: 'Perjumpaan Kelab/Persatuan 1 & Kelab 1M1S (P1)' },
   { id: 4, date: '4 Feb 2026', activity: 'Perjumpaan Unit Beruniform 2 & Kelab 1M1S (L2)' },
   { id: 5, date: '11 Feb 2026', activity: 'Perjumpaan Kelab/Persatuan 2 & Kelab 1M1S (P2)' },
-  { id: 6, date: '28 Feb 2026', activity: 'Koko Ramadhan' },
+  { id: 6, date: '25 Feb 2026', activity: 'Koko Ramadhan' },
   { id: 7, date: '4 Mac 2026', activity: 'Koko Ramadhan' },
   { id: 8, date: '11 Mac 2026', activity: 'Koko Ramadhan' },
   { id: 9, date: '18 Mac 2026', activity: 'Koko Ramadhan' },
@@ -289,9 +289,9 @@ const INITIAL_USER_CREDENTIALS: Record<string, UserCredential> = {
 };
 
 const INITIAL_SITE_CONFIG: SiteConfig = {
-    systemTitle: 'SISTEM PENGURUSAN DIGITAL',
+    systemTitle: 'ePENGURUSAN DIGITAL SMAAM',
     schoolName: 'SMA AL-KHAIRIAH AL-ISLAMIAH MERSING',
-    welcomeMessage: 'SELAMAT DATANG KE ePENGURUSAN DIGITAL SMAAM',
+    welcomeMessage: 'ePENGURUSAN DIGITAL SMAAM',
 };
 
 const INITIAL_SCHOOL_PROFILE: SchoolProfile = {
@@ -348,9 +348,9 @@ Sekolah Menengah Agama Al-Khairiah Al-Islamiah Mersing`,
       guruTotal: 34,
       guruLelaki: 14,
       guruPerempuan: 20,
-      muridTotal: 316,
-      muridLelaki: 156,
-      muridPerempuan: 160,
+      muridTotal: 335,
+      muridLelaki: 139,
+      muridPerempuan: 196,
     }
 };
 
@@ -436,8 +436,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [announcements, setAnnouncements] = useState<Announcement[]>(() => {
       const saved = localStorage.getItem('smaam_announcements');
       return saved ? JSON.parse(saved) : [
-        { id: 1, title: 'Mesyuarat Agung PIBG', date: '2026-03-15', summary: 'Semua ibu bapa dijemput hadir ke Dewan Utama.', views: 0, likes: 0 },
-        { id: 2, title: 'Cuti Perayaan Tahun Baru Cina', date: '2026-02-17', summary: 'Sekolah akan bercuti selama seminggu sempena TBC.', views: 0, likes: 0 },
+        { id: 1, title: 'Mesyuarat Agung PIBG', date: '2026-02-13', summary: 'Semua ibu bapa dijemput hadir ke Dewan Utama.', views: 0, likes: 0 },
+        { id: 2, title: "Ihya' Ramadan", date: '2026-02-19', summary: 'Selamat Menjalani Ibadah Puasa dengan penuh keberkatan', views: 0, likes: 0 },
       ];
   });
 

@@ -124,11 +124,11 @@ export const TakwimCutiJohor: React.FC = () => {
         {/* CENTERED TABLE CONTAINER WITH 1CM MARGIN PADDING */}
         <div className="p-10 flex justify-center bg-[#1C2541]">
             <div className="overflow-x-auto rounded-lg shadow-2xl border border-gray-600 w-full">
-                <table className="w-full text-center border-collapse text-sm bg-[#1C2541]">
+                <table className="w-full min-w-[800px] lg:min-w-full text-center border-separate border-spacing-0 text-sm bg-[#1C2541]">
                     <thead>
                         <tr className="bg-[#C9B458] text-[#0B132B] font-bold uppercase tracking-wider">
-                            <th className="border border-gray-600 px-6 py-4 whitespace-nowrap w-20">BIL</th>
-                            <th className="border border-gray-600 px-6 py-4 whitespace-nowrap w-40">TARIKH</th>
+                            <th className="border border-gray-600 px-6 py-4 whitespace-nowrap w-20 bg-[#C9B458]">BIL</th>
+                            <th className="border border-gray-600 px-6 py-4 whitespace-nowrap w-40 bg-[#C9B458]">TARIKH</th>
                             <th className="border border-gray-600 px-6 py-4 whitespace-nowrap w-40">HARI</th>
                             <th className="border border-gray-600 px-6 py-4">HARI KELEPASAN AM / CATATAN</th>
                             {isAdmin && <th className="border border-gray-600 px-6 py-4 whitespace-nowrap w-32">AKSI</th>}
@@ -137,8 +137,8 @@ export const TakwimCutiJohor: React.FC = () => {
                     <tbody className="text-gray-300">
                         {johorHolidayList.map((item, idx) => (
                             <tr key={item.id} className="hover:bg-[#253252] transition-colors border-b border-gray-700 last:border-0">
-                                <td className="border-r border-gray-600 py-4 px-6 font-medium">{idx + 1}</td>
-                                <td className="border-r border-gray-600 py-4 px-6 font-bold text-white whitespace-nowrap">{item.date}</td>
+                                <td className="border-r border-gray-600 py-4 px-6 font-medium bg-[#1C2541]">{idx + 1}</td>
+                                <td className="border-r border-gray-600 py-4 px-6 font-bold text-white whitespace-nowrap bg-[#1C2541]">{item.date}</td>
                                 <td className="border-r border-gray-600 py-4 px-6 text-[#C9B458] font-bold whitespace-nowrap">{item.day}</td>
                                 <td className="border-r border-gray-600 py-4 px-6 text-center font-medium text-white break-words">{item.name}</td>
                                 {isAdmin && (

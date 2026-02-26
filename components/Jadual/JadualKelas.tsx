@@ -160,15 +160,15 @@ export const JadualKelas: React.FC = () => {
 
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-300">
             <div className="overflow-x-auto w-full custom-scrollbar pb-2">
-                <table className="w-full text-center border-collapse table-fixed min-w-[1500px] md:min-w-full">
+                <table className="w-full text-center border-separate border-spacing-0 table-fixed min-w-[1500px] md:min-w-full">
                     <thead>
                         <tr className="bg-[#004e64] text-white text-xs font-normal tracking-wide uppercase">
                             {/* Sticky First Column */}
-                            <th className="p-1 border border-gray-600 bg-[#0B132B] w-24 md:w-20 font-bold sticky left-0 z-20 shadow-md">HARI/MASA</th>
+                            <th className="p-1 border-y border-l border-gray-600 bg-[#0B132B] w-24 md:w-20 font-bold sticky left-0 z-20 shadow-md">HARI/MASA</th>
                             {PERSENDIRIAN_PERIODS.map((p, i) => {
                                 const parts = p.split(' - ');
                                 return (
-                                    <th key={i} className="p-1 border border-gray-600 h-16 align-middle font-normal">
+                                    <th key={i} className="p-1 border-y border-l border-gray-600 h-16 align-middle font-normal last:border-r">
                                         <div className="flex flex-col items-center justify-center leading-none text-[10px] md:text-[8px] lg:text-[10px]">
                                             <span>{parts[0]}</span>
                                             <span className="my-0.5 opacity-70">-</span>
@@ -183,13 +183,13 @@ export const JadualKelas: React.FC = () => {
                         {PERSENDIRIAN_DAYS.map((day, dIdx) => (
                             <tr key={day} className="hover:bg-gray-50 transition-colors h-16 md:h-14">
                                 {/* Sticky First Column */}
-                                <td className="p-1 border border-gray-300 bg-[#1C2541] text-[#2DD4BF] font-medium shadow-md sticky left-0 z-10 text-[10px] md:text-[9px]">
+                                <td className="p-1 border-b border-l border-gray-300 bg-[#1C2541] text-[#2DD4BF] font-medium shadow-md sticky left-0 z-10 text-[10px] md:text-[9px]">
                                     {day}
                                 </td>
                                 {PERSENDIRIAN_PERIODS.map((p, pIdx) => {
                                     if (p === '10.30 - 11.00') {
                                         return (
-                                            <td key={pIdx} className="bg-gray-300 border border-gray-300 text-gray-500 font-medium p-0">
+                                            <td key={pIdx} className="bg-gray-300 border-b border-l border-gray-300 text-gray-500 font-medium p-0 last:border-r">
                                                 <div className="h-full w-full flex items-center justify-center -rotate-90 text-[10px] md:text-[8px]">REHAT</div>
                                             </td>
                                         );
@@ -199,7 +199,7 @@ export const JadualKelas: React.FC = () => {
                                     return (
                                         <td 
                                             key={pIdx} 
-                                            className={`p-0 border border-gray-300 h-full align-middle cursor-pointer hover:bg-gray-100 transition-colors ${slot ? slot.color.split(' ')[0] : ''}`}
+                                            className={`p-0 border-b border-l border-gray-300 h-full align-middle cursor-pointer hover:bg-gray-100 transition-colors last:border-r ${slot ? slot.color.split(' ')[0] : ''}`}
                                             onClick={() => canEdit && openEditModal({ day, time: p, ...slot })}
                                         >
                                             {slot && (

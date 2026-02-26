@@ -275,10 +275,16 @@ export const AdminSettings: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-between items-center pt-4">
                  <p className="text-xs text-gray-400 italic">
-                    * Semua perubahan disimpan secara automatik.
+                    * Perubahan perlu disimpan untuk mengemaskini sistem.
                  </p>
+                 <button 
+                    onClick={() => showFeedback("Semua tetapan telah berjaya disimpan.")}
+                    className="bg-[#C9B458] text-[#0B132B] px-6 py-2.5 rounded-lg font-bold shadow-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
+                 >
+                    <Icons.Check /> Simpan Tetapan
+                 </button>
             </div>
         </div>
       </div>

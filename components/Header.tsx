@@ -95,7 +95,7 @@ export const Header: React.FC = () => {
 
       {/* Left: System Title - Typography Update */}
       <div className="flex flex-col relative z-10 w-full md:w-auto text-center md:text-left mb-2 md:mb-0">
-        <h1 className="font-bold text-lg md:text-xl lg:text-2xl text-white tracking-tight leading-tight uppercase drop-shadow-md">
+        <h1 className="font-bold text-lg md:text-xl lg:text-2xl text-white tracking-tight leading-tight drop-shadow-md">
           {siteConfig.systemTitle}
         </h1>
         <div className="flex items-center justify-center md:justify-start gap-2 mt-1">

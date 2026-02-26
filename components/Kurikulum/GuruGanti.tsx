@@ -247,12 +247,9 @@ export const GuruGanti: React.FC = () => {
 
         <div className="bg-transparent p-6 mb-6 border-l-8 border-red-600 print:hidden relative">
             <div className="flex items-center gap-4">
-                <div className="h-16 w-16 bg-[#1C2541] rounded-full flex items-center justify-center border-2 border-red-600/50 shadow-lg text-white">
-                    <span className="text-3xl">🔄</span>
-                </div>
                 <div>
                     <h1 className="text-2xl font-bold tracking-wide font-montserrat text-black">PENGURUSAN GURU GANTI</h1>
-                    <h2 className="text-sm font-light tracking-widest text-gray-600 uppercase">Sistem Penjanaan Automatik (SITIGANTI)</h2>
+                    <h2 className="text-sm font-light tracking-widest text-gray-600 uppercase">Sistem Penjanaan Automatik</h2>
                 </div>
             </div>
         </div>

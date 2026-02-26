@@ -50,6 +50,26 @@ const getSumurColor = (sumur: string) => {
     return 'text-gray-400 border-gray-400/30';
 };
 
+const EditableHeader = ({ tKey, className, sectionTitles, canEdit, onEdit }: { 
+  tKey: 'table' | 'list', 
+  className: string, 
+  sectionTitles: { table: string, list: string }, 
+  canEdit: boolean, 
+  onEdit: (key: 'table' | 'list') => void 
+}) => (
+  <div className="flex items-center gap-2 group justify-center">
+    <h3 className={className}>{sectionTitles[tKey]}</h3>
+    {canEdit && (
+      <button 
+        onClick={(e) => { e.stopPropagation(); onEdit(tKey); }}
+        className="opacity-0 group-hover:opacity-100 transition-opacity text-white/50 hover:text-[#C9B458] text-xs"
+      >
+        ✏️
+      </button>
+    )}
+  </div>
+);
+
 export const JadualBerucap: React.FC = () => {
   const { checkPermission, showToast, speechSchedule, updateSpeechSchedule, teacherGroups, updateTeacherGroups } = useApp();
   const canEdit = checkPermission('canUpdateJadualBerucap');
@@ -64,12 +84,12 @@ export const JadualBerucap: React.FC = () => {
       try {
           const saved = localStorage.getItem('smaam_berucap_titles');
           return saved ? JSON.parse(saved) : {
-            table: 'Jadual Bertugas & Berucap',
+            table: 'JADUAL BERTUGAS & BERUCAP',
             list: 'Senarai Kumpulan',
           };
       } catch (e) {
           return {
-            table: 'Jadual Bertugas & Berucap',
+            table: 'JADUAL BERTUGAS & BERUCAP',
             list: 'Senarai Kumpulan',
           };
       }
@@ -84,20 +104,6 @@ export const JadualBerucap: React.FC = () => {
       showToast("Tajuk dikemaskini.");
     }
   };
-
-  const EditableHeader = ({ tKey, className }: { tKey: keyof typeof sectionTitles, className: string }) => (
-    <div className="flex items-center gap-2 group justify-center">
-      <h3 className={className}>{sectionTitles[tKey]}</h3>
-      {canEdit && (
-        <button 
-          onClick={(e) => { e.stopPropagation(); handleEditTitle(tKey); }}
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-white/50 hover:text-[#C9B458] text-xs"
-        >
-          ✏️
-        </button>
-      )}
-    </div>
-  );
 
   const openEditModal = (mType: any, item: any) => {
     setModalType(mType);
@@ -172,17 +178,17 @@ export const JadualBerucap: React.FC = () => {
         <div className="xl:col-span-8 bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-600">
             <div className="p-4 border-b border-gray-600 bg-[#0B132B] relative flex justify-between items-center min-h-[60px]">
                 <div className="flex-1 text-center">
-                    <EditableHeader tKey="table" className="text-xl font-bold text-white" />
+                    <EditableHeader tKey="table" className="text-xl font-bold text-white" sectionTitles={sectionTitles} canEdit={canEdit} onEdit={handleEditTitle} />
                 </div>
                 {canEdit && (
                     <button onClick={() => openEditModal('speech', null)} className="absolute right-4 bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded text-xs font-bold hover:bg-yellow-400">+ Tambah</button>
                 )}
             </div>
             <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full min-w-[800px] lg:min-w-full text-left border-separate border-spacing-0">
                     <thead>
-                        <tr className="bg-gray-900 text-[#C9B458] text-xs font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter">
-                            <th className="px-2 py-3 text-center w-12 border-r border-gray-700">Minggu</th>
+                        <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter">
+                            <th className="px-2 py-3 text-center w-12 border-r border-gray-700 bg-[#253252]">Minggu</th>
                             <th className="px-2 py-3 w-24 text-center border-r border-gray-700">Tarikh</th>
                             <th className="px-2 py-3 w-24 text-center border-r border-gray-700">KUMPULAN BERTUGAS</th>
                             <th className="px-2 py-3 text-center border-r border-gray-700">Guru Berucap</th>
@@ -190,20 +196,20 @@ export const JadualBerucap: React.FC = () => {
                             {canEdit && <th className="px-2 py-3 text-center w-16">Aksi</th>}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-700 text-xs font-inter leading-relaxed">
+                    <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.4]">
                         {speechSchedule.map((item) => (
-                            <tr key={item.id} className="hover:bg-gray-700 transition-colors group">
-                                <td className="px-2 py-3 text-center font-bold text-gray-200 bg-gray-800/40 border-r border-gray-700">{item.week}</td>
-                                <td className="px-2 py-3 text-gray-300 font-mono text-center whitespace-nowrap bg-gray-800/40 border-r border-gray-700">{item.date}</td>
-                                <td className="px-2 py-3 text-center bg-gray-800/40 border-r border-gray-700">
+                            <tr key={item.id} className="hover:bg-gray-700/50 transition-colors group">
+                                <td className="px-2 py-3 text-center font-bold text-gray-300 border-r border-gray-700 bg-[#1C2541]">{item.week}</td>
+                                <td className="px-2 py-3 text-gray-300 font-bold font-mono text-center whitespace-nowrap border-r border-gray-700">{item.date}</td>
+                                <td className="px-2 py-3 text-center border-r border-gray-700">
                                     <span className={`px-2 py-1 rounded text-[10px] font-bold border shadow-sm ${getGroupColor(item.group)}`}>
                                         {item.group.replace('KUMPULAN ', 'K')}
                                     </span>
                                 </td>
-                                <td className="px-2 py-3 text-center font-semibold text-white whitespace-nowrap bg-gray-800/40 border-r border-gray-700">{item.speaker}</td>
-                                <td className="px-2 py-3 text-center text-gray-300 bg-gray-800/40 border-r border-gray-700">
+                                <td className="px-2 py-3 text-center font-semibold text-gray-300 whitespace-nowrap border-r border-gray-700">{item.speaker}</td>
+                                <td className="px-2 py-3 text-center text-gray-300 border-r border-gray-700">
                                     <div className="flex flex-col gap-1.5 items-center">
-                                        <span className="text-white font-medium">{item.topic || '-'}</span>
+                                        <span className="text-gray-300 font-medium">{item.topic || '-'}</span>
                                         <div className="flex gap-2 flex-wrap justify-center">
                                             {item.civic && (
                                                 <span className={`text-[9px] uppercase tracking-wider border px-2 py-0.5 rounded-full w-fit font-bold backdrop-blur-sm ${getCivicColor(item.civic)}`}>
@@ -219,10 +225,10 @@ export const JadualBerucap: React.FC = () => {
                                     </div>
                                 </td>
                                 {canEdit && (
-                                    <td className="px-2 py-3 text-center bg-gray-800/40">
+                                    <td className="px-2 py-3 text-center">
                                         <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => openEditModal('speech', item)} className="text-blue-400 hover:text-white" title="Edit">✏️</button>
-                                            <button onClick={() => handleDeleteSpeech(item.id)} className="text-red-400 hover:text-white" title="Hapus">🗑️</button>
+                                            <button onClick={() => openEditModal('speech', item)} className="text-blue-400 hover:text-blue-300" title="Edit">✏️</button>
+                                            <button onClick={() => handleDeleteSpeech(item.id)} className="text-red-400 hover:text-red-300" title="Hapus">🗑️</button>
                                         </div>
                                     </td>
                                 )}
@@ -237,7 +243,7 @@ export const JadualBerucap: React.FC = () => {
         <div className="xl:col-span-4 flex flex-col gap-4">
             <div className="bg-[#0B132B] p-4 rounded-xl border-l-4 border-[#C9B458] shadow-lg flex justify-between items-center">
                 <div className="text-center">
-                    <EditableHeader tKey="list" className="text-lg font-bold text-white uppercase tracking-wide" />
+                    <EditableHeader tKey="list" className="text-lg font-bold text-white uppercase tracking-wide" sectionTitles={sectionTitles} canEdit={canEdit} onEdit={handleEditTitle} />
                     <p className="text-xs text-gray-400">Anggota kumpulan bertugas mingguan.</p>
                 </div>
                 {canEdit && (
@@ -262,7 +268,7 @@ export const JadualBerucap: React.FC = () => {
                         </div>
                         <ul className="p-4 space-y-2">
                             {group.members.map((member, idx) => (
-                                <li key={idx} className="flex items-center gap-3 text-xs text-gray-300">
+                                <li key={idx} className="flex items-center justify-start gap-3 text-xs text-gray-300 text-left">
                                     <span className={`w-1.5 h-1.5 rounded-full ${getGroupColor(group.name).split(' ')[0]}`}></span>
                                     {member}
                                 </li>

@@ -31,7 +31,7 @@ const generateRangeItems = (start: string, end: string, event: string) => {
     const eDate = new Date(eParts[2], eParts[1]-1, eParts[0]);
     const items = [];
     
-    let loop = new Date(sDate);
+    const loop = new Date(sDate);
     while (loop <= eDate) {
         const d = String(loop.getDate()).padStart(2, '0');
         const m = String(loop.getMonth() + 1).padStart(2, '0');
@@ -94,7 +94,7 @@ const PENTADBIRAN_JK_LIST = [
   "Jawatankuasa SKPM Kualiti @ Sekolah",
   "Jawatankuasa PBPPP",
   "Jawatankuasa Bencana Sekolah",
-  "Jawatankuasa Kelab Guru & Kakitangan (KGKT)",
+  "Jawatankuasa Pengurusan Sumber Manusia",
   "Jawatankuasa PIBG",
   "Jawatankuasa Kajian Tindakan",
   "Jawatankuasa Pemandu KBAT",
@@ -438,6 +438,111 @@ const DEFAULT_DESCRIPTIONS: Record<string, string> = {
 4. Merancang dan mengawal pengurusan sumber di sekolah.
 5. Mengenal pasti dan menyelesaikan isu dan permasalahan di sekolah.`,
   
+  "jk_pentadbiran_9": `(A) ANGGARAN BELANJA MENGURUS (ABM) PERJAWATAN 
+Membuat unjuran keperluan perjawatan guru berdasarkan bilangan murid, kelas dan aliran untuk sesi persekolahan tahun hadapan berdasarkan data 1 Oktober tahun semasa. 
+Mengurus permohonan buka/tutup kelas/aliran pada sesi persekolahan tahun hadapan kepada pendaftar sekolah sebelum bulan Mac tahun semasa. 
+Melakukan semakan unjuran keperluan perjawatan dan kelas selewat-lewatnya bulan Mac tahun semasa untuk sesi persekolahan tahun hadapan. 
+Mengurus permohonan pengisian perjawatan jika ada kekosongan di sekolah. 
+
+(B) PENILAIAN PRESTASI  
+(B1) PENILAIAN BERSEPADU PEGAWAI PERKHIDMATAN PENDIDIKAN (PBPPP) 
+Menubuhkan Jawatankuasa PBPPP Organisasi tahun berkenaan.
+Memastikan maklumat PPP di setiap organisasi dikemas kini dan lengkap. 
+Mengenal pasti PPP yang layak dinilai mengikut syarat Pegawai Yang Dinilai (PYD). 
+Mengenal pasti Pegawai Penilai (PP) mengikut syarat penetapan PP. 
+PYD, PP1 dan PP2 menyediakan dan menetapkan sasaran keberhasilan mengikut garis panduan yang ditetapkan. 
+Mengemaskinikan fail pengurusan PBPPP mengikut tatacara pengurusan fail AM 435 kategori Terhad.  
+Melaksanakan mesyuarat panel untuk pemilihan cadangan calon yang akan menerima Anugerah Perkhidmatan Cemerlang (APC). 
+
+(B2) LAPORAN NILAIAN PRESTASI TAHUNAN (LNPT) 
+Melakukan pengemaskinian maklumat pegawai di bawah seliaan di dalam sistem yang sedang berkuat kuasa. 
+Membuat lantikan Pegawai Penilai (PP) kepada semua Anggota Kumpulan Pelaksana (AKP). 
+Melaksanakan taklimat/penataran kepada semua PP dan Pegawai Yang Dinilai (PYD).
+Melaksanakan sesi bersemuka antara PP dan PYD berdasarkan sasaran kerja tahunan (SKT) yang dikemukakan PYD. 
+Melaksanakan mesyuarat panel untuk pemilihan/cadangan calon yang akan menerima Anugerah Khidmat Cemerlang (APC). 
+
+(C) PENGURUSAN STAF BERMASALAH DAN TATATERTIB 
+Memastikan semua pegawai menandatangani Surat Aku Janji untuk penjawat awam dan memperbaharui ikrar aku janji untuk penjawat awam setiap tahun. 
+Memberi taklimat peraturan-peraturan am penjawat awam dan perbuatan-perbuatan yang boleh disabitkan sebagai salahlaku tatatertib dan jenis-jenis hukuman-hukuman tatatertib kepada pegawai seliaan.
+Memastikan pematuhan prosedur tatatertib selaras dengan peraturan sedia ada.
+Memastikan pengurusan fail tatatertib dibuat mengikut prosedur yang ditetapkan.
+Mempertingkatkan pengetahuan dan pengalaman tentang pengurusan tatatertib perkhidmatan awam yang terkini. 
+Membuat penilaian dan saringan kepada guru dan staf yang bermasalah dan merujuk kepada Kaunselor Pendidikan Daerah (KPD) bagi mendapatkan perkhidmatan sesi kaunseling/bimbingan. 
+Melaporkan salah laku pegawai ke Lembaga Tatatertib (LTT) di Jabatan/Kementerian.
+Melaksanakan;  
+Tindakan pengesanan/mengenal pasti masalah terhadap pegawai
+Tindakan dalam bentuk pembetulan dan pembaikan 
+Tindakan lain secara pentadbiran 
+Tindakan dalam bentuk hukuman 
+Tanggungjawab selepas pegawai dikenakan hukuman tatatertib
+
+(D) LATIHAN PROFESIONALISME (GURU DAN BUKAN GURU)
+Memastikan guru menghadiri kursus/bengkel, mesyuarat dan PLC yang dianjurkan oleh pihak sekolah/PPD/JPN/KPM.
+Merancang dan melaksanakan program kemajuan guru dan staf berdasarkan Analisis Keperluan Latihan – Training Needs Analysis (TNA).
+Memastikan pegawai dalam seliaan menghadiri sekurang-kurangnya jumlah hari/jam latihan (jangka pendek) berdasarkan pekeliling/arahan oleh agensi pusat yang sedang berkuat kuasa.
+Merancang keperluan latihan (POL).
+Melatih dan membimbing guru dalam aspek psikologi bagi tujuan pengurusan murid.
+Melaksanakan latihan melalui pelbagai kaedah bagi memenuhi jumlah hari/jam latihan yang ditetapkan dalam setahun melalui latihan secara formal, sesi pembelajaran dan pembelajaran kendiri termasuk pembelajaran secara dalam talian sekurang-kurangnya lima (5) hari setahun.
+Meningkatkan kecekapan dalam mengurus sumber.
+Menjalankan tindakan susulan.
+Memastikan laporan dan dokumentasi disediakan.
+Mengenal pasti kompetensi dan potensi pegawai yang dinilai agar membolehkan pembangunan profesionalisme berterusan dilaksanakan.
+Mengenal pasti keperluan untuk pembangunan laluan kerjaya.
+Mengurus dan membantu menghasilkan bahan kursus LADAP (CPD) untuk guru-guru dan staf.
+Membantu dan membimbing guru-guru baru dan guru-guru yang tidak mencapai tahap pengajaran yang baik dalam PdP. (under performing teacher)
+Membantu guru dalam menyediakan sasaran tahunan (Performance Management Systems -PMS).
+Membantu guru dalam meningkatkan strategik pengajaran dan pembelajaran. (Teach Smart)
+Mendalami kepakaran PdP secara am dan khusus dari segi aspek pilihan.
+Melaksanakan perkongsian kemahiran/kepakaran yang diperoleh daripada sesi bengkel/kursus di luar dalam kalangan warga sekolah mengikut kesesuaian.
+Membuat penilaian program latihan.
+
+(E) PROGRAM PEMBANGUNAN GURU BAHARU (PPGB)
+Memastikan pelaksanaan PPGB mengikut tatacara penyediaan dan penggunaan dokumen iaitu:
+Surat lantikan mentor oleh pentadbir sekolah 
+Akuan terima guru mentor dan guru baharu 
+Log pementoran 
+Borang penilaian guru baharu 
+Laporan status pelaksanaan PPGB 
+Memastikan pelaksanaan PPGB distrukturkan secara tiga (3) fasa iaitu fasa orientasi, fasa pementoran dan fasa pembangunan profesionalisme dalam tempoh tiga (3) tahun pertama perkhidmatan.
+Pelaksanaan ketiga-tiga fasa dalam program ini boleh berlaku secara serentak.
+
+(F) URUSAN NAIK PANGKAT 
+Membuat semakan iklan kenaikan pangkat dalam sistem ePangkat.
+Mengedarkan borang permohonan kenaikan pangkat kepada pegawai terlibat.
+Membuat lantikan PP1, PP2 dan KPP.
+Melaksanakan penilaian berdasarkan semakan dokumen dan pembentangan (jika perlu).
+Memastikan semua pegawai yang layak untuk kenaikan pangkat dilakukan penilaian dan tiada faktor keciciran berlaku.
+
+(G) HRMIS
+Menyediakan data asas HRMIS seperti carta organisasi yang kemas kini, perjawatan mengikut tempat kerja dan buku perjawatan, dan senarai perjawatan dengan penyandang.
+Menyedia dan memantapkan rangkaian dalaman agensi (Local Area Network – LAN).
+Menediakan komputer tambahan mengikut keperluan agensi yang memenuhi spesifikasi HRMIS.
+Menyediakan sumber yang secukupnya dari segi personel dan kewangan bagi membiayai perbelanjaan aktiviti pelaksanaan HRMIS seperti latihan, pengumpulan dan pengemaskinian data, peningkatan dan pertambahan peralatan serta bayaran caj rangkaian.
+Bagi membolehkan aplikasi HRMIS digunakan, aktiviti yang perlu disempurnakan oleh agensi ialah :
+Melantik seorang pegawai kanan sebagai pentadbir sistem yang bertanggungjawab menyediakan hak capaian mengikut peranan pegawai dan proses PSM.
+Melengkapkan nilai dalam jadual Iook-up sekiranya diperlukan.
+Melengkapkan maklumat sandangan pegawai, jawatan sebenar, unit organisasi dan aktiviti organisasi.
+Menetapkan aliran kerja mengikut peranan pegawai.
+Melengkapkan maklumat peribadi bagi setiap pegawai.
+Melengkapkan data dalam profil perkhidmatan.
+Memasukkan data transaksi tertentu bagi membolehkan sesuatu modul dilaksanakan.
+
+(H) PEMIMPIN PERTENGAHAN 
+Pentadbir sekolah mengenal pasti guru-guru dalam kategori pemimpin pertengahan (Middle Leader Team- MLT).
+Memberikan ruang dan peluang kepada guru-guru pemimpin pertengahan untuk menunjukkan kebolehan dan bakat kepimpinan masing-masing.
+Merancang dan melaksanakan program peningkatan kompetensi guru-guru pemimpin pertengahan sebagai barisan pelapis kepimpinan sekolah.
+Menilai kompetensi guru-guru pemimpin pertengahan untuk dicadangkan kepada perjawatan hakiki tertentu.
+
+(I) PERKHIDMATAN
+Memastikan urusan perkhidmatan guru dan staf sekolah diurus secara cekap mengikut prosedur dan pekeliling yang sedang berkuat kuasa.
+ 
+(J) PENGURUSAN KESEJAHTERAAN PSIKOLOGI
+Menyediakan sesi khidmat kepakaran kaunseling/bimbingan/konsultasi/advokasi kepada warga KPM.
+Merancang operasi penyampaian perkhidmatan kaunseling dan psikologi dalam aspek pembangunan, pencegahan dan pemulihan (3P) bagi memastikan kesejahteraan insan.
+Merancang operasi penyampaian perkhidmatan kaunseling dan psikologi dalam aspek pembangunan dan pemerkasaan bagi memastikan kesejahteraan organisasi.
+Memastikan kumpulan berisiko dirujuk menghadiri program pencegahan dan pemulihan bagi tujuan pengupayaan diri.
+Mewujudkan kumpulan Rakan Pembimbing Perkhidmatan Awam (AKRAB) sebagai kumpulan sokongan.`,
+  
   "jk_kurikulum_0": `1. Memastikan pelaksanaan Kurikulum Standard Sekolah Menengah (KSSM) dipatuhi.
 2. Merancang program peningkatan akademik.
 3. Memastikan sukatan pelajaran diselesaikan mengikut takwim.
@@ -693,30 +798,46 @@ const getConsolidatedItems = (rawItems: any[]) => {
 };
 
 // Helper to get initial items (Mock Data logic moved here)
-const getInitialItems = (unit: string, type: string) => {
+export const getInitialItems = (unit: string, type: string) => {
     if (type === 'Jawatankuasa') {
       if (unit === 'Pentadbiran') {
          return [
-            { id: 1, role: 'Pengerusi', position: 'Pengetua', teacherName: 'Zulkeffle bin Muhammad' },
-            { id: 2, role: 'Timbalan Pengerusi', position: 'GPK Pentadbiran', teacherName: 'Noratikah binti Abd. Kadir' },
-            { id: 3, role: 'Naib Pengerusi 1', position: 'GPK Hal Ehwal Murid', teacherName: 'Shaharer bin Hj Husain' },
-            { id: 4, role: 'Naib Pengerusi 2', position: 'GPK Kokurikulum', teacherName: 'Zulkifli bin Md Aspan' },
-            { id: 5, role: 'Setiausaha', position: 'Setiausaha Pengurusan Pentadbiran', teacherName: 'Nooraind binti Ali' },
-            { id: 6, role: 'AJK', position: 'GKMP Agama', teacherName: 'Saemah binti Supandi' },
-            { id: 7, role: 'AJK', position: 'GKMP Dini', teacherName: 'Nor Azean binti Ismail' },
-            { id: 8, role: 'AJK', position: 'GKMP Bahasa', teacherName: 'Rosmawati @ Rohayati binti Hussin' },
-            { id: 9, role: 'AJK', position: 'GKMP Kemanusiaan', teacherName: 'Nooraind binti Ali' },
-            { id: 10, role: 'AJK', position: 'GKMP Sains & Matematik', teacherName: 'Zahrah Khairiah Nasution binti Saleh' },
-            { id: 11, role: 'AJK', position: 'GKMP Teknik & Vokasional', teacherName: 'Mazuin binti Mat' },
-            { id: 12, role: 'AJK', position: 'Guru Bimbingan & Kaunseling', teacherName: 'Muhammad Hafiz bin Jalil' },
-            { id: 13, role: 'AJK', position: 'Guru Perpustakaan & Media', teacherName: 'Nuurul Amira binti Razak' },
-            { id: 14, role: 'AJK', position: 'Guru Data', teacherName: 'Noorlela binti Zainudin' },
-            { id: 15, role: 'AJK', position: 'Penyelaras ICT/DELIMA', teacherName: 'Syahidatun Najihah binti Aziz' },
-            { id: 16, role: 'AJK', position: 'Guru Disiplin', teacherName: 'Salman bin A Rahman' },
-            { id: 17, role: 'AJK', position: 'Penyelaras Program TS25', teacherName: "Ahmad Fikruddin bin Ahmad Raza'i" },
-            { id: 18, role: 'AJK', position: 'Penyelia Asrama', teacherName: 'Islahuddin bin Muchtar' },
-            { id: 19, role: 'AJK', position: 'Ketua Anggota Kumpulan Pelaksana', teacherName: 'Yati binti Ani' },
-            { id: 20, role: 'AJK', position: 'Ketua Warden', teacherName: 'Salman bin A Rahman' },
+            { id: 1, role: 'Pengerusi', position: 'Pengetua', teacherName: 'Zulkeffle bin Muhammad', committeeId: 'jk_pentadbiran_0' },
+            { id: 2, role: 'Timbalan Pengerusi', position: 'GPK Pentadbiran', teacherName: 'Noratikah binti Abd. Kadir', committeeId: 'jk_pentadbiran_0' },
+            { id: 3, role: 'Naib Pengerusi 1', position: 'GPK Hal Ehwal Murid', teacherName: 'Shaharer bin Hj Husain', committeeId: 'jk_pentadbiran_0' },
+            { id: 4, role: 'Naib Pengerusi 2', position: 'GPK Kokurikulum', teacherName: 'Zulkifli bin Md Aspan', committeeId: 'jk_pentadbiran_0' },
+            { id: 5, role: 'Setiausaha', position: 'Setiausaha Pengurusan Pentadbiran', teacherName: 'Nooraind binti Ali', committeeId: 'jk_pentadbiran_0' },
+            { id: 6, role: 'AJK', position: 'GKMP Agama', teacherName: 'Saemah binti Supandi', committeeId: 'jk_pentadbiran_0' },
+            { id: 7, role: 'AJK', position: 'GKMP Dini', teacherName: 'Nor Azean binti Ismail', committeeId: 'jk_pentadbiran_0' },
+            { id: 8, role: 'AJK', position: 'GKMP Bahasa', teacherName: 'Rosmawati @ Rohayati binti Hussin', committeeId: 'jk_pentadbiran_0' },
+            { id: 9, role: 'AJK', position: 'GKMP Kemanusiaan', teacherName: 'Nooraind binti Ali', committeeId: 'jk_pentadbiran_0' },
+            { id: 10, role: 'AJK', position: 'GKMP Sains & Matematik', teacherName: 'Zahrah Khairiah Nasution binti Saleh', committeeId: 'jk_pentadbiran_0' },
+            { id: 11, role: 'AJK', position: 'GKMP Teknik & Vokasional', teacherName: 'Mazuin binti Mat', committeeId: 'jk_pentadbiran_0' },
+            { id: 12, role: 'AJK', position: 'Guru Bimbingan & Kaunseling', teacherName: 'Muhammad Hafiz bin Jalil', committeeId: 'jk_pentadbiran_0' },
+            { id: 13, role: 'AJK', position: 'Guru Perpustakaan & Media', teacherName: 'Nuurul Amira binti Razak', committeeId: 'jk_pentadbiran_0' },
+            { id: 14, role: 'AJK', position: 'Guru Data', teacherName: 'Noorlela binti Zainudin', committeeId: 'jk_pentadbiran_0' },
+            { id: 15, role: 'AJK', position: 'Penyelaras ICT/DELIMA', teacherName: 'Syahidatun Najihah binti Aziz', committeeId: 'jk_pentadbiran_0' },
+            { id: 16, role: 'AJK', position: 'Guru Disiplin', teacherName: 'Salman bin A Rahman', committeeId: 'jk_pentadbiran_0' },
+            { id: 17, role: 'AJK', position: 'Penyelaras Program TS25', teacherName: "Ahmad Fikruddin bin Ahmad Raza'i", committeeId: 'jk_pentadbiran_0' },
+            { id: 18, role: 'AJK', position: 'Penyelia Asrama', teacherName: 'Islahuddin bin Muchtar', committeeId: 'jk_pentadbiran_0' },
+            { id: 19, role: 'AJK', position: 'Ketua Anggota Kumpulan Pelaksana', teacherName: 'Yati binti Ani', committeeId: 'jk_pentadbiran_0' },
+            { id: 20, role: 'AJK', position: 'Ketua Warden', teacherName: 'Salman bin A Rahman', committeeId: 'jk_pentadbiran_0' },
+            
+            // Jawatankuasa Pengurusan Sumber Manusia (No 10)
+            { id: 1001, role: 'Pengerusi', position: 'Pengetua', teacherName: 'Zulkeffle bin Muhammad', committeeId: 'jk_pentadbiran_9' },
+            { id: 1002, role: 'Timbalan Pengerusi', position: 'GPK Pentadbiran', teacherName: 'Noratikah binti Abd. Kadir', committeeId: 'jk_pentadbiran_9' },
+            { id: 1003, role: 'Naib Pengerusi 1', position: 'GPK Hal Ehwal Murid', teacherName: 'Shaharer bin Hj Husain', committeeId: 'jk_pentadbiran_9' },
+            { id: 1004, role: 'Naib Pengerusi 2', position: 'GPK Kokurikulum', teacherName: 'Zulkifli bin Md Aspan', committeeId: 'jk_pentadbiran_9' },
+            { id: 1005, role: 'Setiausaha', position: 'Ketua Anggota Kumpulan Pelaksana', teacherName: 'Yati binti Ani', committeeId: 'jk_pentadbiran_9' },
+            { id: 1006, role: 'AJK', position: 'Guru Bimbingan & Kaunseling', teacherName: 'Muhammad Hafiz bin Jalil', committeeId: 'jk_pentadbiran_9' },
+            { id: 1007, role: 'AJK', position: 'Setiausaha Pengurusan Latihan Personel', teacherName: 'Liyana binti Iskandar', committeeId: 'jk_pentadbiran_9' },
+            { id: 1008, role: 'AJK', position: 'Guru Disiplin', teacherName: 'Salman bin A Rahman', committeeId: 'jk_pentadbiran_9' },
+            { id: 1009, role: 'AJK', position: 'Setiausaha Program Pembangunan Guru Baharu (PPGB)', teacherName: 'Mazuin binti Mat', committeeId: 'jk_pentadbiran_9' },
+            { id: 1010, role: 'AJK', position: 'Semua GKMP', teacherName: '', committeeId: 'jk_pentadbiran_9' },
+            { id: 1011, role: 'AJK', position: '', teacherName: 'Nur Farhana binti Hassan', committeeId: 'jk_pentadbiran_9' },
+            { id: 1012, role: 'AJK', position: '', teacherName: 'Nurulashiqin binti Razali', committeeId: 'jk_pentadbiran_9' },
+            { id: 1013, role: 'AJK', position: '', teacherName: 'Sadan bin Md Seth', committeeId: 'jk_pentadbiran_9' },
+            { id: 1014, role: 'AJK', position: '', teacherName: 'Islahuddin bin Muchtar', committeeId: 'jk_pentadbiran_9' },
          ];
       }
       if (unit === 'Hal Ehwal Murid') {
@@ -741,8 +862,8 @@ const getInitialItems = (unit: string, type: string) => {
           return INITIAL_KURIKULUM_TAKWIM_DATA;
       }
       return [
-        { id: 1, event: `Mesyuarat ${unit} Bil 1/2026`, date: '15-01-2026', status: 'Selesai' },
-        { id: 2, event: 'Bengkel Pemantapan', date: '22-02-2026', status: 'Dalam Perancangan' },
+        { id: 1, event: unit === 'Pentadbiran' ? 'Taklimat Pembugaran PLC 2026' : `Mesyuarat ${unit} Bil 1/2026`, date: unit === 'Pentadbiran' ? '25-02-2026' : '15-01-2026', status: unit === 'Pentadbiran' ? 'Selesai' : 'Selesai' },
+        { id: 2, event: unit === 'Pentadbiran' ? 'Mesyuarat Pentadbiran Bil 1/2026' : 'Bengkel Pemantapan', date: unit === 'Pentadbiran' ? '02-03-2026' : '22-02-2026', status: 'Dalam Perancangan' },
         { id: 3, event: 'Semakan Fail', date: '10-03-2026', status: 'Akan Datang' },
       ];
     }
@@ -991,8 +1112,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     const storageKey = `smaam_data_${unit}_${type}`;
     // Background Sync (Silent Update)
     apiService.read(storageKey).then((remoteData) => {
-        if (remoteData) {
+        if (remoteData && Array.isArray(remoteData)) {
             setItems(remoteData);
+        } else {
+            // If no remote data, ensure we have initial items for this unit/type
+            setItems(getInitialItems(unit, type));
         }
     });
   }, [unit, type]);
@@ -1189,11 +1313,12 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   };
 
   // --- NEW: Group Deletion for Consolidated Items ---
-  const handleDeleteGroup = (ids: number[]) => {
-      if (confirm(`Padam kumpulan aktiviti ini (${ids.length} hari)?`)) {
-          const newItems = items.filter(i => !ids.includes(i.id));
+  const handleDeleteGroup = (ids: (number | string)[]) => {
+      if (window.confirm(`Adakah anda pasti ingin memadam kumpulan aktiviti ini (${ids.length} hari)?`)) {
+          const stringIds = ids.map(id => id.toString());
+          const newItems = items.filter(i => !stringIds.includes(i.id.toString()));
           saveToStorage(newItems);
-          showToast("Aktiviti berjaya dipadam.");
+          showToast("Kumpulan aktiviti berjaya dipadam.");
       }
   };
 
@@ -1268,11 +1393,28 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: number | string) => {
     if (window.confirm("Adakah anda pasti ingin memadam rekod ini?")) {
-      const newItems = items.filter(item => item.id !== id);
+      const newItems = items.filter(item => item.id.toString() !== id.toString());
       saveToStorage(newItems);
       showToast("Rekod berjaya dipadam.");
+    }
+  };
+
+  const handleResetTakwim = () => {
+    if (window.confirm("Adakah anda pasti ingin mengosongkan senarai aktiviti ini? Semua data akan dipadam.")) {
+      saveToStorage([]);
+      showToast("Senarai aktiviti dikosongkan.");
+    }
+  };
+
+  const handleCleanEmptyRows = () => {
+    const newItems = items.filter(item => item.event && item.event.trim() !== '');
+    if (newItems.length !== items.length) {
+        saveToStorage(newItems);
+        showToast("Baris kosong telah dibersihkan.");
+    } else {
+        showToast("Tiada baris kosong dijumpai.");
     }
   };
 
@@ -1386,14 +1528,33 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   const renderPerjumpaanMingguan = () => (
     <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
         <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex justify-between items-center gap-2">
-            <h4 className="text-white font-bold flex items-center gap-2 text-[16px]"><span className="text-[#C9B458]">🗓️</span> {kokoTitles.weekly}</h4>
+            <h4 className="text-[#C9B458] font-bold flex items-center gap-2 text-[16px]">{kokoTitles.weekly}</h4>
             {isSystemAdmin && (<div className="flex gap-2"><button onClick={() => handleEditKokoTitle('title_weekly')} className="text-xs text-blue-400 hover:text-white underline">Edit Tajuk</button><button onClick={() => handleEditKoko('weekly', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded font-bold text-xs hover:bg-yellow-400">+ Tambah</button></div>)}
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse min-w-[700px]">
-                <thead><tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter"><th className="px-6 py-4 w-16 text-center">BIL</th><th className="px-6 py-4 w-40 text-center">TARIKH</th><th className="px-6 py-4">AKTIVITI</th>{isSystemAdmin && <th className="px-6 py-4 w-24 text-center">AKSI</th>}</tr></thead>
+                <thead>
+                    <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter sticky top-0 z-20">
+                        <th className="px-6 py-4 w-16 text-center sticky left-0 z-30 bg-[#253252]">BIL</th>
+                        <th className="px-6 py-4 w-40 text-center">TARIKH</th>
+                        <th className="px-6 py-4">AKTIVITI</th>
+                        {isSystemAdmin && <th className="px-6 py-4 w-24 text-center">AKSI</th>}
+                    </tr>
+                </thead>
                 <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">
-                    {kokoWeeklyData.map((item, idx) => (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="px-6 py-3 font-medium text-white text-center">{idx + 1}</td><td className="px-6 py-3 text-white text-center font-mono">{item.date}</td><td className="px-6 py-3 text-gray-300 font-medium">{item.activity}</td>{isSystemAdmin && (<td className="px-6 py-3 text-center flex justify-center gap-2"><button onClick={() => handleEditKoko('weekly', item)} className="text-blue-400 hover:text-white">✏️</button><button onClick={() => handleDeleteKoko('weekly', item.id)} className="text-red-400 hover:text-white">🗑️</button></td>)}</tr>))}
+                    {kokoWeeklyData.map((item, idx) => (
+                        <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
+                            <td className="px-6 py-3 font-medium text-white text-center sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{idx + 1}</td>
+                            <td className="px-6 py-3 text-white text-center font-mono">{item.date}</td>
+                            <td className="px-6 py-3 text-gray-300 font-medium">{item.activity}</td>
+                            {isSystemAdmin && (
+                                <td className="px-6 py-3 text-center flex justify-center gap-2">
+                                    <button onClick={() => handleEditKoko('weekly', item)} className="text-blue-400 hover:text-white">✏️</button>
+                                    <button onClick={() => handleDeleteKoko('weekly', item.id)} className="text-red-400 hover:text-white">🗑️</button>
+                                </td>
+                            )}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>
@@ -1403,14 +1564,37 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   const renderPerhimpunanBulanan = () => (
     <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
         <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex justify-between items-center gap-2">
-            <h4 className="text-white font-bold flex items-center gap-2 text-[16px]"><span className="text-[#C9B458]">📢</span> {kokoTitles.monthly}</h4>
+            <h4 className="text-[#C9B458] font-bold flex items-center gap-2 text-[16px]">{kokoTitles.monthly}</h4>
             {isSystemAdmin && (<div className="flex gap-2"><button onClick={() => handleEditKokoTitle('title_monthly')} className="text-xs text-blue-400 hover:text-white underline">Edit Tajuk</button><button onClick={() => handleEditKoko('monthly', null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded font-bold text-xs hover:bg-yellow-400">+ Tambah</button></div>)}
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse min-w-[700px]">
-                <thead><tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter"><th className="px-6 py-4 w-16 text-center">BIL</th><th className="px-6 py-4 w-32 text-center">BULAN</th><th className="px-6 py-4 w-40 text-center">TARIKH</th><th className="px-6 py-4">UNIT BERTUGAS</th><th className="px-6 py-4">CATATAN</th>{isSystemAdmin && <th className="px-6 py-4 w-24 text-center">AKSI</th>}</tr></thead>
+                <thead>
+                    <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter sticky top-0 z-20">
+                        <th className="px-6 py-4 w-16 text-center sticky left-0 z-30 bg-[#253252]">BIL</th>
+                        <th className="px-6 py-4 w-32 text-center">BULAN</th>
+                        <th className="px-6 py-4 w-40 text-center">TARIKH</th>
+                        <th className="px-6 py-4">UNIT BERTUGAS</th>
+                        <th className="px-6 py-4">CATATAN</th>
+                        {isSystemAdmin && <th className="px-6 py-4 w-24 text-center">AKSI</th>}
+                    </tr>
+                </thead>
                 <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">
-                    {kokoAssemblyData.map((item, idx) => (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="px-6 py-4 font-medium text-white text-center">{idx + 1}</td><td className="px-6 py-4 text-gray-300 text-center uppercase font-bold">{item.month}</td><td className="px-6 py-4 text-white text-center font-mono">{item.date}</td><td className="px-6 py-4"><span className={`px-3 py-1 rounded text-xs font-bold ${getUnitBadgeColor(item.unit)}`}>{toTitleCase(item.unit)}</span></td><td className="px-6 py-4 text-gray-300 text-sm">{item.notes}</td>{isSystemAdmin && (<td className="px-6 py-3 text-center flex justify-center gap-2"><button onClick={() => handleEditKoko('monthly', item)} className="text-blue-400 hover:text-white">✏️</button><button onClick={() => handleDeleteKoko('monthly', item.id)} className="text-red-400 hover:text-white">🗑️</button></td>)}</tr>))}
+                    {kokoAssemblyData.map((item, idx) => (
+                        <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
+                            <td className="px-6 py-4 font-medium text-white text-center sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{idx + 1}</td>
+                            <td className="px-6 py-4 text-gray-300 text-center uppercase font-bold">{item.month}</td>
+                            <td className="px-6 py-4 text-white text-center font-mono">{item.date}</td>
+                            <td className="px-6 py-4"><span className={`px-3 py-1 rounded text-xs font-bold ${getUnitBadgeColor(item.unit)}`}>{toTitleCase(item.unit)}</span></td>
+                            <td className="px-6 py-4 text-gray-300 text-sm">{item.notes}</td>
+                            {isSystemAdmin && (
+                                <td className="px-6 py-3 text-center flex justify-center gap-2">
+                                    <button onClick={() => handleEditKoko('monthly', item)} className="text-blue-400 hover:text-white">✏️</button>
+                                    <button onClick={() => handleDeleteKoko('monthly', item.id)} className="text-red-400 hover:text-white">🗑️</button>
+                                </td>
+                            )}
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>
@@ -1435,7 +1619,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     return (
     <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in">
         <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex flex-col md:flex-row justify-between items-center gap-2">
-            <h4 className="text-white font-bold flex items-center gap-2 text-[16px]"><span className="text-[#C9B458]">🔄</span> TAKWIM PENGGILIRAN HIP, HA & SUMUR 2026</h4>
+            <h4 className="text-[#C9B458] font-bold flex items-center gap-2 text-[16px]">TAKWIM PENGGILIRAN HIP, HA & SUMUR 2026</h4>
             {isSystemAdmin && (
                 <div className="flex gap-2">
                     <button onClick={() => handleEditSumur(null)} className="bg-[#C9B458] text-[#0B132B] px-3 py-1 rounded font-bold text-xs hover:bg-yellow-400">+ SUMUR</button>
@@ -1443,11 +1627,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                 </div>
             )}
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
-                    <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter">
-                        <th className="px-6 py-4 w-16 text-center">NO</th>
+                    <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter sticky top-0 z-20">
+                        <th className="px-6 py-4 w-16 text-center sticky left-0 z-30 bg-[#253252]">NO</th>
                         <th className="px-6 py-4 w-40 text-center">TARIKH</th>
                         <th className="px-6 py-4">PROGRAM</th>
                         <th className="px-6 py-4">GURU BERTUGAS</th>
@@ -1458,7 +1642,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                 <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">
                     {combined.map((item, idx) => (
                         <tr key={`${item.source}-${item.id}`} className="hover:bg-[#253252] transition-colors group">
-                            <td className="px-6 py-3 font-medium text-white text-center">{idx + 1}</td>
+                            <td className="px-6 py-3 font-medium text-white text-center sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{idx + 1}</td>
                             <td className="px-6 py-3 text-white text-center font-mono">{item.date}</td>
                             <td className={`px-6 py-3 font-bold ${getProgramColor(item.program)}`}>
                                 {item.program}
@@ -1493,12 +1677,52 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   };
 
   const renderTakwimPeperiksaan = () => (
-    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col">
-        <div className="p-4 md:p-6 bg-[#0B132B] border-b border-gray-700"><h3 className="text-lg md:text-xl font-bold text-white font-montserrat uppercase flex items-center gap-2"><span className="text-[#C9B458]">📅</span> TAKWIM PEPERIKSAAN 2026</h3></div>
-        <div className="overflow-x-auto">
+    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full max-h-[70vh]">
+        <div className="p-4 md:p-6 bg-[#0B132B] border-b border-gray-700 flex-none"><h3 className="text-lg md:text-xl font-bold text-[#C9B458] font-montserrat uppercase flex items-center gap-2">TAKWIM PEPERIKSAAN 2026</h3></div>
+        <div className="overflow-x-auto overflow-y-auto custom-scrollbar flex-1">
             <table className="w-full text-center border-collapse border border-gray-600 min-w-[650px] md:min-w-[900px] text-[10px] md:text-sm table-fixed">
-                <thead><tr className="bg-[#C9B458] text-[#0B132B] uppercase font-bold"><th className="border border-gray-600 px-1 py-3 w-8 md:w-16">M</th><th className="border border-gray-600 px-2 py-3 w-24 md:w-40">TARIKH</th><th className="border border-gray-600 px-2 py-3">DALAMAN</th><th className="border border-gray-600 px-2 py-3">JAJ</th><th className="border border-gray-600 px-2 py-3">AWAM</th>{isSystemAdmin && <th className="border border-gray-600 px-1 py-3 w-8 md:w-16">EDIT</th>}</tr></thead>
-                <tbody className="text-gray-300">{examWeeks.map((item) => (item.isHoliday ? (<tr key={item.id} className="bg-[#C9B458] text-[#0B132B] font-bold uppercase border-b border-gray-600"><td colSpan={2} className="border border-gray-600 py-2 px-1 text-center">{item.date}</td><td colSpan={3} className="border border-gray-600 py-2 px-1 text-center truncate">{item.dalaman}</td>{isSystemAdmin && <td className="border border-gray-600 py-2 px-1 bg-[#0B132B]"><button onClick={() => handleEditExamWeek(item)} className={`${isSystemData(item.id) && !isSystemAdmin ? 'text-gray-500' : 'text-[#C9B458] hover:text-white'}`}>{isSystemData(item.id) && !isSystemAdmin ? '🔒' : '✏️'}</button></td>}</tr>) : (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="border border-gray-600 py-2 font-mono text-[#C9B458] font-bold">{item.week}</td><td className="border border-gray-600 py-2 px-1 md:px-2 whitespace-nowrap text-white">{item.date}</td><td className="border border-gray-600 py-2 px-1 md:px-2">{renderExamCell(item.dalaman, 'text-pink-500')}</td><td className="border border-gray-600 py-2 px-1 md:px-2">{renderExamCell(item.jaj, 'text-green-400')}</td><td className="border border-gray-600 py-2 px-1 md:px-2">{renderExamCell(item.awam, 'text-cyan-400')}</td>{isSystemAdmin && <td className="border border-gray-600 py-2 px-1 text-center"><button onClick={() => handleEditExamWeek(item)} className={`${isSystemData(item.id) && !isSystemAdmin ? 'text-gray-600 cursor-not-allowed' : 'text-gray-500 hover:text-[#C9B458]'}`}>{isSystemData(item.id) && !isSystemAdmin ? '🔒' : '✏️'}</button></td>}</tr>)))}</tbody>
+                <thead>
+                    <tr className="bg-[#C9B458] text-[#0B132B] uppercase font-bold sticky top-0 z-30">
+                        <th className="border border-gray-600 px-1 py-3 w-8 md:w-16 sticky left-0 z-40 bg-[#C9B458]">M</th>
+                        <th className="border border-gray-600 px-2 py-3 w-24 md:w-40 sticky left-[32px] md:left-[64px] z-40 bg-[#C9B458]">TARIKH</th>
+                        <th className="border border-gray-600 px-2 py-3">DALAMAN</th>
+                        <th className="border border-gray-600 px-2 py-3">JAJ</th>
+                        <th className="border border-gray-600 px-2 py-3">AWAM</th>
+                        {isSystemAdmin && <th className="border border-gray-600 px-1 py-3 w-8 md:w-16">EDIT</th>}
+                    </tr>
+                </thead>
+                <tbody className="text-gray-300">
+                    {examWeeks.map((item) => (
+                        item.isHoliday ? (
+                            <tr key={item.id} className="bg-[#C9B458] text-[#0B132B] font-bold uppercase border-b border-gray-600">
+                                <td colSpan={2} className="border border-gray-600 py-2 px-1 text-center sticky left-0 z-10 bg-[#C9B458]">{item.date}</td>
+                                <td colSpan={3} className="border border-gray-600 py-2 px-1 text-center whitespace-normal break-words">{item.dalaman}</td>
+                                {isSystemAdmin && (
+                                    <td className="border border-gray-600 py-2 px-1 bg-[#0B132B]">
+                                        <button onClick={() => handleEditExamWeek(item)} className={`${isSystemData(item.id) && !isSystemAdmin ? 'text-gray-500' : 'text-[#C9B458] hover:text-white'}`}>
+                                            {isSystemData(item.id) && !isSystemAdmin ? '🔒' : '✏️'}
+                                        </button>
+                                    </td>
+                                )}
+                            </tr>
+                        ) : (
+                            <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
+                                <td className="border border-gray-600 py-2 font-mono text-[#C9B458] font-bold sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{item.week}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 whitespace-normal break-words text-white sticky left-[32px] md:left-[64px] z-10 bg-[#1C2541] group-hover:bg-[#253252]">{item.date}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 whitespace-normal break-words">{renderExamCell(item.dalaman, 'text-pink-500')}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 whitespace-normal break-words">{renderExamCell(item.jaj, 'text-green-400')}</td>
+                                <td className="border border-gray-600 py-2 px-1 md:px-2 whitespace-normal break-words">{renderExamCell(item.awam, 'text-cyan-400')}</td>
+                                {isSystemAdmin && (
+                                    <td className="border border-gray-600 py-2 px-1 text-center">
+                                        <button onClick={() => handleEditExamWeek(item)} className={`${isSystemData(item.id) && !isSystemAdmin ? 'text-gray-600 cursor-not-allowed' : 'text-gray-500 hover:text-[#C9B458]'}`}>
+                                            {isSystemData(item.id) && !isSystemAdmin ? '🔒' : '✏️'}
+                                        </button>
+                                    </td>
+                                )}
+                            </tr>
+                        )
+                    ))}
+                </tbody>
             </table>
         </div>
     </div>
@@ -1511,7 +1735,9 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
           <div className="flex items-center gap-2 text-[13px] text-black font-mono mb-1 font-inter">
              <span className="font-bold">{unit.toUpperCase()}</span><span className="opacity-50">/</span><span className="font-bold opacity-80">{type.toUpperCase()}</span>
           </div>
-          <h2 className="text-[22px] md:text-3xl font-bold text-black font-montserrat">Pengurusan {type}</h2>
+          <h2 className="text-[22px] md:text-3xl font-bold text-black font-montserrat uppercase">
+            PENGURUSAN {type} {type === 'Takwim' ? unit : ''}
+          </h2>
           <p className="text-black/80 mt-1 text-[13px] font-inter font-medium">{type === 'Jawatankuasa' ? `Senarai jawatankuasa dan ahli bagi unit ${unit}.` : `Kalendar dan jadual aktiviti bagi unit ${unit}.`}</p>
         </div>
         <div className="flex gap-3">
@@ -1600,11 +1826,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-x-auto relative">
+                    <div className="overflow-x-auto relative custom-scrollbar">
                         <table className="w-full text-left border-collapse min-w-[300px] md:min-w-[500px]">
                             <thead className="shadow-sm">
-                                <tr className="bg-[#253252] border-b border-gray-700">
-                                    <th className="px-2 py-2 md:px-4 md:py-3 w-1/4 text-[#C9B458] text-xs md:text-sm font-bold font-['Century_Gothic'] uppercase tracking-wider text-left">Peranan</th>
+                                <tr className="bg-[#253252] border-b border-gray-700 sticky top-0 z-20">
+                                    <th className="px-2 py-2 md:px-4 md:py-3 w-1/4 text-[#C9B458] text-xs md:text-sm font-bold font-['Century_Gothic'] uppercase tracking-wider text-left sticky left-0 z-30 bg-[#253252]">Peranan</th>
                                     <th className="px-2 py-2 md:px-4 md:py-3 w-1/4 text-[#C9B458] text-xs md:text-sm font-bold font-['Century_Gothic'] uppercase tracking-wider text-left">Jawatan</th>
                                     <th className="px-2 py-2 md:px-4 md:py-3 w-1/3 text-[#C9B458] text-xs md:text-sm font-bold font-['Century_Gothic'] uppercase tracking-wider text-left">Nama Guru</th>
                                     {(canEdit || canDelete) && <th className="px-2 py-2 md:px-4 md:py-3 text-right text-[#C9B458] text-xs md:text-sm font-bold font-['Century_Gothic'] uppercase tracking-wider">Aksi</th>}
@@ -1613,12 +1839,12 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                             <tbody className="divide-y divide-gray-700 text-xs md:text-[13px] font-inter leading-[1.3]">
                                 {filteredItems.length > 0 ? (filteredItems.map((item: any) => (
                                     <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
-                                        <td className="px-2 py-2 md:px-4 md:py-3 font-normal text-white border-r border-gray-800/50">{item.role}</td>
+                                        <td className="px-2 py-2 md:px-4 md:py-3 font-normal text-white border-r border-gray-800/50 sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{item.role}</td>
                                         <td className="px-2 py-2 md:px-4 md:py-3 text-gray-400 italic">{item.position}</td>
                                         <td className="px-2 py-2 md:px-4 md:py-3 font-semibold text-[#C9B458]">{formatTeacherName(item.teacherName)}</td>
                                         {(canEdit || canDelete) && (
                                             <td className="px-2 py-2 md:px-4 md:py-3 text-right">
-                                                <div className="flex justify-end gap-2 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className={`flex justify-end gap-2 ${isSystemAdmin ? 'opacity-100' : 'md:opacity-0 group-hover:opacity-100'} transition-opacity`}>
                                                     {canEdit && <button onClick={() => handleOpenModal(item)} className="text-blue-400 hover:text-white" title="Edit">✏️</button>}
                                                     {canDelete && <button onClick={() => handleDelete(item.id)} className="text-red-400 hover:text-white" title="Hapus">🗑️</button>}
                                                 </div>
@@ -1678,8 +1904,17 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                   <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex items-center justify-between"><h3 className="text-lg font-bold text-[#C9B458] font-montserrat uppercase">PERANCANGAN TAHUNAN {unit.toUpperCase()} TAHUN {year}</h3></div>
                   <div className="overflow-x-auto w-full custom-scrollbar">
                       <table className="w-full min-w-[1000px] border-collapse text-xs border border-gray-800">
-                          <thead><tr><th className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm w-12 border border-[#0B132B] sticky left-0 z-20">HB</th>{months.map(m => (<th key={m} className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm border border-[#0B132B] min-w-[80px]">{m}</th>))}</tr></thead>
-                          <tbody>{Array.from({ length: 31 }, (_, i) => i + 1).map(date => (<tr key={date}><td className="bg-[#0B132B] text-[#C9B458] font-bold text-center border border-gray-700 sticky left-0 z-10 p-1">{date}</td>{months.map((_, monthIdx) => {
+                          <thead>
+                              <tr className="sticky top-0 z-30">
+                                  <th className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm w-12 border border-[#0B132B] sticky left-0 z-40">HB</th>
+                                  {months.map(m => (<th key={m} className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm border border-[#0B132B] min-w-[80px]">{m}</th>))}
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {Array.from({ length: 31 }, (_, i) => i + 1).map(date => (
+                                  <tr key={date}>
+                                      <td className="bg-[#0B132B] text-[#C9B458] font-bold text-center border border-gray-700 sticky left-0 z-10 p-1">{date}</td>
+                                      {months.map((_, monthIdx) => {
                             const dayLetter = getDayLetter(monthIdx, date);
                             if (!dayLetter) return <td key={monthIdx} className="bg-black/40 border border-gray-800"></td>;
                             
@@ -1807,13 +2042,13 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                             }
 
                             return (
-                              <td key={monthIdx} className={`${isHolidayDate ? 'bg-yellow-200 text-black' : 'bg-[#1C2541]'} border border-gray-700 relative h-12 p-1 align-top hover:bg-[#253252] transition-colors ${canEdit ? 'cursor-pointer' : ''}`} onClick={() => { if (canEdit) eventsOnDay.length > 0 ? handleOpenModal(eventsOnDay[0]) : handleOpenModal({ date: dateStr }); }}>
+                              <td key={monthIdx} className={`${isHolidayDate ? 'bg-yellow-200 text-black' : 'bg-[#1C2541]'} border border-gray-700 relative min-h-[48px] p-1 align-top hover:bg-[#253252] transition-colors ${canEdit ? 'cursor-pointer' : ''}`} onClick={() => { if (canEdit) handleOpenModal(eventsOnDay.length > 0 ? eventsOnDay[0] : { date: dateStr }); }}>
                                 <span className={`absolute top-0.5 right-1 text-[8px] font-mono ${isHolidayDate ? 'text-black/60' : 'text-gray-500'}`}>{dayLetter}</span>
                                 <div className="mt-3 flex flex-col gap-1">
                                 {eventsOnDay.map((event, idx) => (
                                   <div key={idx} className="flex items-start gap-1.5 group" title={event.event}>
                                       <div className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${getBulletColor(event.type, isHolidayDate)}`}></div>
-                                      <span className={`text-[9px] leading-tight group-hover:text-white line-clamp-2 ${isHolidayDate ? 'text-black font-semibold' : 'text-gray-300'}`}>{event.event}</span>
+                                      <span className={`text-[9px] leading-tight group-hover:text-white whitespace-normal break-words ${isHolidayDate ? 'text-black font-semibold' : 'text-gray-300'}`}>{event.event}</span>
                                   </div>
                                 ))}
                                 </div>
@@ -1827,19 +2062,34 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
 
             {takwimView === 'list' && (
                 <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 mb-4">
-                  <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex flex-col gap-2"><h4 className="text-white font-bold flex items-center gap-2 text-[16px]">Senarai Aktiviti</h4></div>
-                  <div className="overflow-x-auto">
+                  <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex flex-col md:flex-row justify-between items-center gap-2">
+                    <h4 className="text-white font-bold flex items-center gap-2 text-[16px]">Senarai Aktiviti</h4>
+                    {isSystemAdmin && (
+                        <div className="flex gap-2">
+                            <button onClick={handleCleanEmptyRows} className="text-[11px] text-blue-400 hover:text-white border border-blue-900/30 px-2 py-1 rounded font-bold" title="Bersihkan baris tanpa nama aktiviti">🧹 Bersih</button>
+                            <button onClick={handleResetTakwim} className="text-[11px] text-red-400 hover:text-white border border-red-900/30 px-2 py-1 rounded font-bold" title="Padam semua aktiviti">🗑️ Reset</button>
+                        </div>
+                    )}
+                  </div>
+                  <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left border-collapse min-w-[700px]">
-                      <thead><tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter"><th className="px-6 py-4">Nama Program / Aktiviti</th><th className="px-6 py-4">Tarikh Pelaksanaan</th><th className="px-6 py-4">Status</th>{(canEdit || canDelete) && <th className="px-6 py-4 text-right">Tindakan</th>}</tr></thead>
+                      <thead>
+                        <tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter sticky top-0 z-20">
+                          <th className="px-6 py-4 sticky left-0 z-30 bg-[#253252]">Nama Program / Aktiviti</th>
+                          <th className="px-6 py-4">Tarikh Pelaksanaan</th>
+                          <th className="px-6 py-4">Status</th>
+                          {(canEdit || canDelete) && <th className="px-6 py-4 text-right">Tindakan</th>}
+                        </tr>
+                      </thead>
                       <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">
                         {consolidatedList.length > 0 ? (consolidatedList.map((item: any) => (
                             <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
-                                <td className="px-6 py-4 font-medium text-white">{item.event}</td>
+                                <td className="px-6 py-4 font-medium text-white sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{item.event}</td>
                                 <td className="px-6 py-4 text-gray-300 font-mono">{item.dateDisplay || item.date}</td>
                                 <td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(item.status)}`}>{item.status}</span></td>
                                 {(canEdit || canDelete) && (
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className={`flex justify-end gap-2 ${isSystemAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
                                             {canEdit && <button onClick={() => handleOpenModal(item)} className="p-2 bg-[#3A506B] text-white rounded" title="Edit">✏️</button>}
                                             {canDelete && <button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds) : handleDelete(item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button>}
                                         </div>
@@ -1927,12 +2177,9 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
 
                <div className="flex gap-4 pt-6">
                    <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-3 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors font-medium uppercase tracking-wide text-xs">Batal</button>
-                   {/* ADDED RESET BUTTON */}
-                   {!editingId && (
-                       <button type="button" onClick={handleResetForm} className="flex-1 px-4 py-3 rounded-lg border border-red-900/50 text-red-300 hover:bg-red-900/20 transition-colors font-medium uppercase tracking-wide text-xs">
-                           Reset
-                       </button>
-                   )}
+                   <button type="button" onClick={handleResetForm} className="flex-1 px-4 py-3 rounded-lg border border-red-900/50 text-red-300 hover:bg-red-900/20 transition-colors font-medium uppercase tracking-wide text-xs">
+                       Reset
+                   </button>
                    <button type="submit" className="flex-1 bg-[#C9B458] text-[#0B132B] px-4 py-3 rounded-lg font-bold hover:bg-yellow-500 transition-colors shadow-lg shadow-yellow-900/20 transform hover:-translate-y-0.5 uppercase tracking-wide text-xs">SIMPAN</button>
                </div>
             </form>

@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Announcement, Program, KokoActivity, SumurEvent, HipEvent, KokoAssemblyEvent } from '../types';
+import { getInitialItems } from './UnitContent';
+import { Announcement, Program } from '../types';
 
 // Minimalist Corporate Icon Components
 const Icons = {
@@ -89,7 +90,7 @@ const isDateInCurrentWeek = (dateRangeStr: string): boolean => {
     // Assume start date uses same month/year unless specified otherwise, simplified for this specific format
     const startPart = parts[0]; // "12" or "30 Mac"
     const startPieces = startPart.split(' ');
-    let dayStart = parseInt(startPieces[0]);
+    const dayStart = parseInt(startPieces[0]);
     let startMonth = month;
     
     if (startPieces.length > 1) {
@@ -107,7 +108,7 @@ const isDateInCurrentWeek = (dateRangeStr: string): boolean => {
     // Check if today is between start and end
     return today >= startDate && today <= endDate;
 
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -124,16 +125,16 @@ const isEventInWeek = (eventDateStr: string, weekDateRangeStr: string): boolean 
 
         const endPart = rangeParts[1]; 
         const endPieces = endPart.split(' ');
-        let year = parseInt(endPieces[2]);
-        let month = months[endPieces[1].toLowerCase()] || 0;
-        let dayEnd = parseInt(endPieces[0]);
+        const year = parseInt(endPieces[2]);
+        const month = months[endPieces[1].toLowerCase()] || 0;
+        const dayEnd = parseInt(endPieces[0]);
         
         const endDate = new Date(year, month, dayEnd);
         endDate.setHours(23, 59, 59);
 
         const startPart = rangeParts[0];
         const startPieces = startPart.split(' ');
-        let dayStart = parseInt(startPieces[0]);
+        const dayStart = parseInt(startPieces[0]);
         let startMonth = month;
         if (startPieces.length > 1) {
             startMonth = months[startPieces[1].toLowerCase()] || month;
@@ -195,53 +196,39 @@ const getCurrentWeekRange = () => {
 
 export const Dashboard: React.FC = () => {
   const { 
-    user, permissions, announcements, programs, siteConfig, updateSiteConfig, 
+    user, permissions, announcements, siteConfig, updateSiteConfig, 
     addAnnouncement, updateAnnouncement, deleteAnnouncement, 
-    addProgram, updateProgram, deleteProgram,
     checkPermission, showToast,
     speechSchedule, teacherGroups, kokoWeeklyData, kokoAssemblyData,
-    sumurSchedule
+    sumurSchedule, hipSchedule
   } = useApp();
   
   const [isEditing, setIsEditing] = useState(false);
   const [tempWelcome, setTempWelcome] = useState(siteConfig.welcomeMessage);
   
-  // Current Week Logic
-  const [currentWeekItem, setCurrentWeekItem] = useState<any>(null);
-  const [currentGroupMembers, setCurrentGroupMembers] = useState<string[]>([]);
+  // Current Week Logic (Derived)
+  const { currentWeekItem, currentGroupMembers, currentKokoActivity, currentKokoAssembly } = React.useMemo(() => {
+      const found = speechSchedule.find(item => isDateInCurrentWeek(item.date));
+      if (!found) return { currentWeekItem: null, currentGroupMembers: [], currentKokoActivity: null, currentKokoAssembly: null };
+
+      const group = teacherGroups.find(g => g.name === found.group);
+      const members = group ? group.members : [];
+      
+      const kokoMatch = kokoWeeklyData.find(k => isEventInWeek(k.date, found.date));
+      const kokoAssemblyMatch = kokoAssemblyData.find(k => isEventInWeek(k.date, found.date));
+
+      return {
+          currentWeekItem: found,
+          currentGroupMembers: members,
+          currentKokoActivity: kokoMatch || null,
+          currentKokoAssembly: kokoAssemblyMatch || null
+      };
+  }, [speechSchedule, teacherGroups, kokoWeeklyData, kokoAssemblyData]);
+  
   const [showTeachersModal, setShowTeachersModal] = useState(false);
   
-  // Koko Logic
-  const [currentKokoActivity, setCurrentKokoActivity] = useState<KokoActivity | null>(null);
-  const [currentKokoAssembly, setCurrentKokoAssembly] = useState<KokoAssemblyEvent | null>(null);
-  
-  // Specific Program Logic
-  const [currentSumurProgram, setCurrentSumurProgram] = useState<SumurEvent | null>(null);
-  const [currentHayyaProgram, setCurrentHayyaProgram] = useState<SumurEvent | null>(null);
-  const [currentEnglishProgram, setCurrentEnglishProgram] = useState<SumurEvent | null>(null);
-
-  useEffect(() => {
-      // 1. Logic for Speech & Koko
-      const found = speechSchedule.find(item => isDateInCurrentWeek(item.date));
-      setCurrentWeekItem(found || null);
-
-      if (found) {
-          const group = teacherGroups.find(g => g.name === found.group);
-          setCurrentGroupMembers(group ? group.members : []);
-          
-          const kokoMatch = kokoWeeklyData.find(k => isEventInWeek(k.date, found.date));
-          setCurrentKokoActivity(kokoMatch || null);
-
-          // Check for Koko Assembly Match within current week range
-          const kokoAssemblyMatch = kokoAssemblyData.find(k => isEventInWeek(k.date, found.date));
-          setCurrentKokoAssembly(kokoAssemblyMatch || null);
-      } else {
-          setCurrentGroupMembers([]);
-          setCurrentKokoActivity(null);
-          setCurrentKokoAssembly(null);
-      }
-
-      // 2. Logic for Specific Programs (SUMUR, HAYYA, ENGLISH)
+  // Specific Program Logic (Derived)
+  const { currentSumurProgram, currentHayyaProgram, currentEnglishProgram } = React.useMemo(() => {
       const { start, end } = getCurrentWeekRange();
 
       // Filter sumurSchedule for current week matches
@@ -250,11 +237,12 @@ export const Dashboard: React.FC = () => {
           return d && d >= start && d <= end;
       });
 
-      setCurrentSumurProgram(weeklySumurEvents.find(e => e.program.trim().toUpperCase() === 'SUMUR') || null);
-      setCurrentHayyaProgram(weeklySumurEvents.find(e => e.program.trim().toUpperCase().includes('HAYYA')) || null);
-      setCurrentEnglishProgram(weeklySumurEvents.find(e => e.program.trim().toUpperCase().includes('ENGLISH')) || null);
-
-  }, [speechSchedule, teacherGroups, kokoWeeklyData, kokoAssemblyData, sumurSchedule]);
+      return {
+          currentSumurProgram: weeklySumurEvents.find(e => e.program.trim().toUpperCase() === 'SUMUR') || null,
+          currentHayyaProgram: weeklySumurEvents.find(e => e.program.trim().toUpperCase().includes('HAYYA')) || null,
+          currentEnglishProgram: weeklySumurEvents.find(e => e.program.trim().toUpperCase().includes('ENGLISH')) || null
+      };
+  }, [sumurSchedule]);
 
   // Announcement Modal State
   const [showAnnounceModal, setShowAnnounceModal] = useState(false);
@@ -263,21 +251,6 @@ export const Dashboard: React.FC = () => {
   // View Announcement Modal State
   const [viewingAnnounce, setViewingAnnounce] = useState<Announcement | null>(null);
 
-  // Persistent States for Views and Likes
-  const [viewedIds, setViewedIds] = useState<number[]>(() => {
-      try {
-          const stored = sessionStorage.getItem('viewed_announcements');
-          return stored ? JSON.parse(stored) : [];
-      } catch { return []; }
-  });
-
-  const [likedIds, setLikedIds] = useState<number[]>(() => {
-      try {
-          const stored = localStorage.getItem('liked_announcements');
-          return stored ? JSON.parse(stored) : [];
-      } catch { return []; }
-  });
-  
   // Program Modal State
   const [showProgramModal, setShowProgramModal] = useState(false);
   const [programForm, setProgramForm] = useState<Partial<Program>>({ 
@@ -286,7 +259,6 @@ export const Dashboard: React.FC = () => {
 
   const canEditWelcome = user?.role === 'adminsistem'; 
   const canUpdatePengumuman = checkPermission('canUpdatePengumuman');
-  const canUpdateProgram = checkPermission('canUpdateProgram');
 
   const saveEdit = () => {
     updateSiteConfig({ welcomeMessage: tempWelcome });
@@ -298,10 +270,193 @@ export const Dashboard: React.FC = () => {
     setShowAnnounceModal(true);
   };
 
+  const [viewedIds, setViewedIds] = useState<number[]>(() => {
+    try {
+        const stored = sessionStorage.getItem('viewed_announcements');
+        return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+
+  const [likedIds, setLikedIds] = useState<number[]>(() => {
+    try {
+        const stored = localStorage.getItem('liked_announcements');
+        return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
+
+  const upcomingTakwimActivities = React.useMemo(() => {
+    const units = ['Pentadbiran', 'Kurikulum', 'Hal Ehwal Murid', 'Kokurikulum'];
+    const allActivities: { id: number; event: string; date: string; status: string; unit: string; dateObj: Date }[] = [];
+    
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth(); // 0-indexed
+    const currentYear = currentDate.getFullYear();
+
+    // 1. Standard Takwim from LocalStorage for each unit
+    units.forEach(unit => {
+      const storageKey = `smaam_data_${unit}_Takwim`;
+      const localData = localStorage.getItem(storageKey);
+      let items: { id: number; event: string; date: string; status: string }[];
+      if (localData && localData !== "undefined" && localData !== "null") {
+        try {
+          items = JSON.parse(localData);
+        } catch {
+          items = getInitialItems(unit, 'Takwim');
+        }
+      } else {
+        items = getInitialItems(unit, 'Takwim');
+      }
+
+      items.forEach((item) => {
+        if (item.date && item.event) {
+          const parts = item.date.split('-');
+          if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const year = parseInt(parts[2], 10);
+            
+            if (month === (currentMonth + 1) && year === currentYear) {
+              const dateObj = new Date(year, month - 1, day);
+              allActivities.push({
+                ...item,
+                unit,
+                dateObj
+              });
+            }
+          }
+        }
+      });
+    });
+
+    // 2. Koko Weekly Data
+    kokoWeeklyData.forEach(item => {
+        const d = parseMalayDate(item.date);
+        if (d && d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+            allActivities.push({
+                id: item.id + 20000,
+                event: item.activity,
+                date: item.date,
+                status: 'Akan Datang',
+                unit: 'Kokurikulum',
+                dateObj: d
+            });
+        }
+    });
+
+    // 3. Koko Assembly Data
+    kokoAssemblyData.forEach(item => {
+        const d = parseMalayDate(item.date);
+        if (d && d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+            allActivities.push({
+                id: item.id + 30000,
+                event: `Perhimpunan Bulanan: ${item.unit}`,
+                date: item.date,
+                status: 'Akan Datang',
+                unit: 'Kokurikulum',
+                dateObj: d
+            });
+        }
+    });
+
+    // 4. Sumur Schedule
+    sumurSchedule.forEach(item => {
+        const d = parseMalayDate(item.date);
+        if (d && d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+            allActivities.push({
+                id: item.id + 40000,
+                event: `${item.program}: ${item.activity}`,
+                date: item.date,
+                status: 'Akan Datang',
+                unit: 'Hal Ehwal Murid',
+                dateObj: d
+            });
+        }
+    });
+
+    // 5. HIP Schedule
+    hipSchedule.forEach(item => {
+        const d = parseMalayDate(item.date);
+        if (d && d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+            allActivities.push({
+                id: item.id + 50000,
+                event: `${item.program}: ${item.activity}`,
+                date: item.date,
+                status: 'Akan Datang',
+                unit: 'Hal Ehwal Murid',
+                dateObj: d
+            });
+        }
+    });
+
+    // 6. Exam Weeks (Peperiksaan)
+    const examDataKey = 'smaam_data_Kurikulum_Peperiksaan';
+    const savedExams = localStorage.getItem(examDataKey);
+    let examItems: any[] = [];
+    if (savedExams) {
+        try { examItems = JSON.parse(savedExams); } catch { examItems = []; }
+    }
+
+    examItems.forEach((item: any) => {
+        // Exam dates are ranges like "12 – 16 Jan 2026"
+        // We check if the range overlaps with the current month
+        const rangeParts = item.date.split('–').map((s: string) => s.trim());
+        if (rangeParts.length === 2) {
+            const endD = parseMalayDate(rangeParts[1]);
+            if (endD && endD.getMonth() === currentMonth && endD.getFullYear() === currentYear) {
+                // Check if there's actual exam content
+                const content = [item.dalaman, item.jaj, item.awam].filter(c => c && c.trim() !== '').join('; ');
+                if (content && !item.isHoliday) {
+                    allActivities.push({
+                        id: item.id + 60000,
+                        event: `Peperiksaan: ${content}`,
+                        date: item.date,
+                        status: 'Akan Datang',
+                        unit: 'Kurikulum',
+                        dateObj: endD
+                    });
+                }
+            }
+        }
+    });
+
+    // Group by date
+    const grouped: { [key: string]: { id: number; event: string; date: string; status: string; unit: string; dateObj: Date; unitList: string[]; eventList: string[] } } = {};
+    allActivities.forEach(item => {
+      const dateKey = item.date;
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = {
+          ...item,
+          unitList: [item.unit],
+          eventList: [item.event]
+        };
+      } else {
+        if (!grouped[dateKey].unitList.includes(item.unit)) {
+            grouped[dateKey].unitList.push(item.unit);
+        }
+        if (!grouped[dateKey].eventList.includes(item.event)) {
+          grouped[dateKey].eventList.push(item.event);
+        }
+      }
+    });
+
+    const finalActivities = Object.values(grouped).map((group) => ({
+      ...group,
+      unit: group.unitList.join('/'),
+      event: group.eventList.join(' / ')
+    }));
+
+    finalActivities.sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+    return finalActivities;
+  }, [kokoWeeklyData, kokoAssemblyData, sumurSchedule, hipSchedule]);
+
   const handleSaveAnnouncement = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = { ...announceForm, id: announceForm.id || Date.now(), views: announceForm.views || 0, likes: announceForm.likes || 0 } as Announcement;
-    announceForm.id ? updateAnnouncement(payload) : addAnnouncement(payload);
+    if (announceForm.id) {
+        updateAnnouncement(payload);
+    } else {
+        addAnnouncement(payload);
+    }
     showToast(announceForm.id ? "Pengumuman dikemaskini." : "Pengumuman ditambah.");
     setShowAnnounceModal(false);
   };
@@ -353,27 +508,14 @@ export const Dashboard: React.FC = () => {
       localStorage.setItem('liked_announcements', JSON.stringify(newLikedIds));
   };
 
-  const handleOpenProgramModal = (prog?: Program) => {
-      setProgramForm(prog || { title: '', date: '', category: 'Lain-lain', description: '', time: '', location: '', image1: '', image2: '' });
-      setShowProgramModal(true);
-  };
-
-  const handleSaveProgram = (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = { ...programForm, id: programForm.id || Date.now(), category: programForm.category || 'Lain-lain' } as Program;
-    programForm.id ? updateProgram(payload) : addProgram(payload);
-    showToast(programForm.id ? "Program dikemaskini." : "Program ditambah.");
-    setShowProgramModal(false);
-  };
-
-  const handleDeleteProgram = (id: number) => {
-      if(window.confirm("Padam program ini?")) { deleteProgram(id); showToast("Program dipadam."); }
-  };
-
   const handleDateChange = (value: string, type: 'announce' | 'program') => {
       const parts = value.split('-');
       const formatted = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : value;
-      type === 'announce' ? setAnnounceForm({...announceForm, date: formatted}) : setProgramForm({...programForm, date: formatted});
+      if (type === 'announce') {
+          setAnnounceForm({...announceForm, date: formatted});
+      } else {
+          setProgramForm({...programForm, date: formatted});
+      }
   };
 
   const formatDateForInput = (dateStr?: string) => {
@@ -715,38 +857,23 @@ export const Dashboard: React.FC = () => {
           <div className="bg-[#0B132B] rounded-xl shadow-2xl overflow-hidden border border-[#2DD4BF]/30 flex flex-col">
              <div className="p-5 border-b border-[#2DD4BF]/30 flex justify-between items-center bg-[#003840]/30">
               <h3 className="text-lg md:text-xl font-bold text-white flex items-center gap-3 uppercase tracking-wide">
-                <span className="text-[#2DD4BF]"><Icons.Target /></span> Takwim Program
+                <span className="text-[#2DD4BF]"><Icons.Target /></span> Program Bulan Ini
               </h3>
-              {canUpdateProgram && (
-                <button 
-                  onClick={() => handleOpenProgramModal()}
-                  className="text-xs border border-[#2DD4BF] text-[#2DD4BF] p-2 rounded-lg hover:bg-[#2DD4BF] hover:text-[#0B132B] transition-colors font-bold"
-                >
-                  <Icons.Plus />
-                </button>
-              )}
             </div>
-            <div className="p-6 space-y-6 flex-1">
-              {programs.slice(0, 4).map((prog) => (
-                <div key={prog.id} className="relative pl-6 border-l-2 border-[#2DD4BF]/20 hover:border-[#2DD4BF] transition-colors group">
+            <div className="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar max-h-[500px]">
+              {upcomingTakwimActivities.map((prog, idx) => (
+                <div key={`${prog.id}-${idx}`} className="relative pl-6 border-l-2 border-[#2DD4BF]/20 hover:border-[#2DD4BF] transition-colors group">
                   <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-[#0B132B] border-2 border-[#2DD4BF] group-hover:scale-110 transition-transform"></div>
                   <span className="text-xs text-[#2DD4BF] font-bold mb-1 block uppercase tracking-wider">{formatDisplayDate(prog.date)}</span>
                   <div className="flex justify-between items-start">
-                     <h4 className="text-sm font-bold text-white uppercase leading-tight">{prog.title}</h4>
-                     {canUpdateProgram && (
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleOpenProgramModal(prog)} className="text-xs text-blue-400 hover:text-white">✏️</button>
-                            <button onClick={() => handleDeleteProgram(prog.id)} className="text-xs text-red-400 hover:text-white">🗑️</button>
-                        </div>
-                     )}
+                     <h4 className="text-sm font-bold text-white uppercase leading-tight">{prog.event}</h4>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2 line-clamp-2 italic leading-normal">{prog.description}</p>
                   <span className="inline-block mt-3 text-[0.65rem] font-bold bg-[#003840] px-3 py-1 rounded-full text-[#2DD4BF] border border-[#2DD4BF]/30 uppercase tracking-wider">
-                    {prog.category}
+                    {prog.unit}
                   </span>
                 </div>
               ))}
-              {programs.length === 0 && <p className="text-gray-500 text-center text-sm py-8 italic">Tiada program.</p>}
+              {upcomingTakwimActivities.length === 0 && <p className="text-gray-500 text-center text-sm py-8 italic">Tiada aktiviti takwim sepanjang bulan ini.</p>}
             </div>
           </div>
         )}

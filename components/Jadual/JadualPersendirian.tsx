@@ -174,11 +174,11 @@ export const JadualPersendirian: React.FC = () => {
 
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-300">
             <div className="overflow-x-auto w-full custom-scrollbar pb-2">
-                <table className="w-full text-center border-collapse table-fixed min-w-[1500px] md:min-w-full">
+                <table className="w-full text-center border-separate border-spacing-0 table-fixed min-w-[1500px] md:min-w-full">
                     <thead>
                         <tr className="bg-gray-100 text-gray-900 text-[11px] md:text-[9px] lg:text-[10px] uppercase font-medium tracking-wide">
                             {/* Sticky First Column */}
-                            <th className="p-0 border border-gray-400 w-28 md:w-20 relative h-24 overflow-hidden bg-[#1C2541] sticky left-0 z-20 shadow-lg">
+                            <th className="p-0 border-y border-l border-gray-400 w-28 md:w-20 relative h-24 overflow-hidden bg-[#1C2541] sticky left-0 z-20 shadow-lg">
                                 <div className="absolute inset-0 w-full h-full" style={{
                                      background: 'linear-gradient(to bottom left, transparent calc(50% - 0.5px), #C9B458 calc(50% - 0.5px), #C9B458 calc(50% + 0.5px), transparent calc(50% + 0.5px))'
                                 }}></div>
@@ -188,7 +188,7 @@ export const JadualPersendirian: React.FC = () => {
                             {PERSENDIRIAN_PERIODS.map((p, i) => {
                                 const parts = p.split(' - ');
                                 return (
-                                    <th key={i} className="p-1 border border-gray-400 font-medium leading-tight">
+                                    <th key={i} className="p-1 border-y border-l border-gray-400 font-medium leading-tight last:border-r">
                                         <div className="flex flex-col gap-1 items-center justify-center h-full text-[11px] md:text-[8px] lg:text-[10px]">
                                             <span>{parts[0]}</span>
                                             <span className="opacity-60 md:hidden">-</span>
@@ -203,13 +203,13 @@ export const JadualPersendirian: React.FC = () => {
                         {PERSENDIRIAN_DAYS.map((day, dIdx) => (
                             <tr key={day} className="hover:bg-gray-50 transition-colors h-20 md:h-16">
                                 {/* Sticky First Column */}
-                                <td className="p-1 border border-gray-400 bg-gray-200 text-gray-900 font-bold shadow-md text-xs sticky left-0 z-10">
+                                <td className="p-1 border-b border-l border-gray-400 bg-gray-200 text-gray-900 font-bold shadow-md text-xs sticky left-0 z-10">
                                     {day}
                                 </td>
                                 {PERSENDIRIAN_PERIODS.map((p, pIdx) => {
                                     if (p === '10.30 - 11.00') {
                                         return (
-                                            <td key={pIdx} className="p-0 border border-gray-400 bg-gray-300 align-middle">
+                                            <td key={pIdx} className="p-0 border-b border-l border-gray-400 bg-gray-300 align-middle last:border-r">
                                                 <div className="flex items-center justify-center h-full w-full">
                                                     <span className="text-gray-600 text-[10px] md:text-[8px] font-bold -rotate-90 whitespace-nowrap tracking-widest">REHAT</span>
                                                 </div>
@@ -222,7 +222,7 @@ export const JadualPersendirian: React.FC = () => {
                                     return (
                                         <td 
                                             key={pIdx} 
-                                            className={`p-0 border border-gray-400 h-full align-middle cursor-pointer hover:bg-gray-100 transition-colors ${slot ? slot.color.split(' ')[0] : ''}`}
+                                            className={`p-0 border-b border-l border-gray-400 h-full align-middle cursor-pointer hover:bg-gray-100 transition-colors last:border-r ${slot ? slot.color.split(' ')[0] : ''}`}
                                             onClick={() => canEdit && openEditModal({ day, time: p, ...slot })}
                                         >
                                             {slot && (

@@ -9,7 +9,7 @@ export const TakwimCutiPerayaan: React.FC = () => {
             <p className="text-sm text-gray-400">Tambahan Cuti Perayaan yang diperuntukkan oleh KPM</p>
          </div>
          <div className="overflow-x-auto p-4">
-             <table className="w-full text-center border-collapse border border-gray-600 min-w-[900px]">
+             <table className="w-full text-center border-separate border-spacing-0 border border-gray-600 min-w-[900px] lg:min-w-full">
                  <thead>
                      <tr>
                          <th rowSpan={2} className="bg-[#C9B458] text-[#0B132B] font-bold p-3 border border-gray-600 w-1/4">CUTI PERAYAAN</th>

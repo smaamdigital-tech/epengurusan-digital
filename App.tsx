@@ -108,7 +108,7 @@ const App: React.FC = () => {
       case 'Jadual - Jadual Pemantauan': return <JadualPemantauan />;
 
       // Fallback untuk route yang tidak dijumpai atau masih dalam pembinaan
-      default:
+      default: {
         // Cuba dapatkan nama induk untuk paparan placeholder
         const [parent, child] = activeTab.includes(' - ') ? activeTab.split(' - ') : [activeTab, ''];
         let icon = '📂';
@@ -119,6 +119,7 @@ const App: React.FC = () => {
         if (parent === 'Jadual') icon = '🗓️';
         
         return <PlaceholderPage title={parent} subtitle={child} icon={icon} />;
+      }
     }
   };
 
