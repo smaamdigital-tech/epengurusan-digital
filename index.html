@@ -6,7 +6,36 @@
     <title>Sistem Pengurusan Digital SMAAM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: {
+                900: '#0B132B',
+                800: '#1C2541',
+                700: '#3A506B',
+              },
+              teal: {
+                500: '#006D77',
+                400: '#83C5BE',
+              },
+              gold: {
+                500: '#C9B458',
+              }
+            },
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+              inter: ['Inter', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+          }
+        }
+      }
+    </script>
     <style>
       :root {
         --font-primary: 'Poppins', sans-serif;

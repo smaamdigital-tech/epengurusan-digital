@@ -10,13 +10,15 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "framer-motion": "^12.34.3",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.0",
+    "lucide-react": "^0.575.0",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1"
+    "react-dom": "^19.2.1",
+    "recharts": "^3.7.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.2.0",
     "@types/node": "^22.14.0",
     "@typescript-eslint/eslint-plugin": "^8.56.0",

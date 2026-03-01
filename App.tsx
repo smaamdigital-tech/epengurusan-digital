@@ -1,44 +1,45 @@
 
 import React, { useState } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { Dashboard } from './components/Dashboard';
-import { AdminSettings } from './components/AdminSettings';
-import { LoginModal } from './components/LoginModal';
-import { Toast } from './components/Toast';
-import { ProgramView } from './components/ProgramView';
-import { ProfilSekolah } from './components/ProfilSekolah';
-import { Footer } from './components/Footer';
-import { useApp } from './context/AppContext';
+import { Sidebar } from '@/components/Sidebar';
+import { Header } from '@/components/Header';
+import { Dashboard } from '@/components/Dashboard';
+import { AdminSettings } from '@/components/AdminSettings';
+import { LoginModal } from '@/components/LoginModal';
+import { Toast } from '@/components/Toast';
+import { ProgramView } from '@/components/ProgramView';
+import { ProfilSekolah } from '@/components/ProfilSekolah';
+import { Organisasi } from '@/components/Organisasi';
+import { Footer } from '@/components/Footer';
+import { useApp } from '@/context/AppContext';
 
 // --- IMPORTS: UNIT PENTADBIRAN ---
-import { PentadbiranJawatankuasa } from './components/Pentadbiran/PentadbiranJawatankuasa';
-import { PentadbiranTakwim } from './components/Pentadbiran/PentadbiranTakwim';
+import { PentadbiranJawatankuasa } from '@/components/Pentadbiran/PentadbiranJawatankuasa';
+import { PentadbiranTakwim } from '@/components/Pentadbiran/PentadbiranTakwim';
 
 // --- IMPORTS: UNIT KURIKULUM ---
-import { KurikulumJawatankuasa } from './components/Kurikulum/KurikulumJawatankuasa';
-import { KurikulumTakwim } from './components/Kurikulum/KurikulumTakwim';
-import { KurikulumPeperiksaan } from './components/Kurikulum/KurikulumPeperiksaan';
-import { GuruGanti } from './components/Kurikulum/GuruGanti';
+import { KurikulumJawatankuasa } from '@/components/Kurikulum/KurikulumJawatankuasa';
+import { KurikulumTakwim } from '@/components/Kurikulum/KurikulumTakwim';
+import { KurikulumPeperiksaan } from '@/components/Kurikulum/KurikulumPeperiksaan';
+import { GuruGanti } from '@/components/Kurikulum/GuruGanti';
 
 // --- IMPORTS: UNIT HAL EHWAL MURID ---
-import { HEMJawatankuasa } from './components/HEM/HEMJawatankuasa';
-import { HEMTakwim } from './components/HEM/HEMTakwim';
-import { PengurusanMurid } from './components/HEM/PengurusanMurid';
-import { PengurusanKelas } from './components/HEM/PengurusanKelas';
+import { HEMJawatankuasa } from '@/components/HEM/HEMJawatankuasa';
+import { HEMTakwim } from '@/components/HEM/HEMTakwim';
+import { PengurusanMurid } from '@/components/HEM/PengurusanMurid';
+import { PengurusanKelas } from '@/components/HEM/PengurusanKelas';
 
 // --- IMPORTS: UNIT KOKURIKULUM ---
-import { KokoJawatankuasa } from './components/Kokurikulum/KokoJawatankuasa';
-import { KokoTakwim } from './components/Kokurikulum/KokoTakwim';
+import { KokoJawatankuasa } from '@/components/Kokurikulum/KokoJawatankuasa';
+import { KokoTakwim } from '@/components/Kokurikulum/KokoTakwim';
 
 // --- IMPORTS: TAKWIM (GLOBAL) ---
-import { TakwimPlanner } from './components/Takwim/TakwimPlanner';
+import { TakwimPlanner } from '@/components/Takwim/TakwimPlanner';
 
 // --- IMPORTS: JADUAL ---
-import { JadualPersendirian } from './components/Jadual/JadualPersendirian';
-import { JadualKelas } from './components/Jadual/JadualKelas';
-import { JadualBerucap } from './components/Jadual/JadualBerucap';
-import { JadualPemantauan } from './components/Jadual/JadualPemantauan';
+import { JadualPersendirian } from '@/components/Jadual/JadualPersendirian';
+import { JadualKelas } from '@/components/Jadual/JadualKelas';
+import { JadualBerucap } from '@/components/Jadual/JadualBerucap';
+import { JadualPemantauan } from '@/components/Jadual/JadualPemantauan';
 
 // Placeholder untuk modul yang belum siap
 const PlaceholderPage: React.FC<{ title: string, subtitle?: string, icon: string }> = ({ title, subtitle, icon }) => (
@@ -58,9 +59,15 @@ const PlaceholderPage: React.FC<{ title: string, subtitle?: string, icon: string
 );
 
 const App: React.FC = () => {
-  const { activeTab } = useApp();
+  const { activeTab, user } = useApp();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Determine if the user is an admin to adjust background brightness
+  const isAdmin = user?.role?.toLowerCase().includes('admin') || user?.role?.toLowerCase().includes('pentadbir');
+  const backgroundOverlay = isAdmin 
+    ? 'rgba(225, 229, 235, 0.95)' // Slightly darker/grayer for admins (Anti-glare)
+    : 'rgba(255, 255, 255, 0.9)'; // Bright white for others
 
   // --- PEMETAAN KOMPONEN (COMPONENT MAPPING) ---
   // Ini memastikan setiap tab yang dipilih di Sidebar mempunyai komponen yang tepat.
@@ -69,6 +76,7 @@ const App: React.FC = () => {
     // 1. Modul Utama
     if (activeTab === 'Dashboard') return <Dashboard />;
     if (activeTab === 'Profil Sekolah') return <ProfilSekolah />;
+    if (activeTab === 'Organisasi') return <Organisasi />;
     if (activeTab === 'Program') return <ProgramView />;
     if (activeTab === 'Tetapan Admin') return <AdminSettings />;
 
@@ -124,7 +132,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-app-layer text-[#1C2541] font-sans">
+    <div className="flex w-full bg-app-layer text-[#1C2541] font-sans items-stretch min-h-screen">
       
       {isMobileMenuOpen && (
         <div 
@@ -133,7 +141,7 @@ const App: React.FC = () => {
         />
       )}
 
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex-shrink-0 shadow-2xl`}>
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} flex-shrink-0 shadow-2xl`}>
         <Sidebar 
           onOpenLogin={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} 
           onCloseMobile={() => setIsMobileMenuOpen(false)}
@@ -148,11 +156,22 @@ const App: React.FC = () => {
                <div className="w-8"></div>
            </div>
            <div className="hidden md:block">
-               <Header />
+               <Header onOpenLogin={() => setIsLoginOpen(true)} />
            </div>
         </div>
         
-        <main className="flex-1 flex flex-col bg-[#A9CCE3]/80 backdrop-blur-sm">
+        <main 
+          className="flex-1 flex flex-col transition-all duration-500"
+          style={activeTab !== 'Profil Sekolah' ? {
+            backgroundImage: `linear-gradient(${backgroundOverlay}, ${backgroundOverlay}), url('https://i.postimg.cc/D0pqvnTy/SMAAM2024.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+            backgroundRepeat: 'no-repeat'
+          } : {
+            backgroundColor: '#A9CCE3'
+          }}
+        >
           <div className="flex-grow p-0">
             {renderContent()}
           </div>

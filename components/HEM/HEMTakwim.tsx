@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
-import { apiService } from '../../services/api';
+import { useApp } from '@/context/AppContext';
+import { apiService } from '@/services/api';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 // --- INTERFACES ---
 interface TakwimItem {
@@ -29,6 +30,12 @@ interface HipEvent {
   program: string;
   teacher: string;
   activity: string;
+}
+
+interface Html2Pdf {
+    set: (opt: unknown) => Html2Pdf;
+    from: (element: HTMLElement | null) => Html2Pdf;
+    save: () => Promise<void>;
 }
 
 // --- HELPER FUNCTIONS ---
@@ -141,7 +148,7 @@ const parseRangeFromString = (rangeStr: string): { start: Date, end: Date } | nu
      end = new Date(year, endMonth, endDay);
 
      const startParts = parts[0].split(' ');
-     let startDay = parseInt(startParts[0]);
+     const startDay = parseInt(startParts[0]);
      let startMonth = endMonth; 
      
      if (startParts.length > 1) {
@@ -326,13 +333,13 @@ export const HEMTakwim: React.FC = () => {
           }
       } else if (editingType === 'sumur') {
           const payload = { id: editingId || Date.now(), date: formData.date, program: formData.program, teacher: formData.teacher, activity: formData.activity };
-          let newData = editingId ? sumurSchedule.map(i => i.id === editingId ? payload : i) : [...sumurSchedule, payload];
+          const newData = editingId ? sumurSchedule.map(i => i.id === editingId ? payload : i) : [...sumurSchedule, payload];
           updateSumurSchedule(newData);
           apiService.write('smaam_sumur_schedule', newData);
           showToast("Takwim SUMUR dikemaskini.");
       } else if (editingType === 'hip') {
           const payload = { id: editingId || Date.now(), date: formData.date, program: formData.program, teacher: formData.teacher, activity: formData.activity };
-          let newData = editingId ? hipSchedule.map(i => i.id === editingId ? payload : i) : [...hipSchedule, payload];
+          const newData = editingId ? hipSchedule.map(i => i.id === editingId ? payload : i) : [...hipSchedule, payload];
           updateHipSchedule(newData);
           apiService.write('smaam_hip_schedule', newData);
           showToast("Takwim HIP dikemaskini.");
@@ -447,63 +454,41 @@ export const HEMTakwim: React.FC = () => {
   ].sort((a, b) => parseDateForSort(a.date) - parseDateForSort(b.date));
 
   // --- PDF GENERATION ---
-  const handleDownloadPDF = async () => {
-      showToast("Sedang menjana PDF (A4 Landskap)...");
+  const handleDownloadPDF = () => {
+      const element = document.getElementById('print-container');
+      if (!element) {
+          showToast("Gagal mencari elemen untuk dicetak.");
+          return;
+      }
       
-      const loadScript = (src: string) => {
-        return new Promise((resolve, reject) => {
-            if (document.querySelector(`script[src="${src}"]`)) { resolve(true); return; }
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = () => resolve(true);
-            script.onerror = () => reject(new Error(`Failed to load ${src}`));
-            document.body.appendChild(script);
-        });
+      showToast("Sedang menjana PDF (A4 Landskap)...");
+
+      const generate = () => {
+          const opt = {
+              margin: [10, 5, 10, 5],
+              filename: `Takwim_HEM_${view}_2026.pdf`,
+              image: { type: 'jpeg', quality: 0.98 },
+              html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+              jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+              pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+          };
+
+          const html2pdf = (window as unknown as { html2pdf: () => Html2Pdf }).html2pdf;
+          html2pdf().set(opt).from(element).save().then(() => {
+              showToast("PDF berjaya dimuat turun.");
+          }).catch((err: Error) => {
+              console.error("PDF Gen Error:", err);
+              showToast("Gagal menjana PDF.");
+          });
       };
 
-      try {
-          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-          await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-          
-          const elementId = 'print-container';
-          const element = document.getElementById(elementId);
-          if (!element) {
-              showToast("Gagal mencari elemen untuk dicetak.");
-              return;
-          }
-
-          const canvas = await (window as any).html2canvas(element, {
-              scale: 2, 
-              useCORS: true,
-              backgroundColor: "#ffffff" // Force white background
-          });
-
-          const imgData = canvas.toDataURL('image/jpeg', 1.0);
-          const { jsPDF } = (window as any).jspdf;
-          const pdf = new jsPDF('landscape', 'mm', 'a4');
-          
-          const imgWidth = 297; 
-          const pageHeight = 210; 
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          let heightLeft = imgHeight;
-          let position = 0;
-
-          pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-
-          while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-          }
-          
-          pdf.save(`Takwim_HEM_${view}_2026.pdf`);
-          showToast("PDF berjaya dimuat turun.");
-
-      } catch (err) {
-          console.error("PDF Gen Error:", err);
-          showToast("Gagal menjana PDF.");
+      if (typeof (window as unknown as { html2pdf: unknown }).html2pdf === 'undefined') {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+          script.onload = generate;
+          document.body.appendChild(script);
+      } else {
+          generate();
       }
   };
 
@@ -513,8 +498,8 @@ export const HEMTakwim: React.FC = () => {
       <div id="takwim-container" className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col">
           <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex items-center justify-between"><h3 className="text-lg font-bold text-[#C9B458] font-montserrat uppercase">PERANCANGAN TAHUNAN HAL EHWAL MURID TAHUN {year}</h3></div>
           <div className="overflow-x-auto w-full custom-scrollbar">
-              <table className="w-full min-w-[1000px] border-collapse text-xs border border-gray-800">
-                  <thead><tr><th className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm w-12 border border-[#0B132B] sticky left-0 z-20">HB</th>{months.map(m => (<th key={m} className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm border border-[#0B132B] min-w-[80px]">{m}</th>))}</tr></thead>
+              <table className="w-full min-w-[1000px] border-collapse text-xs border border-gray-800 table-fixed">
+                  <thead><tr><th className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm w-12 border border-[#0B132B] sticky left-0 z-20">HB</th>{months.map(m => (<th key={m} className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm border border-[#0B132B] w-[calc((100%-3rem)/12)]">{m}</th>))}</tr></thead>
                   <tbody>{Array.from({ length: 31 }, (_, i) => i + 1).map(date => (<tr key={date}><td className="bg-[#0B132B] text-[#C9B458] font-bold text-center border border-gray-700 sticky left-0 z-10 p-1">{date}</td>{months.map((_, monthIdx) => {
                     const dayLetter = getDayLetter(monthIdx, date);
                     if (!dayLetter) return <td key={monthIdx} className="bg-black/40 border border-gray-800"></td>;
@@ -537,13 +522,13 @@ export const HEMTakwim: React.FC = () => {
                     const isHolidayDate = eventsOnDay.some(e => e.event.toLowerCase().includes('cuti'));
 
                     return (
-                      <td key={monthIdx} className={`${isHolidayDate ? 'bg-yellow-200 text-black' : 'bg-[#1C2541]'} border border-gray-700 relative h-12 p-1 align-top hover:bg-[#253252] transition-colors ${canEdit ? 'cursor-pointer' : ''}`} onClick={() => { if (canEdit && eventsOnDay.length === 0) handleOpenModal('item', { date: dateStr }); }}>
+                      <td key={monthIdx} className={`${isHolidayDate ? 'bg-yellow-200 text-black' : 'bg-[#1C2541]'} border border-gray-700 relative min-h-[48px] p-1 align-top hover:bg-[#253252] transition-colors ${canEdit ? 'cursor-pointer' : ''}`} onClick={() => { if (canEdit && eventsOnDay.length === 0) handleOpenModal('item', { date: dateStr }); }}>
                         <span className={`absolute top-0.5 right-1 text-[8px] font-mono ${isHolidayDate ? 'text-black/60' : 'text-gray-500'}`}>{dayLetter}</span>
                         <div className="mt-3 flex flex-col gap-1">
                         {eventsOnDay.map((event, idx) => (
                           <div key={idx} className="flex items-start gap-1.5 group cursor-pointer" title={event.event} onClick={(e) => { e.stopPropagation(); if (canEdit && event.type === 'activity') handleOpenModal('item', event); }}>
                               <div className={`w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 ${getBulletColor(event.type)}`}></div>
-                              <span className={`text-[9px] leading-tight line-clamp-2 ${isHolidayDate ? 'text-black font-semibold' : 'text-gray-300 group-hover:text-white'}`}>{event.event}</span>
+                              <span className={`text-[9px] leading-tight whitespace-normal break-words ${isHolidayDate ? 'text-black font-semibold' : 'text-gray-300 group-hover:text-white'}`}>{event.event}</span>
                           </div>
                         ))}
                         </div>
@@ -647,7 +632,7 @@ export const HEMTakwim: React.FC = () => {
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[700px]">
                     <thead><tr className="bg-[#253252] text-[#C9B458] text-[13px] font-extrabold uppercase tracking-wide border-b border-gray-700 font-inter"><th className="px-6 py-4">Nama Program / Aktiviti</th><th className="px-6 py-4">Tarikh Pelaksanaan</th><th className="px-6 py-4">Status</th>{canEdit && <th className="px-6 py-4 text-right">Tindakan</th>}</tr></thead>
-                    <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">{consolidatedList.length > 0 ? (consolidatedList.map((item: any) => (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="px-6 py-4 font-medium text-white">{item.event}</td><td className="px-6 py-4 text-gray-300 font-mono">{item.dateDisplay || item.date}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs font-semibold ${item.status === 'Selesai' ? 'bg-green-900/50 text-green-400' : item.status === 'Sedang Berjalan' ? 'bg-blue-900/50 text-blue-400' :'bg-yellow-900/30 text-yellow-500'}`}>{item.status}</span></td>{canEdit && (<td className="px-6 py-4 text-right"><div className={`flex justify-end gap-2 ${isSystemAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}><button onClick={() => handleOpenModal('item', item)} className="p-2 bg-[#3A506B] text-white rounded" title="Edit">✏️</button><button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds) : handleDelete('item', item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button></div></td>)}</tr>))) : (<tr><td colSpan={canEdit ? 4 : 3} className="px-6 py-12 text-center text-gray-500 italic">Tiada aktiviti direkodkan.</td></tr>)}</tbody>
+                    <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">{consolidatedList.length > 0 ? (consolidatedList.map((item: TakwimItem) => (<tr key={item.id} className="hover:bg-[#253252] transition-colors group"><td className="px-6 py-4 font-medium text-white">{item.event}</td><td className="px-6 py-4 text-gray-300 font-mono">{item.dateDisplay || item.date}</td><td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs font-semibold ${item.status === 'Selesai' ? 'bg-green-900/50 text-green-400' : item.status === 'Sedang Berjalan' ? 'bg-blue-900/50 text-blue-400' :'bg-yellow-900/30 text-yellow-500'}`}>{item.status}</span></td>{canEdit && (<td className="px-6 py-4 text-right"><div className={`flex justify-end gap-2 ${isSystemAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}><button onClick={() => handleOpenModal('item', item)} className="p-2 bg-[#3A506B] text-white rounded" title="Edit">✏️</button><button onClick={() => item.isGroup ? handleDeleteGroup(item.originalIds || []) : handleDelete('item', item.id)} className="p-2 bg-red-900/50 text-red-200 rounded" title="Hapus">🗑️</button></div></td>)}</tr>))) : (<tr><td colSpan={canEdit ? 4 : 3} className="px-6 py-12 text-center text-gray-500 italic">Tiada aktiviti direkodkan.</td></tr>)}</tbody>
                 </table>
             </div>
         </div>
@@ -694,9 +679,9 @@ export const HEMTakwim: React.FC = () => {
                                 const isHolidayDate = eventsOnDay.some(e => e.event.toLowerCase().includes('cuti'));
 
                                 return (
-                                    <td key={monthIdx} className={`border border-black p-1 align-top h-12 ${isHolidayDate ? 'bg-gray-100' : ''}`}>
+                                    <td key={monthIdx} className={`border border-black p-1 align-top min-h-[48px] ${isHolidayDate ? 'bg-gray-100' : ''}`}>
                                         {eventsOnDay.map((event, idx) => (
-                                            <div key={idx} className="mb-1 leading-tight">
+                                            <div key={idx} className="mb-1 leading-tight whitespace-normal break-words">
                                                 <span className={`block ${isHolidayDate ? 'font-bold' : ''}`} style={{ fontSize: '9px' }}>• {event.event}</span>
                                             </div>
                                         ))}
@@ -719,7 +704,7 @@ export const HEMTakwim: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {consolidatedList.map((item: any) => (
+                    {consolidatedList.map((item: TakwimItem) => (
                         <tr key={item.id}>
                             <td className="border border-black p-2 font-bold">{item.event}</td>
                             <td className="border border-black p-2 text-center">{item.dateDisplay || item.date}</td>

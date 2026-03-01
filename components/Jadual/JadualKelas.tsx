@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
+import React, { useState } from 'react';
+import { useApp } from '@/context/AppContext';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 interface ClassScheduleSlot {
   id: string;
@@ -53,7 +54,7 @@ const PERSENDIRIAN_COLORS = [
     { value: 'bg-red-100 text-red-900 border-red-200', label: 'Merah (Sukan/Koko)' },
     { value: 'bg-purple-100 text-purple-900 border-purple-200', label: 'Ungu (Bahasa)' },
     { value: 'bg-gray-200 text-gray-700 border-gray-300', label: 'Kelabu (Rehat)' },
-    { value: 'bg-white text-gray-900 border-gray-200', label: 'Putih (Umum)' },
+    { value: 'bg-gray-50 text-gray-900 border-gray-200', label: 'Putih (Umum)' },
 ];
 
 const PERSENDIRIAN_DAYS = ['ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT'];
@@ -71,21 +72,56 @@ export const JadualKelas: React.FC = () => {
   const { checkPermission, showToast } = useApp();
   const canEdit = checkPermission('canUpdateJadualKelas');
   
-  const [selectedClass, setSelectedClass] = useState(CLASS_LIST[0]);
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
   
   // --- LAZY INITIALIZATION ---
   const [classSchedule, setClassSchedule] = useState<ClassScheduleSlot[]>(() => {
       try {
           const saved = localStorage.getItem('smaam_class_schedule');
           return saved ? JSON.parse(saved) : INITIAL_CLASS_SCHEDULE;
-      } catch (e) {
+      } catch {
           return INITIAL_CLASS_SCHEDULE;
       }
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({});
+  const [showPreview, setShowPreview] = useState(false);
+  const [editingItem, setEditingItem] = useState<ClassScheduleSlot | null>(null);
+  const [formData, setFormData] = useState<Partial<ClassScheduleSlot>>({});
+
+  const handleDownloadPDF = () => {
+      if (!selectedClass) {
+          showToast("Sila pilih kelas terlebih dahulu.");
+          return;
+      }
+      setShowPreview(true);
+  };
+
+  const executeDownload = () => {
+      const element = document.getElementById('pdf-content');
+      if (!element || !selectedClass) return;
+      
+      showToast("Sedang menjana PDF...");
+      
+      const opt = {
+          margin: 5,
+          filename: `Jadual_Kelas_${selectedClass.replace(/\s+/g, '_')}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      (window as any).html2pdf().set(opt).from(element).save().then(() => {
+          showToast("PDF berjaya dimuat turun.");
+      }).catch((err: any) => {
+          console.error("PDF Error:", err);
+          showToast("Gagal menjana PDF.");
+      });
+  };
+
+  const handlePrint = () => {
+      window.print();
+  };
 
   const saveToStorage = (data: ClassScheduleSlot[]) => {
     localStorage.setItem('smaam_class_schedule', JSON.stringify(data));
@@ -148,17 +184,26 @@ export const JadualKelas: React.FC = () => {
                 <div>
                     <label className="text-[#2DD4BF] font-bold uppercase tracking-wider text-sm block mb-1">Pilih Kelas</label>
                     <select 
-                        value={selectedClass}
+                        value={selectedClass || ''}
                         onChange={(e) => setSelectedClass(e.target.value)}
-                        className="bg-[#0B132B] text-white border border-gray-600 rounded px-3 py-1.5 text-sm outline-none focus:border-[#2DD4BF] min-w-[200px]"
+                        className={`bg-[#0B132B] text-white border rounded px-3 py-1.5 text-sm outline-none min-w-[200px] transition-colors ${selectedClass ? 'border-yellow-400 ring-1 ring-yellow-400' : 'border-gray-600 focus:border-[#2DD4BF]'}`}
                     >
+                        <option value="" disabled>-- Sila Pilih Kelas --</option>
                         {CLASS_LIST.map((c, i) => <option key={i} value={c}>{c}</option>)}
                     </select>
                 </div>
             </div>
+            <button onClick={handleDownloadPDF} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                📥 Muat Turun PDF
+            </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-300">
+      <div className="bg-gray-100 rounded-xl shadow-xl overflow-hidden border border-gray-300 min-h-[400px]">
+            {!selectedClass ? (
+                <div className="flex flex-col items-center justify-center h-[400px] text-gray-500">
+                    <p className="text-lg font-semibold">Sila pilih kelas untuk memaparkan jadual waktu.</p>
+                </div>
+            ) : (
             <div className="overflow-x-auto w-full custom-scrollbar pb-2">
                 <table className="w-full text-center border-separate border-spacing-0 table-fixed min-w-[1500px] md:min-w-full">
                     <thead>
@@ -180,7 +225,7 @@ export const JadualKelas: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody className="text-xs md:text-[9px] lg:text-[10px] text-gray-800 font-normal">
-                        {PERSENDIRIAN_DAYS.map((day, dIdx) => (
+                        {PERSENDIRIAN_DAYS.map((day) => (
                             <tr key={day} className="hover:bg-gray-50 transition-colors h-16 md:h-14">
                                 {/* Sticky First Column */}
                                 <td className="p-1 border-b border-l border-gray-300 bg-[#1C2541] text-[#2DD4BF] font-medium shadow-md sticky left-0 z-10 text-[10px] md:text-[9px]">
@@ -220,7 +265,101 @@ export const JadualKelas: React.FC = () => {
                     </tbody>
                 </table>
             </div>
+            )}
       </div>
+
+      {/* PRINT PREVIEW MODAL */}
+      <PrintPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onDownload={executeDownload}
+        onPrint={handlePrint}
+        title={`Pratonton Jadual Kelas ${selectedClass}`}
+        orientation="landscape"
+      >
+        <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8">
+            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-24 w-auto object-contain" alt="Logo Sekolah" crossOrigin="anonymous" />
+            <div className="flex-1 text-center text-black">
+                <h1 className="text-2xl font-extrabold uppercase tracking-wide mb-1">SEKOLAH MENENGAH AGAMA AL-KHAIRIAH AL-ISLAMIAH MERSING</h1>
+                <h2 className="text-xl font-bold uppercase text-black">JADUAL WAKTU KELAS</h2>
+                <p className="text-lg font-bold mt-1 uppercase text-black tracking-widest bg-gray-200 inline-block px-4 py-1 rounded border border-black">
+                    {selectedClass}
+                </p>
+            </div>
+        </div>
+
+        <div className="mb-8">
+            <table className="w-full text-center border-collapse border border-black table-fixed">
+                <thead>
+                    <tr className="bg-gray-300 text-black text-[10px] font-bold uppercase tracking-wide">
+                        <th className="p-1 border border-black w-20">HARI/MASA</th>
+                        {PERSENDIRIAN_PERIODS.map((p, i) => {
+                            const parts = p.split(' - ');
+                            return (
+                                <th key={i} className="p-1 border border-black h-12 align-middle">
+                                    <div className="flex flex-col items-center justify-center leading-none text-[9px]">
+                                        <span>{parts[0]}</span>
+                                        <span className="my-0.5">-</span>
+                                        <span>{parts[1]}</span>
+                                    </div>
+                                </th>
+                            );
+                        })}
+                    </tr>
+                </thead>
+                <tbody className="text-[9px] text-black font-medium">
+                    {PERSENDIRIAN_DAYS.map((day) => (
+                        <tr key={day} className="h-16">
+                            <td className="p-1 border border-black bg-gray-200 font-bold text-[10px]">
+                                {day}
+                            </td>
+                            {PERSENDIRIAN_PERIODS.map((p, pIdx) => {
+                                if (p === '10.30 - 11.00') {
+                                    return (
+                                        <td key={pIdx} className="bg-gray-400 border border-black p-0">
+                                            <div className="h-full w-full flex items-center justify-center -rotate-90 text-[8px] font-bold text-white">REHAT</div>
+                                        </td>
+                                    );
+                                }
+                                const slot = classSchedule.find(s => s.className === selectedClass && s.day === day && s.time === p);
+
+                                return (
+                                    <td key={pIdx} className="p-0 border border-black h-full align-middle">
+                                        {slot && (
+                                            <div className="flex flex-col items-center justify-center h-full w-full p-0.5">
+                                                <span className="font-bold leading-tight text-center break-words text-[9px]">
+                                                    {slot.subject}
+                                                </span>
+                                                {slot.teacher && (
+                                                    <span className="text-[8px] mt-0.5 italic leading-tight text-center break-words">{slot.teacher}</span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </td>
+                                )
+                            })}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-black flex justify-between text-xs font-bold uppercase">
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disediakan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Penyelaras Jadual Waktu</p>
+            </div>
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disahkan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pengetua</p>
+            </div>
+        </div>
+        <div className="mt-8 text-center text-[10px] italic text-gray-500">
+            Dicetak pada {new Date().toLocaleDateString('ms-MY')} melalui Sistem Pengurusan Digital SMAAM
+        </div>
+      </PrintPreviewModal>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm px-4 py-6 overflow-y-auto pt-20">

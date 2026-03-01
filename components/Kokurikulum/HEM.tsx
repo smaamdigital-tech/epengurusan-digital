@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { apiService } from '../services/api';
+import { apiService } from '@/services/api';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 type Tab = 'rekod' | 'laporan' | 'analitik' | 'memo' | 'admin_sistem';
 
@@ -539,6 +540,38 @@ export const HEM = () => {
       await loadData(true);
   }
 
+  const [showPreview, setShowPreview] = useState(false);
+
+  const handleDownloadPDF = () => {
+      setShowPreview(true);
+  };
+
+  const executeDownload = () => {
+      const element = document.getElementById('pdf-content');
+      if (!element) return;
+      
+      showToast("Sedang menjana PDF...");
+      
+      const opt = {
+          margin: 5,
+          filename: `Enrolmen_${selectedClass.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      (window as any).html2pdf().set(opt).from(element).save().then(() => {
+          showToast("PDF berjaya dimuat turun.");
+      }).catch((err: any) => {
+          console.error("PDF Error:", err);
+          showToast("Gagal menjana PDF.");
+      });
+  };
+
+  const handlePrint = () => {
+      window.print();
+  };
+
   const renderRekodHarian = () => (
     <div className="space-y-6 fade-in">
       <div className="bg-[#1C2541] p-6 rounded-xl border border-gray-700 flex flex-col md:flex-row gap-4 items-end md:items-center justify-between shadow-lg">
@@ -642,10 +675,18 @@ export const HEM = () => {
                     <label className="text-xs text-[#C9B458] font-bold uppercase">Tapis Kelas</label>
                     <select value={reportFilterForm} onChange={(e) => setReportFilterForm(e.target.value)} className="bg-[#0B132B] text-white border border-gray-600 rounded-lg px-4 py-2 outline-none focus:border-[#C9B458]">{CLASS_LIST.map(c => <option key={c} value={c}>{c}</option>)}</select>
                 </div>
-                <button onClick={() => showToast("Laporan PDF sedang dijana...")} className="bg-[#3A506B] hover:bg-[#4a6382] text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 shadow-md transition-colors"><Icons.Download /> Muat Turun PDF</button>
+                <button onClick={handleDownloadPDF} className="bg-[#3A506B] hover:bg-[#4a6382] text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 shadow-md transition-colors"><Icons.Download /> Muat Turun PDF</button>
             </div>
         </div>
-        <div className="bg-[#1C2541] p-6 rounded-xl border border-gray-700 shadow-lg flex items-center justify-center min-h-[300px]"><p className="text-gray-500 italic">Pratonton laporan akan dipaparkan di sini.</p></div>
+        <div className="bg-[#1C2541] p-6 rounded-xl border border-gray-700 shadow-lg flex items-center justify-center min-h-[300px]">
+            <div className="text-center">
+                <p className="text-gray-500 italic mb-4">Klik butang "Muat Turun PDF" untuk melihat pratonton dan menjana laporan.</p>
+                <div className="flex justify-center gap-4 opacity-30 grayscale pointer-events-none">
+                    <div className="w-24 h-32 bg-white border border-gray-400 rounded shadow-sm"></div>
+                    <div className="w-24 h-32 bg-white border border-gray-400 rounded shadow-sm"></div>
+                </div>
+            </div>
+        </div>
     </div>
   );
 
@@ -737,6 +778,71 @@ export const HEM = () => {
         {activeTab === 'memo' && renderMemo()}
         {activeTab === 'admin_sistem' && renderAdminSistem()}
       </div>
+
+      <PrintPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onDownload={executeDownload}
+        onPrint={handlePrint}
+        title={`Pratonton Laporan Enrolmen - ${reportFilterForm}`}
+        orientation="landscape"
+      >
+        <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8">
+            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-24 w-auto object-contain" alt="Logo Sekolah" crossOrigin="anonymous" />
+            <div className="flex-1 text-center text-black">
+                <h1 className="text-2xl font-extrabold uppercase tracking-wide mb-1">SEKOLAH MENENGAH AGAMA AL-KHAIRIAH AL-ISLAMIAH MERSING</h1>
+                <h2 className="text-xl font-bold uppercase text-black">LAPORAN ENROLMEN MURID</h2>
+                <p className="text-sm font-semibold mt-1 uppercase text-black tracking-widest">
+                    KELAS: {reportFilterForm} | TARIKH: {new Date().toLocaleDateString('ms-MY')}
+                </p>
+            </div>
+        </div>
+
+        <table className="w-full text-left border-collapse border border-black text-xs">
+            <thead>
+                <tr className="bg-gray-200 text-black font-bold uppercase">
+                    <th className="border border-black px-2 py-1 text-center w-8">Bil</th>
+                    <th className="border border-black px-2 py-1">Nama Murid</th>
+                    <th className="border border-black px-2 py-1 w-24">No. KP</th>
+                    <th className="border border-black px-2 py-1 text-center w-24">Status</th>
+                    <th className="border border-black px-2 py-1 w-24">Kelas</th>
+                    {customColumns.map(col => (
+                        <th key={col} className="border border-black px-2 py-1">{col}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {(reportFilterForm === 'Semua' ? allStudents : allStudents.filter(s => s.className === reportFilterForm)).map((student, idx) => (
+                    <tr key={student.id}>
+                        <td className="border border-black px-2 py-1 text-center">{idx + 1}</td>
+                        <td className="border border-black px-2 py-1 font-medium">{student.name}</td>
+                        <td className="border border-black px-2 py-1 font-mono">{student.kp}</td>
+                        <td className="border border-black px-2 py-1 text-center">{student.status}</td>
+                        <td className="border border-black px-2 py-1 text-center">{student.className}</td>
+                        {customColumns.map(col => (
+                            <td key={col} className="border border-black px-2 py-1">{student.dynamicData?.[col] || '-'}</td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+
+        <div className="mt-12 pt-8 border-t border-black flex justify-between text-xs font-bold uppercase">
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disediakan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pembantu Tadbir / Guru Kelas</p>
+            </div>
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disahkan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pengetua</p>
+            </div>
+        </div>
+        <div className="mt-8 text-center text-[10px] italic text-gray-500">
+            Dicetak pada {new Date().toLocaleDateString('ms-MY')} melalui Sistem Pengurusan Digital SMAAM
+        </div>
+      </PrintPreviewModal>
 
       {isImportModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in px-4">

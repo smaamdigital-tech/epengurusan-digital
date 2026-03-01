@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
+import React, { useState } from 'react';
+import { useApp } from '@/context/AppContext';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 interface PersonalScheduleSlot {
   id: string;
@@ -85,14 +86,45 @@ export const JadualPersendirian: React.FC = () => {
       try {
           const saved = localStorage.getItem('smaam_personal_schedule');
           return saved ? JSON.parse(saved) : INITIAL_PERSONAL_SCHEDULE;
-      } catch (e) {
+      } catch {
           return INITIAL_PERSONAL_SCHEDULE;
       }
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({});
+  const [showPreview, setShowPreview] = useState(false);
+  const [editingItem, setEditingItem] = useState<PersonalScheduleSlot | null>(null);
+  const [formData, setFormData] = useState<Partial<PersonalScheduleSlot>>({});
+
+  const handleDownloadPDF = () => {
+      setShowPreview(true);
+  };
+
+  const executeDownload = () => {
+      const element = document.getElementById('pdf-content');
+      if (!element) return;
+      
+      showToast("Sedang menjana PDF...");
+      
+      const opt = {
+          margin: 5,
+          filename: `Jadual_Persendirian_${selectedTeacher.replace(/\s+/g, '_')}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      (window as any).html2pdf().set(opt).from(element).save().then(() => {
+          showToast("PDF berjaya dimuat turun.");
+      }).catch((err: any) => {
+          console.error("PDF Error:", err);
+          showToast("Gagal menjana PDF.");
+      });
+  };
+
+  const handlePrint = () => {
+      window.print();
+  };
 
   const saveToStorage = (data: PersonalScheduleSlot[]) => {
     localStorage.setItem('smaam_personal_schedule', JSON.stringify(data));
@@ -139,6 +171,7 @@ export const JadualPersendirian: React.FC = () => {
   };
 
   const handleDeleteSlot = () => {
+      if (!editingItem) return;
       const shortName = getShortName(selectedTeacher);
       const filtered = personalSchedule.filter(s => 
           !((s.teacher === selectedTeacher || s.teacher === shortName) && s.day === editingItem.day && s.time === editingItem.time)
@@ -170,6 +203,9 @@ export const JadualPersendirian: React.FC = () => {
                     </select>
                 </div>
             </div>
+            <button onClick={handleDownloadPDF} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                📥 Muat Turun PDF
+            </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-300">
@@ -242,6 +278,100 @@ export const JadualPersendirian: React.FC = () => {
                 </table>
             </div>
       </div>
+
+      {/* PRINT PREVIEW MODAL */}
+      <PrintPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onDownload={executeDownload}
+        onPrint={handlePrint}
+        title={`Pratonton Jadual Persendirian ${selectedTeacher}`}
+        orientation="landscape"
+      >
+        <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8">
+            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-24 w-auto object-contain" alt="Logo Sekolah" crossOrigin="anonymous" />
+            <div className="flex-1 text-center text-black">
+                <h1 className="text-2xl font-extrabold uppercase tracking-wide mb-1">SEKOLAH MENENGAH AGAMA AL-KHAIRIAH AL-ISLAMIAH MERSING</h1>
+                <h2 className="text-xl font-bold uppercase text-black">JADUAL WAKTU PERSENDIRIAN</h2>
+                <p className="text-lg font-bold mt-1 uppercase text-black tracking-widest bg-gray-200 inline-block px-4 py-1 rounded border border-black">
+                    {selectedTeacher}
+                </p>
+            </div>
+        </div>
+
+        <div className="mb-8">
+            <table className="w-full text-center border-collapse border border-black table-fixed">
+                <thead>
+                    <tr className="bg-gray-300 text-black text-[10px] font-bold uppercase tracking-wide">
+                        <th className="p-1 border border-black w-20">HARI/MASA</th>
+                        {PERSENDIRIAN_PERIODS.map((p, i) => {
+                            const parts = p.split(' - ');
+                            return (
+                                <th key={i} className="p-1 border border-black h-12 align-middle">
+                                    <div className="flex flex-col items-center justify-center leading-none text-[9px]">
+                                        <span>{parts[0]}</span>
+                                        <span className="my-0.5">-</span>
+                                        <span>{parts[1]}</span>
+                                    </div>
+                                </th>
+                            );
+                        })}
+                    </tr>
+                </thead>
+                <tbody className="text-[9px] text-black font-medium">
+                    {PERSENDIRIAN_DAYS.map((day) => (
+                        <tr key={day} className="h-16">
+                            <td className="p-1 border border-black bg-gray-200 font-bold text-[10px]">
+                                {day}
+                            </td>
+                            {PERSENDIRIAN_PERIODS.map((p, pIdx) => {
+                                if (p === '10.30 - 11.00') {
+                                    return (
+                                        <td key={pIdx} className="bg-gray-400 border border-black p-0">
+                                            <div className="h-full w-full flex items-center justify-center -rotate-90 text-[8px] font-bold text-white">REHAT</div>
+                                        </td>
+                                    );
+                                }
+                                const shortName = getShortName(selectedTeacher);
+                                const slot = personalSchedule.find(s => (s.teacher === selectedTeacher || s.teacher === shortName) && s.day === day && s.time === p);
+
+                                return (
+                                    <td key={pIdx} className="p-0 border border-black h-full align-middle">
+                                        {slot && (
+                                            <div className="flex flex-col items-center justify-center h-full w-full p-0.5">
+                                                <span className="font-bold leading-tight text-center break-words text-[9px]">
+                                                    {slot.subject}
+                                                </span>
+                                                {slot.className && (
+                                                    <span className="text-[8px] mt-0.5 italic leading-tight text-center break-words">{slot.className}</span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </td>
+                                )
+                            })}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-black flex justify-between text-xs font-bold uppercase">
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disediakan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Guru Mata Pelajaran</p>
+            </div>
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disahkan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pengetua</p>
+            </div>
+        </div>
+        <div className="mt-8 text-center text-[10px] italic text-gray-500">
+            Dicetak pada {new Date().toLocaleDateString('ms-MY')} melalui Sistem Pengurusan Digital SMAAM
+        </div>
+      </PrintPreviewModal>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 backdrop-blur-sm px-4 py-6 overflow-y-auto pt-20">

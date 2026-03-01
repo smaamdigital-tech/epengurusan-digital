@@ -159,7 +159,6 @@ export const committeeData: Record<number, { role: string; position: string; nam
     { role: "AJK", position: "Penolong Penyelaras Tahfiz Syatibi", name: "Ali bin A Rahman" },
     { role: "AJK", position: "Penyelaras Isbat Tahfiz / KKQ", name: "Salman bin A Rahman" },
     { role: "AJK", position: "Penolong Penyelaras KKQ", name: "Muhammad Zaid bin Zamzuri" },
-    { role: "AJK", position: "Penolong Guru KKQ", name: "Hatim Aniq bin Hamzah" },
   ],
   11: []
 };

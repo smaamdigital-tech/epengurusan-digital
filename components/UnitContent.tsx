@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
-import { apiService } from '../services/api';
+import { useApp } from '@/context/AppContext';
+import { apiService } from '@/services/api';
 
 interface UnitContentProps {
   unit: string;
@@ -21,6 +21,49 @@ interface ExamWeekRow {
   jaj: string;
   awam: string;
   isHoliday?: boolean;
+}
+
+interface TakwimItem {
+    id: number;
+    event: string;
+    date: string;
+    status: string;
+    teacherName?: string;
+    committeeId?: string;
+}
+
+interface KokoWeeklyItem {
+    id: number;
+    week: string;
+    date: string;
+    activity: string;
+    teacher: string;
+}
+
+interface KokoMonthlyItem {
+    id: number;
+    month: string;
+    activity: string;
+}
+
+interface SumurItem {
+    id: number;
+    month: string;
+    modul: string;
+}
+
+interface HipItem {
+    id: number;
+    date: string;
+    program: string;
+    teacher: string;
+    activity: string;
+}
+
+interface Html2Pdf {
+    set: (opt: unknown) => Html2Pdf;
+    from: (element: HTMLElement | null) => Html2Pdf;
+    save: () => Promise<void>;
 }
 
 // --- HELPER FUNCTIONS ---
@@ -308,7 +351,7 @@ const dateToISO = (dateStr: string) => {
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
     const parts = dateStr.split(' ');
     if (parts.length < 3) return '';
-    let day = parts[0].padStart(2, '0');
+    const day = parts[0].padStart(2, '0');
     const monthStr = parts[1].toLowerCase().substring(0, 3);
     const year = parts[2];
     const monthMap: Record<string, string> = {
@@ -362,7 +405,7 @@ const parseRangeFromString = (rangeStr: string): { start: Date, end: Date } | nu
      end = new Date(year, endMonth, endDay);
 
      const startParts = parts[0].split(' '); // "12" or "30 Mac"
-     let startDay = parseInt(startParts[0]);
+     const startDay = parseInt(startParts[0]);
      let startMonth = endMonth; // Default to same month
      
      if (startParts.length > 1) {
@@ -411,7 +454,7 @@ const toTitleCase = (str: string) => {
   return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
-const isSystemData = (id: any) => {
+const isSystemData = (id: number | string) => {
     if (typeof id === 'number') {
         return id < 1000000000;
     }
@@ -713,7 +756,7 @@ const getDynamicStatus = (dateStr: string) => {
 };
 
 // --- HELPER FOR LIST VIEW GROUPING (New) ---
-const getConsolidatedItems = (rawItems: any[]) => {
+const getConsolidatedItems = (rawItems: TakwimItem[]) => {
     if (!rawItems.length) return [];
 
     const parseDate = (d: string) => {
@@ -728,11 +771,11 @@ const getConsolidatedItems = (rawItems: any[]) => {
         const db = b.date || '';
         return parseDate(da) - parseDate(db);
     });
-    const grouped: any[] = [];
+    const grouped: (TakwimItem & { endDate: string; originalIds: number[] })[] = [];
     
     if (sorted.length === 0) return [];
 
-    let currentGroup: any = { 
+    let currentGroup: TakwimItem & { endDate: string; originalIds: number[] } = { 
         ...sorted[0], 
         endDate: sorted[0].date, 
         originalIds: [sorted[0].id] 
@@ -895,21 +938,21 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
 
   // --- LAZY INITIALIZATION FOR STATES ---
 
-  const [items, setItems] = useState<any[]>(() => {
+  const [items, setItems] = useState<TakwimItem[]>(() => {
       const storageKey = `smaam_data_${unit}_${type}`;
       const localData = localStorage.getItem(storageKey);
       
       if (localData && localData !== "undefined" && localData !== "null") {
-          let loadedItems = JSON.parse(localData);
+          const loadedItems = JSON.parse(localData);
           
           // Special Checks moved from useEffect
           if (unit === 'Hal Ehwal Murid' && type === 'Takwim') {
-               const isOldMock = loadedItems.length < 5 && loadedItems.some((i:any) => i.id === 1 && i.event.includes('Mesyuarat'));
+               const isOldMock = loadedItems.length < 5 && loadedItems.some((i: TakwimItem) => i.id === 1 && i.event.includes('Mesyuarat'));
                if (isOldMock) return INITIAL_HEM_TAKWIM_DATA;
           }
           if (unit === 'Hal Ehwal Murid' && type === 'Jawatankuasa') {
                // Check if data is sparse/generic
-               const isPlaceholder = loadedItems.length <= 10 && loadedItems.some((i:any) => i.teacherName === '(Nama Guru)' || i.teacherName === '(Lantikan Khas)');
+               const isPlaceholder = loadedItems.length <= 10 && loadedItems.some((i: TakwimItem) => i.teacherName === '(Nama Guru)' || i.teacherName === '(Lantikan Khas)');
                // If placeholder detected, return MERGED list to ensure 3K data is present
                if (isPlaceholder) return [...INITIAL_HEM_JK_DATA, ...INITIAL_HEM_3K_DATA];
           }
@@ -917,9 +960,9 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                const isOldMock = loadedItems.length < 5; 
                if (isOldMock) return INITIAL_KURIKULUM_TAKWIM_DATA;
                // HOTFIX: Remove isolated Hari Krismas to fix grouping for Cuti Akhir Tahun
-               const christmasIndex = loadedItems.findIndex((i:any) => i.id === 20261225 && i.event === "Hari Krismas");
+               const christmasIndex = loadedItems.findIndex((i: TakwimItem) => i.id === 20261225 && i.event === "Hari Krismas");
                if (christmasIndex !== -1) {
-                   return loadedItems.filter((i:any) => i.id !== 20261225);
+                   return loadedItems.filter((i: TakwimItem) => i.id !== 20261225);
                }
           }
           return loadedItems;
@@ -1126,15 +1169,18 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     if (type === 'Jawatankuasa') {
       const descKey = `smaam_desc_${unit}_${activeCommitteeId}`;
       const storedDesc = localStorage.getItem(descKey);
-      if (storedDesc) {
-        setDescription(storedDesc);
-      } else {
-        setDescription(DEFAULT_DESCRIPTIONS[activeCommitteeId] || '');
+      const newDesc = storedDesc || DEFAULT_DESCRIPTIONS[activeCommitteeId] || '';
+      
+      if (description !== newDesc) {
+        const timer = setTimeout(() => {
+          setDescription(newDesc);
+        }, 0);
+        return () => clearTimeout(timer);
       }
     }
-  }, [activeCommitteeId, unit, type]);
+  }, [activeCommitteeId, unit, type, description]);
 
-  const saveToStorage = (newItems: any[]) => {
+  const saveToStorage = (newItems: TakwimItem[]) => {
     const storageKey = `smaam_data_${unit}_${type}`;
     // Instant Save
     localStorage.setItem(storageKey, JSON.stringify(newItems));
@@ -1157,14 +1203,16 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     setCommittees(newList);
   };
 
-  const handleEditKoko = (type: 'weekly' | 'monthly', item?: any) => {
+  const handleEditKoko = (type: 'weekly' | 'monthly', item?: KokoWeeklyItem | KokoMonthlyItem) => {
       setEditingKokoType(type);
       setEditingId(item ? item.id : null);
       setIsModalOpen(true);
       if (type === 'weekly') {
-          setFormData({ ...formData, date: item?.date || '', activity: item?.activity || '' });
+          const weeklyItem = item as KokoWeeklyItem;
+          setFormData({ ...formData, date: weeklyItem?.date || '', activity: weeklyItem?.activity || '' });
       } else {
-          setFormData({ ...formData, month: item?.month || '', date: item?.date || '', unit: item?.unit || '', notes: item?.notes || '' });
+          const monthlyItem = item as KokoMonthlyItem;
+          setFormData({ ...formData, month: monthlyItem?.month || '', date: '', unit: '', notes: '' });
       }
   };
 
@@ -1189,11 +1237,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       }
   };
 
-  const handleEditSumur = (item: any) => {
+  const handleEditSumur = (item: SumurItem | null) => {
       setEditingKokoType('sumur');
       setEditingId(item ? item.id : null);
       setIsModalOpen(true);
-      setFormData({ ...formData, date: item?.date || '', program: item?.program || '', teacher: item?.teacher || '', activity: item?.activity || '' });
+      setFormData({ ...formData, date: '', program: '', teacher: '', activity: '' });
   };
 
   const handleDeleteSumur = (id: number) => {
@@ -1205,7 +1253,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       }
   };
 
-  const handleEditHip = (item: any) => {
+  const handleEditHip = (item: HipItem | null) => {
       setEditingKokoType('hip');
       setEditingId(item ? item.id : null);
       setIsModalOpen(true);
@@ -1221,7 +1269,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       }
   };
 
-  const handleEditExamWeek = (item: any) => {
+  const handleEditExamWeek = (item: ExamWeekRow) => {
       if (isSystemData(item.id) && !isSystemAdmin) {
           showToast("Akses Ditolak: Data asal sistem dikunci dan tidak boleh diubah.");
           return;
@@ -1368,16 +1416,16 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
       return 'bg-blue-900/30 text-blue-200'; 
   };
 
-  const handleOpenModal = (item?: any) => {
+  const handleOpenModal = (item?: TakwimItem | { date: string }) => {
     setEditingKokoType(null); 
     // Reset bulk mode on open
     setIsBulkEntry(false);
     setBulkText('');
 
-    if (item && item.id) {
+    if (item && 'id' in item) {
       setEditingId(item.id);
       setFormData({
-        role: item.role || '', position: item.position || '', teacherName: item.teacherName || '',
+        role: '', position: '', teacherName: item.teacherName || '',
         event: item.event || '', date: item.date || '', status: item.status || 'Akan Datang',
         activity: '', month: '', unit: '', title: '', notes: '',
         week: '', dalaman: '', jaj: '', awam: '', program: '', teacher: ''
@@ -1385,7 +1433,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     } else {
       setEditingId(null);
       setFormData({
-        role: '', position: '', teacherName: '', event: '', status: 'Akan Datang', date: item?.date || '',
+        role: '', position: '', teacherName: '', event: '', status: 'Akan Datang', date: (item as { date?: string })?.date || '',
         activity: '', month: '', unit: '', title: '', notes: '',
         week: '', dalaman: '', jaj: '', awam: '', program: '', teacher: ''
       });
@@ -1432,7 +1480,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     }
     if (editingKokoType === 'weekly') {
         const payload = { id: editingId || Date.now(), date: formData.date, activity: formData.activity };
-        let newData = editingId ? kokoWeeklyData.map(i => i.id === editingId ? payload : i) : [...kokoWeeklyData, payload];
+        const newData = editingId ? kokoWeeklyData.map(i => i.id === editingId ? payload : i) : [...kokoWeeklyData, payload];
         updateKokoWeeklyData(newData);
         apiService.write('smaam_koko_weekly', newData);
         showToast("Rekod mingguan dikemaskini.");
@@ -1441,7 +1489,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     }
     if (editingKokoType === 'monthly') {
         const payload = { id: editingId || Date.now(), month: formData.month, date: formData.date, unit: formData.unit, notes: formData.notes };
-        let newData = editingId ? kokoAssemblyData.map(i => i.id === editingId ? payload : i) : [...kokoAssemblyData, payload];
+        const newData = editingId ? kokoAssemblyData.map(i => i.id === editingId ? payload : i) : [...kokoAssemblyData, payload];
         updateKokoAssemblyData(newData);
         apiService.write('smaam_koko_assembly', newData);
         showToast("Rekod bulanan dikemaskini.");
@@ -1450,7 +1498,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     }
     if (editingKokoType === 'sumur') {
         const payload = { id: editingId || Date.now(), date: formData.date, program: formData.program, teacher: formData.teacher, activity: formData.activity };
-        let newData = editingId ? sumurSchedule.map(i => i.id === editingId ? payload : i) : [...sumurSchedule, payload];
+        const newData = editingId ? sumurSchedule.map(i => i.id === editingId ? payload : i) : [...sumurSchedule, payload];
         updateSumurSchedule(newData);
         apiService.write('smaam_sumur_schedule', newData);
         showToast("Takwim SUMUR dikemaskini.");
@@ -1459,7 +1507,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     }
     if (editingKokoType === 'hip') {
         const payload = { id: editingId || Date.now(), date: formData.date, program: formData.program, teacher: formData.teacher, activity: formData.activity };
-        let newData = editingId ? hipSchedule.map(i => i.id === editingId ? payload : i) : [...hipSchedule, payload];
+        const newData = editingId ? hipSchedule.map(i => i.id === editingId ? payload : i) : [...hipSchedule, payload];
         updateHipSchedule(newData);
         apiService.write('smaam_hip_schedule', newData);
         showToast("Takwim HIP dikemaskini.");
@@ -1503,7 +1551,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
         return;
     }
 
-    let newItem: any;
+    let newItem: TakwimItem;
     if (type === 'Jawatankuasa') {
       newItem = { role: formData.role, position: formData.position, teacherName: formatTeacherName(formData.teacherName), committeeId: activeCommitteeId };
     } else {
@@ -1522,7 +1570,67 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
     setIsModalOpen(false);
   };
 
-  const handleDownloadPDF = () => { showToast("Memuat turun PDF..."); };
+  const handleDownloadPDF = () => {
+    const element = document.getElementById('pdf-content');
+    if (!element) return;
+    
+    showToast("Menjana PDF...");
+
+    const generate = () => {
+        // Inject style to expand scrollable areas for PDF
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #pdf-content .overflow-x-auto {
+                overflow: visible !important;
+            }
+            #pdf-content .overflow-y-auto {
+                overflow: visible !important;
+                height: auto !important;
+            }
+            #pdf-content table {
+                width: 100% !important;
+                table-layout: fixed !important;
+            }
+             #pdf-content th, #pdf-content td {
+                white-space: normal !important;
+                word-wrap: break-word !important;
+            }
+            /* Hide buttons in PDF */
+            #pdf-content button {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        const opt = {
+            margin: [5, 5, 5, 5],
+            filename: `${unit}_${type}_${year}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        const html2pdf = (window as unknown as { html2pdf: () => Html2Pdf }).html2pdf;
+        html2pdf().set(opt).from(element).save().then(() => {
+            document.head.removeChild(style);
+            showToast("PDF berjaya dimuat turun.");
+        }).catch((err: Error) => {
+            console.error(err);
+            document.head.removeChild(style);
+            showToast("Ralat menjana PDF.");
+        });
+    };
+
+    if (typeof (window as unknown as { html2pdf: unknown }).html2pdf === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = generate;
+        document.body.appendChild(script);
+    } else {
+        generate();
+    }
+  };
 
   // --- RENDERERS ---
   const renderPerjumpaanMingguan = () => (
@@ -1677,9 +1785,9 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   };
 
   const renderTakwimPeperiksaan = () => (
-    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col h-full max-h-[70vh]">
+    <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col">
         <div className="p-4 md:p-6 bg-[#0B132B] border-b border-gray-700 flex-none"><h3 className="text-lg md:text-xl font-bold text-[#C9B458] font-montserrat uppercase flex items-center gap-2">TAKWIM PEPERIKSAAN 2026</h3></div>
-        <div className="overflow-x-auto overflow-y-auto custom-scrollbar flex-1">
+        <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-center border-collapse border border-gray-600 min-w-[650px] md:min-w-[900px] text-[10px] md:text-sm table-fixed">
                 <thead>
                     <tr className="bg-[#C9B458] text-[#0B132B] uppercase font-bold sticky top-0 z-30">
@@ -1729,7 +1837,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
   );
 
   return (
-    <div className="flex flex-col p-2 md:p-8 gap-6 relative fade-in w-full h-auto">
+    <div id="pdf-content" className="flex flex-col p-2 md:p-8 gap-6 relative fade-in w-full h-auto">
       <div className="flex-none flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-700 pb-4 gap-4">
         <div>
           <div className="flex items-center gap-2 text-[13px] text-black font-mono mb-1 font-inter">
@@ -1837,7 +1945,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700 text-xs md:text-[13px] font-inter leading-[1.3]">
-                                {filteredItems.length > 0 ? (filteredItems.map((item: any) => (
+                                {filteredItems.length > 0 ? (filteredItems.map((item: TakwimItem) => (
                                     <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
                                         <td className="px-2 py-2 md:px-4 md:py-3 font-normal text-white border-r border-gray-800/50 sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{item.role}</td>
                                         <td className="px-2 py-2 md:px-4 md:py-3 text-gray-400 italic">{item.position}</td>
@@ -1903,11 +2011,11 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
               <div className="bg-[#1C2541] rounded-xl shadow-xl overflow-hidden border border-gray-700 fade-in flex flex-col mb-4">
                   <div className="p-4 border-b border-gray-700 bg-[#0B132B] flex items-center justify-between"><h3 className="text-lg font-bold text-[#C9B458] font-montserrat uppercase">PERANCANGAN TAHUNAN {unit.toUpperCase()} TAHUN {year}</h3></div>
                   <div className="overflow-x-auto w-full custom-scrollbar">
-                      <table className="w-full min-w-[1000px] border-collapse text-xs border border-gray-800">
+                      <table className="w-full min-w-[1000px] border-collapse text-xs border border-gray-800 table-fixed">
                           <thead>
                               <tr className="sticky top-0 z-30">
                                   <th className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm w-12 border border-[#0B132B] sticky left-0 z-40">HB</th>
-                                  {months.map(m => (<th key={m} className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm border border-[#0B132B] min-w-[80px]">{m}</th>))}
+                                  {months.map(m => (<th key={m} className="bg-[#C9B458] text-[#0B132B] p-2 font-extrabold text-sm border border-[#0B132B] w-[80px]">{m}</th>))}
                               </tr>
                           </thead>
                           <tbody>
@@ -2082,7 +2190,7 @@ export const UnitContent: React.FC<UnitContentProps> = ({ unit, type }) => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-700 text-[13px] font-inter leading-[1.3]">
-                        {consolidatedList.length > 0 ? (consolidatedList.map((item: any) => (
+                        {consolidatedList.length > 0 ? (consolidatedList.map((item: TakwimItem & { dateDisplay?: string; isGroup?: boolean; originalIds?: number[] }) => (
                             <tr key={item.id} className="hover:bg-[#253252] transition-colors group">
                                 <td className="px-6 py-4 font-medium text-white sticky left-0 z-10 bg-[#1C2541] group-hover:bg-[#253252]">{item.event}</td>
                                 <td className="px-6 py-4 text-gray-300 font-mono">{item.dateDisplay || item.date}</td>

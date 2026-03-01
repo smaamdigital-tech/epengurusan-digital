@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
-import { apiService } from '../../services/api';
+import { useApp } from '@/context/AppContext';
+import { apiService } from '@/services/api';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 // --- HELPER FUNCTIONS ---
 const dateToISO = (dateStr: string) => {
@@ -214,13 +215,13 @@ export const KokoTakwim: React.FC = () => {
           showToast("Tajuk dikemaskini.");
       } else if (editingType === 'weekly') {
           const payload = { id: editingId || Date.now(), date: formData.date, activity: formData.activity };
-          let newData = editingId ? kokoWeeklyData.map(i => i.id === editingId ? payload : i) : [...kokoWeeklyData, payload];
+          const newData = editingId ? kokoWeeklyData.map(i => i.id === editingId ? payload : i) : [...kokoWeeklyData, payload];
           updateKokoWeeklyData(newData);
           apiService.write('smaam_koko_weekly', newData);
           showToast(editingId ? "Rekod dikemaskini." : "Rekod ditambah.");
       } else if (editingType === 'monthly') {
           const payload = { id: editingId || Date.now(), month: formData.month, date: formData.date, unit: formData.unit, notes: formData.notes };
-          let newData = editingId ? kokoAssemblyData.map(i => i.id === editingId ? payload : i) : [...kokoAssemblyData, payload];
+          const newData = editingId ? kokoAssemblyData.map(i => i.id === editingId ? payload : i) : [...kokoAssemblyData, payload];
           updateKokoAssemblyData(newData);
           apiService.write('smaam_koko_assembly', newData);
           showToast(editingId ? "Rekod dikemaskini." : "Rekod ditambah.");
@@ -252,8 +253,36 @@ export const KokoTakwim: React.FC = () => {
       }
   };
 
+  const [showPreview, setShowPreview] = useState(false);
+
   const handleDownloadPDF = () => {
+      setShowPreview(true);
+  };
+
+  const executeDownload = () => {
+      const element = document.getElementById('pdf-content');
+      if (!element) return;
+      
       showToast("Sedang menjana PDF...");
+      
+      const opt = {
+          margin: 5,
+          filename: `Takwim_Kokurikulum_${year}_${viewMode}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      (window as any).html2pdf().set(opt).from(element).save().then(() => {
+          showToast("PDF berjaya dimuat turun.");
+      }).catch((err: any) => {
+          console.error("PDF Error:", err);
+          showToast("Gagal menjana PDF.");
+      });
+  };
+
+  const handlePrint = () => {
+      window.print();
   };
 
   // --- RENDER ANNUAL VIEW (GRID LAYOUT) ---
@@ -308,7 +337,7 @@ export const KokoTakwim: React.FC = () => {
                                       });
 
                                       return (
-                                          <td key={monthIdx} className={`${isHolidayDate ? 'bg-yellow-200 text-black' : 'bg-[#1C2541]'} border border-gray-700 relative h-12 p-1 align-top hover:bg-[#253252] transition-colors`}>
+                                          <td key={monthIdx} className={`${isHolidayDate ? 'bg-yellow-200 text-black' : 'bg-[#1C2541]'} border border-gray-700 relative min-h-[48px] p-1 align-top hover:bg-[#253252] transition-colors`}>
                                               <span className={`absolute top-0.5 right-1 text-[8px] font-mono ${isHolidayDate ? 'text-black/60' : 'text-gray-500'}`}>{dayLetter}</span>
                                               
                                               <div className="mt-3 flex flex-col gap-1">
@@ -316,7 +345,7 @@ export const KokoTakwim: React.FC = () => {
                                                   {isHolidayDate && (
                                                       <div className="flex items-start gap-1.5 group cursor-pointer" title={holidayName}>
                                                           <div className="w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 bg-yellow-500 shadow-[0_0_5px_rgba(234,179,8,0.8)]"></div>
-                                                          <span className="text-[9px] font-bold leading-tight line-clamp-2 text-black">
+                                                          <span className="text-[9px] font-bold leading-tight text-black whitespace-normal break-words">
                                                               {holidayName}
                                                           </span>
                                                       </div>
@@ -331,7 +360,7 @@ export const KokoTakwim: React.FC = () => {
                                                         onClick={() => canEdit && handleOpenModal('weekly', event)}
                                                       >
                                                           <div className="w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.8)]"></div>
-                                                          <span className={`text-[9px] leading-tight group-hover:text-white line-clamp-2 ${isHolidayDate ? 'text-black' : 'text-gray-300'}`}>
+                                                          <span className={`text-[9px] leading-tight group-hover:text-white whitespace-normal break-words ${isHolidayDate ? 'text-black' : 'text-gray-300'}`}>
                                                               {event.activity}
                                                           </span>
                                                       </div>
@@ -346,7 +375,7 @@ export const KokoTakwim: React.FC = () => {
                                                         onClick={() => canEdit && handleOpenModal('monthly', event)}
                                                       >
                                                           <div className="w-1.5 h-1.5 rounded-full mt-1 flex-shrink-0 bg-pink-500 shadow-[0_0_5px_rgba(236,72,153,0.8)]"></div>
-                                                          <span className={`text-[9px] leading-tight group-hover:text-white line-clamp-2 ${isHolidayDate ? 'text-black' : 'text-gray-300'}`}>
+                                                          <span className={`text-[9px] leading-tight group-hover:text-white whitespace-normal break-words ${isHolidayDate ? 'text-black' : 'text-gray-300'}`}>
                                                               {event.unit}
                                                           </span>
                                                       </div>
@@ -521,6 +550,172 @@ export const KokoTakwim: React.FC = () => {
           {/* ANNUAL VIEW GRID */}
           {viewMode === 'annual' && renderAnnualView()}
       </div>
+
+      {/* PRINT PREVIEW MODAL */}
+      <PrintPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onDownload={executeDownload}
+        onPrint={handlePrint}
+        title={`Pratonton Pengurusan Kokurikulum ${year}`}
+        orientation="landscape"
+      >
+        <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8">
+            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-24 w-auto object-contain" alt="Logo Sekolah" crossOrigin="anonymous" />
+            <div className="flex-1 text-center text-black">
+                <h1 className="text-2xl font-extrabold uppercase tracking-wide mb-1">SEKOLAH MENENGAH AGAMA AL-KHAIRIAH AL-ISLAMIAH MERSING</h1>
+                <h2 className="text-xl font-bold uppercase text-black">PENGURUSAN KOKURIKULUM TAHUN {year}</h2>
+                <p className="text-sm font-semibold mt-1 uppercase text-black tracking-widest">
+                    {viewMode === 'weekly' ? 'JADUAL PERJUMPAAN MINGGUAN' : viewMode === 'monthly' ? 'JADUAL PERHIMPUNAN BULANAN' : 'TAKWIM TAHUNAN'}
+                </p>
+            </div>
+        </div>
+
+        {viewMode === 'weekly' && (
+            <div className="mb-8">
+                <h3 className="text-lg font-bold uppercase text-center mb-4 border-b border-gray-400 pb-2">{kokoTitles.weekly}</h3>
+                <table className="w-full text-left border-collapse border border-black text-sm">
+                    <thead>
+                        <tr className="bg-gray-200 text-black">
+                            <th className="border border-black px-3 py-2 text-center w-16">BIL</th>
+                            <th className="border border-black px-3 py-2 text-center w-40">TARIKH</th>
+                            <th className="border border-black px-3 py-2 text-center">AKTIVITI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {kokoWeeklyData.map((item, idx) => (
+                            <tr key={item.id}>
+                                <td className="border border-black px-3 py-2 text-center">{idx + 1}</td>
+                                <td className="border border-black px-3 py-2 text-center font-mono">{item.date}</td>
+                                <td className="border border-black px-3 py-2">{item.activity}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )}
+
+        {viewMode === 'monthly' && (
+            <div className="mb-8">
+                <h3 className="text-lg font-bold uppercase text-center mb-4 border-b border-gray-400 pb-2">{kokoTitles.monthly}</h3>
+                <table className="w-full text-left border-collapse border border-black text-sm">
+                    <thead>
+                        <tr className="bg-gray-200 text-black">
+                            <th className="border border-black px-3 py-2 text-center w-16">BIL</th>
+                            <th className="border border-black px-3 py-2 text-center w-32">BULAN</th>
+                            <th className="border border-black px-3 py-2 text-center w-40">TARIKH</th>
+                            <th className="border border-black px-3 py-2 text-center">UNIT BERTUGAS</th>
+                            <th className="border border-black px-3 py-2 text-center">CATATAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {kokoAssemblyData.map((item, idx) => (
+                            <tr key={item.id}>
+                                <td className="border border-black px-3 py-2 text-center">{idx + 1}</td>
+                                <td className="border border-black px-3 py-2 text-center uppercase font-bold">{item.month}</td>
+                                <td className="border border-black px-3 py-2 text-center font-mono">{item.date}</td>
+                                <td className="border border-black px-3 py-2 uppercase font-bold text-center">{item.unit}</td>
+                                <td className="border border-black px-3 py-2 italic text-center text-xs">{item.notes || '-'}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )}
+
+        {viewMode === 'annual' && (
+            <div className="mb-8 overflow-x-auto">
+                <h3 className="text-lg font-bold uppercase text-center mb-4 border-b border-gray-400 pb-2">PERANCANGAN TAHUNAN KOKURIKULUM {year}</h3>
+                <table className="w-full border-collapse text-[8px] border border-black table-fixed">
+                    <thead>
+                        <tr>
+                            <th className="bg-gray-300 text-black p-1 font-bold border border-black w-8 text-center">HB</th>
+                            {months.map(m => (
+                                <th key={m} className="bg-gray-300 text-black p-1 font-bold border border-black text-center">{m}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map(date => (
+                            <tr key={date}>
+                                <td className="bg-gray-200 text-black font-bold text-center border border-black p-1">{date}</td>
+                                {months.map((_, monthIdx) => {
+                                    const dayLetter = getDayLetter(monthIdx, date);
+                                    if (!dayLetter) return <td key={monthIdx} className="bg-gray-100 border border-black"></td>;
+                                    
+                                    // Construct date object to match data
+                                    const cellDate = new Date(year, monthIdx, date);
+                                    cellDate.setHours(12, 0, 0, 0);
+
+                                    // CHECK HOLIDAY
+                                    let isHolidayDate = false;
+                                    let holidayName = '';
+                                    SCHOOL_HOLIDAYS.forEach(h => {
+                                        const range = parseRangeFromString(h.date);
+                                        if (range && cellDate >= range.start && cellDate <= range.end) {
+                                            isHolidayDate = true;
+                                            holidayName = h.event;
+                                        }
+                                    });
+                                    
+                                    // Find events matching this date
+                                    const weeklyEvents = kokoWeeklyData.filter(item => {
+                                        const d = parseDate(item.date);
+                                        return d.getDate() === date && d.getMonth() === monthIdx && d.getFullYear() === year;
+                                    });
+                                    
+                                    const assemblyEvents = kokoAssemblyData.filter(item => {
+                                        const d = parseDate(item.date);
+                                        return d.getDate() === date && d.getMonth() === monthIdx && d.getFullYear() === year;
+                                    });
+
+                                    return (
+                                        <td key={monthIdx} className={`border border-black relative min-h-[40px] p-0.5 align-top ${isHolidayDate ? 'bg-gray-300' : ''}`}>
+                                            <span className="absolute top-0 right-0.5 text-[6px] font-mono text-gray-600">{dayLetter}</span>
+                                            
+                                            <div className="mt-2 flex flex-col gap-0.5">
+                                                {isHolidayDate && (
+                                                    <div className="text-[6px] font-bold leading-none text-black uppercase bg-gray-400 px-0.5 rounded-sm whitespace-normal">
+                                                        {holidayName}
+                                                    </div>
+                                                )}
+                                                {weeklyEvents.map((event, idx) => (
+                                                    <div key={`w-${idx}`} className="text-[6px] leading-tight text-blue-900 font-bold whitespace-normal">
+                                                        • {event.activity}
+                                                    </div>
+                                                ))}
+                                                {assemblyEvents.map((event, idx) => (
+                                                    <div key={`a-${idx}`} className="text-[6px] leading-tight text-red-900 font-bold whitespace-normal">
+                                                        • {event.unit}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )}
+
+        <div className="mt-12 pt-8 border-t border-black flex justify-between text-xs font-bold uppercase">
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disediakan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Setiausaha Kokurikulum</p>
+            </div>
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disahkan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pengetua</p>
+            </div>
+        </div>
+        <div className="mt-8 text-center text-[10px] italic text-gray-500">
+            Dicetak pada {new Date().toLocaleDateString('ms-MY')} melalui Sistem Pengurusan Digital SMAAM
+        </div>
+      </PrintPreviewModal>
 
       {/* MODALS */}
       {isModalOpen && canEdit && (

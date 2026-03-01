@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '@/context/AppContext';
 import { SchoolProfile } from '../types';
 
 // Minimalist Icon Components matching Sidebar style
@@ -91,8 +91,8 @@ export const ProfilSekolah: React.FC = () => {
   };
 
   return (
-    // Updated Background: Lighter Navy & Teal Gradient for clarity
-    <div className="w-full relative fade-in bg-gradient-to-br from-[#131b36] via-[#005f73] to-[#0a4539] min-h-screen text-white overflow-hidden">
+    // Updated Background: Softer Navy & Teal Gradient
+    <div className="w-full relative fade-in bg-gradient-to-br from-[#1e293b] via-[#0f4c75] to-[#1b4332] min-h-screen text-white overflow-hidden">
       
       {/* --- Background Image Overlay (Transparent ~12%) --- */}
       <div 

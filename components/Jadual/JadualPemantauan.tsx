@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
+import React, { useState } from 'react';
+import { useApp } from '@/context/AppContext';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 interface MonitoringItem {
   code: string;
@@ -135,8 +136,50 @@ export const JadualPemantauan: React.FC = () => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
+
+  const handleDownloadPDF = () => {
+      setShowPreview(true);
+  };
+
+  const generatePDF = (element: HTMLElement) => {
+      const opt = {
+          margin: 5,
+          filename: `Jadual_Pemantauan.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      const win = window as unknown as { html2pdf: () => { set: (o: unknown) => { from: (e: HTMLElement) => { save: () => { then: (cb: () => void) => void } } } } };
+      if (win.html2pdf) {
+          win.html2pdf().set(opt).from(element).save().then(() => {
+              showToast("PDF berjaya dimuat turun.");
+          });
+      }
+  };
+
+  const executeDownload = () => {
+      const element = document.getElementById('pdf-content');
+      if (!element) return;
+
+      showToast("Sedang menjana PDF...");
+
+      if (typeof (window as unknown as { html2pdf: unknown }).html2pdf === 'undefined') {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+          script.onload = () => generatePDF(element);
+          document.body.appendChild(script);
+      } else {
+          generatePDF(element);
+      }
+  };
+
+  const handlePrint = () => {
+      window.print();
+  };
 
   const saveToStorage = (updatedList?: MonitoringGroup[]) => {
     localStorage.setItem('smaam_monitoring_list', JSON.stringify(updatedList || monitoringList));
@@ -200,11 +243,16 @@ export const JadualPemantauan: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8 space-y-6 fade-in pb-20">
-      <div className="border-b border-gray-400 pb-4">
-        <h2 className="text-3xl font-bold text-black font-montserrat uppercase flex items-center gap-3">
-          Jadual Pemantauan
-        </h2>
-        <p className="text-black font-medium mt-1 opacity-80">Jadual pencerapan guru dan pemantauan.</p>
+      <div className="border-b border-gray-400 pb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="text-center md:text-left">
+            <h2 className="text-3xl font-bold text-black font-montserrat uppercase flex items-center md:justify-start justify-center gap-3">
+              Jadual Pemantauan
+            </h2>
+            <p className="text-black font-medium mt-1 opacity-80">Jadual pencerapan guru dan pemantauan.</p>
+        </div>
+        <button onClick={handleDownloadPDF} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 shadow-lg inline-flex items-center gap-2 transition-transform hover:scale-105">
+            📥 Muat Turun PDF
+        </button>
       </div>
 
       <div className="space-y-6 fade-in">
@@ -286,6 +334,59 @@ export const JadualPemantauan: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* PRINT PREVIEW MODAL */}
+      <PrintPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onDownload={executeDownload}
+        onPrint={handlePrint}
+        title="Pratonton Jadual Pencerapan & Pemantauan"
+        orientation="landscape"
+      >
+        <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8">
+            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-24 w-auto object-contain" alt="Logo Sekolah" crossOrigin="anonymous" />
+            <div className="flex-1 text-center text-black">
+                <h1 className="text-2xl font-extrabold uppercase tracking-wide mb-1">SEKOLAH MENENGAH AGAMA AL-KHAIRIAH AL-ISLAMIAH MERSING</h1>
+                <h2 className="text-xl font-bold uppercase text-black">JADUAL PENCERAPAN & PEMANTAUAN</h2>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-8">
+            {monitoringList.map((group) => (
+                <div key={group.id} className="border border-black p-4 rounded break-inside-avoid">
+                    <div className="border-b border-black pb-2 mb-3">
+                        <h4 className="font-bold uppercase text-sm">{group.monitor}</h4>
+                        <p className="text-xs italic">{group.position}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                        {group.items.map((item, idx) => (
+                            <div key={idx} className="flex text-[10px] items-start">
+                                <span className="font-bold w-8">{item.code}</span>
+                                <span>{item.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-black flex justify-between text-xs font-bold uppercase">
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disediakan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Penyelaras Jadual</p>
+            </div>
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disahkan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pengetua</p>
+            </div>
+        </div>
+        <div className="mt-8 text-center text-[10px] italic text-gray-500">
+            Dicetak pada {new Date().toLocaleDateString('ms-MY')} melalui Sistem Pengurusan Digital SMAAM
+        </div>
+      </PrintPreviewModal>
     </div>
   );
 };

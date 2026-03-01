@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '@/context/AppContext';
 
 // --- CONSTANTS & MOCK DATA ---
 const TEACHER_NAMES = [
@@ -203,7 +203,7 @@ export const GuruGanti: React.FC = () => {
       showToast("Sedang menjana PDF...");
 
       // Check if library is loaded
-      if (typeof (window as any).html2pdf === 'undefined') {
+      if (typeof (window as unknown as { html2pdf: unknown }).html2pdf === 'undefined') {
           const script = document.createElement('script');
           script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
           script.onload = () => generatePDF(element);
@@ -223,9 +223,12 @@ export const GuruGanti: React.FC = () => {
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       
-      (window as any).html2pdf().set(opt).from(element).save().then(() => {
-          showToast("PDF berjaya dimuat turun.");
-      });
+      const win = window as unknown as { html2pdf: () => { set: (o: unknown) => { from: (e: HTMLElement) => { save: () => { then: (cb: () => void) => void } } } } };
+      if (win.html2pdf) {
+          win.html2pdf().set(opt).from(element).save().then(() => {
+              showToast("PDF berjaya dimuat turun.");
+          });
+      }
   };
 
   const getDayName = (dateStr: string) => {

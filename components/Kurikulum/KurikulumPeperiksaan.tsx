@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useApp } from '../../context/AppContext';
+import React, { useState, useCallback } from 'react';
+import { useApp } from '@/context/AppContext';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Download, FileText, Filter, TrendingUp, Users, Award, BookOpen, PieChart as PieChartIcon } from 'lucide-react';
 
 type Tab = 'info' | 'jadual' | 'analisis' | 'laporan';
 
@@ -162,6 +164,38 @@ const paginateScheduleData = (data: DetailedScheduleRow[], slotsPerPage: number 
 
     return pages;
 };
+
+const reportsList = [
+  { id: 1, title: 'Analisis Keseluruhan Tingkatan 5', type: 'PDF', date: '15-03-2026', size: '2.4 MB' },
+  { id: 2, title: 'Analisis Mata Pelajaran (Semua Subjek)', type: 'Excel', date: '15-03-2026', size: '1.1 MB' },
+  { id: 3, title: 'Senarai Murid Cemerlang (Top 10)', type: 'PDF', date: '16-03-2026', size: '0.8 MB' },
+  { id: 4, title: 'Laporan Gred Purata Mata Pelajaran (GPMP)', type: 'PDF', date: '16-03-2026', size: '1.5 MB' },
+  { id: 5, title: 'Slip Keputusan Individu (Semua Pelajar)', type: 'PDF', date: '17-03-2026', size: '12.5 MB' },
+];
+
+const analysisSubjectData = [
+  { subject: 'B. Melayu', A: 45, B: 30, C: 15, D: 5, E: 3, F: 2, lulus: 98 },
+  { subject: 'B. Inggeris', A: 25, B: 35, C: 20, D: 10, E: 5, F: 5, lulus: 95 },
+  { subject: 'Matematik', A: 20, B: 25, C: 30, D: 15, E: 5, F: 5, lulus: 95 },
+  { subject: 'Sejarah', A: 35, B: 40, C: 15, D: 5, E: 3, F: 2, lulus: 98 },
+  { subject: 'Sains', A: 30, B: 35, C: 20, D: 10, E: 3, F: 2, lulus: 98 },
+  { subject: 'P. Islam', A: 55, B: 30, C: 10, D: 3, E: 2, F: 0, lulus: 100 },
+];
+
+const gpsTrendData = [
+  { exam: 'UP1', gps: 2.85 },
+  { exam: 'PPT', gps: 2.65 },
+  { exam: 'Percubaan', gps: 2.35 },
+  { exam: 'PAT', gps: 2.15 },
+];
+
+const gradeDistributionData = [
+  { name: 'Cemerlang (A)', value: 210, color: '#4CAF50' },
+  { name: 'Kepujian (B)', value: 195, color: '#2196F3' },
+  { name: 'Baik (C)', value: 110, color: '#FFC107' },
+  { name: 'Lulus (D/E)', value: 65, color: '#FF9800' },
+  { name: 'Gagal (F)', value: 16, color: '#F44336' },
+];
 
 export const KurikulumPeperiksaan: React.FC = () => {
   const { user, showToast } = useApp();
@@ -420,23 +454,39 @@ export const KurikulumPeperiksaan: React.FC = () => {
     }
   };
 
+  const renderNotesSection = () => (
+    <div className="bg-gray-100 p-5 rounded-2xl border border-gray-300 flex items-start gap-4 relative group mt-6">
+      <div className="text-2xl mt-1">⚠️</div>
+      <div className="flex-1">
+        <p className="text-gray-700 font-bold text-sm uppercase mb-1 font-poppins">Nota Penting Pengurusan Peperiksaan:</p>
+        <ul className="text-[11px] text-gray-500 list-disc list-outside ml-4 space-y-1 font-poppins">
+          {examNotes.map((note, i) => (<li key={i}>{note}</li>))}
+        </ul>
+      </div>
+      {canEdit && (<button onClick={openNoteEdit} className="absolute top-4 right-4 text-gray-400 hover:text-[#0B132B]">✏️</button>)}
+    </div>
+  );
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'info':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 fade-in">
-            {exams.map((exam) => (
-              <div key={exam.id} className="bg-[#1C2541] rounded-xl p-6 border border-gray-700 shadow-lg hover:border-[#C9B458] transition-all group relative">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="bg-[#3A506B] text-white text-xs font-bold px-2 py-1 rounded">{exam.code}</div>
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full border ${exam.status === 'Selesai' ? 'bg-green-900/50 text-green-400 border-green-600' : exam.status === 'Sedang Berjalan' ? 'bg-blue-900/50 text-blue-400 border-blue-600' : 'bg-yellow-900/30 text-[#C9B458] border-[#C9B458]'}`}>{exam.status}</span>
+          <div className="fade-in pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {exams.map((exam) => (
+                <div key={exam.id} className="bg-[#1C2541] rounded-xl p-6 border border-gray-700 shadow-lg hover:border-[#C9B458] transition-all group relative">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="bg-[#3A506B] text-white text-xs font-bold px-2 py-1 rounded">{exam.code}</div>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full border ${exam.status === 'Selesai' ? 'bg-green-900/50 text-green-400 border-green-600' : exam.status === 'Sedang Berjalan' ? 'bg-blue-900/50 text-blue-400 border-blue-600' : 'bg-yellow-900/30 text-[#C9B458] border-[#C9B458]'}`}>{exam.status}</span>
+                  </div>
+                  <h3 className="text-white font-bold text-lg mb-2 group-hover:text-[#C9B458] transition-colors">{exam.name}</h3>
+                  <div className="text-gray-400 text-sm space-y-1"><p>📅 Mula: <span className="text-gray-200">{exam.dateStart}</span></p><p>🏁 Tamat: <span className="text-gray-200">{exam.dateEnd}</span></p></div>
+                  {isAdmin && (<div className="mt-4 pt-4 border-t border-gray-700 flex justify-end"><button className="text-sm text-blue-400 hover:text-white flex items-center gap-1"><span>✏️</span> Edit</button></div>)}
                 </div>
-                <h3 className="text-white font-bold text-lg mb-2 group-hover:text-[#C9B458] transition-colors">{exam.name}</h3>
-                <div className="text-gray-400 text-sm space-y-1"><p>📅 Mula: <span className="text-gray-200">{exam.dateStart}</span></p><p>🏁 Tamat: <span className="text-gray-200">{exam.dateEnd}</span></p></div>
-                {isAdmin && (<div className="mt-4 pt-4 border-t border-gray-700 flex justify-end"><button className="text-sm text-blue-400 hover:text-white flex items-center gap-1"><span>✏️</span> Edit</button></div>)}
-              </div>
-            ))}
-            {isAdmin && (<div onClick={handleAddExam} className="bg-[#1C2541]/50 border-2 border-dashed border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#C9B458] hover:bg-[#1C2541] transition-all min-h-[200px]"><div className="text-4xl text-gray-500 mb-2">+</div><p className="text-gray-400 font-semibold">Tambah Peperiksaan</p></div>)}
+              ))}
+              {isAdmin && (<div onClick={handleAddExam} className="bg-[#1C2541]/50 border-2 border-dashed border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#C9B458] hover:bg-[#1C2541] transition-all min-h-[200px]"><div className="text-4xl text-gray-500 mb-2">+</div><p className="text-gray-400 font-semibold">Tambah Peperiksaan</p></div>)}
+            </div>
+            {renderNotesSection()}
           </div>
         );
       case 'jadual':
@@ -497,18 +547,167 @@ export const KurikulumPeperiksaan: React.FC = () => {
                 </table>
               </div>
             </div>
-            <div className="bg-gray-100 p-5 rounded-2xl border border-gray-300 flex items-start gap-4 relative group"><div className="text-2xl mt-1">⚠️</div><div className="flex-1"><p className="text-gray-700 font-bold text-sm uppercase mb-1 font-poppins">Nota Penting Pengurusan Peperiksaan:</p><ul className="text-[11px] text-gray-500 list-disc list-outside ml-4 space-y-1 font-poppins">{examNotes.map((note, i) => (<li key={i}>{note}</li>))}</ul></div>{canEdit && (<button onClick={openNoteEdit} className="absolute top-4 right-4 text-gray-400 hover:text-[#0B132B]">✏️</button>)}</div>
+            {renderNotesSection()}
           </div>
         );
       case 'analisis':
+        return (
+          <div className="space-y-6 fade-in font-poppins pb-20">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex items-center gap-4">
+                <div className="p-4 bg-blue-100 text-blue-600 rounded-full"><TrendingUp size={24} /></div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold uppercase">Gred Purata Sekolah (GPS)</p>
+                  <h3 className="text-3xl font-black text-[#0B132B]">2.15</h3>
+                  <p className="text-xs text-green-600 font-bold flex items-center gap-1"><span>▲</span> 0.20 Peningkatan</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex items-center gap-4">
+                <div className="p-4 bg-green-100 text-green-600 rounded-full"><Award size={24} /></div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold uppercase">Peratus Layak Sijil</p>
+                  <h3 className="text-3xl font-black text-[#0B132B]">96.5%</h3>
+                  <p className="text-xs text-green-600 font-bold flex items-center gap-1"><span>▲</span> 1.5% Peningkatan</p>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 flex items-center gap-4">
+                <div className="p-4 bg-yellow-100 text-yellow-600 rounded-full"><Users size={24} /></div>
+                <div>
+                  <p className="text-sm text-gray-500 font-bold uppercase">Jumlah Calon</p>
+                  <h3 className="text-3xl font-black text-[#0B132B]">145</h3>
+                  <p className="text-xs text-gray-500 font-bold">Tingkatan {selectedForm}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* GPS Trend */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <h4 className="text-lg font-bold text-[#0B132B] mb-4 flex items-center gap-2"><TrendingUp size={20} /> Trend Pencapaian GPS</h4>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={gpsTrendData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                      <XAxis dataKey="exam" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />
+                      <YAxis domain={[0, 4.0]} hide />
+                      <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                      <Line type="monotone" dataKey="gps" stroke="#0B132B" strokeWidth={3} dot={{r: 6, fill: '#C9B458', strokeWidth: 2, stroke: '#fff'}} activeDot={{r: 8}} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Grade Distribution */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+                <h4 className="text-lg font-bold text-[#0B132B] mb-4 flex items-center gap-2"><PieChartIcon size={20} /> Taburan Gred Keseluruhan</h4>
+                <div className="h-64 flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={gradeDistributionData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                        {gradeDistributionData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Subject Performance */}
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+              <h4 className="text-lg font-bold text-[#0B132B] mb-4 flex items-center gap-2"><BookOpen size={20} /> Analisis Mata Pelajaran Teras</h4>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analysisSubjectData} margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                    <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
+                    <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'}} />
+                    <Legend />
+                    <Bar dataKey="A" name="Cemerlang (A)" stackId="a" fill="#4CAF50" radius={[0, 0, 4, 4]} />
+                    <Bar dataKey="B" name="Kepujian (B)" stackId="a" fill="#2196F3" />
+                    <Bar dataKey="C" name="Baik (C)" stackId="a" fill="#FFC107" />
+                    <Bar dataKey="D" name="Lulus (D/E)" stackId="a" fill="#FF9800" />
+                    <Bar dataKey="F" name="Gagal (F)" stackId="a" fill="#F44336" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            {renderNotesSection()}
+          </div>
+        );
+
       case 'laporan':
-        // Reuse similar simple returns or the full code if needed, keeping it concise here for the patch
-        return <div className="p-10 text-center text-gray-400">Modul dalam pembangunan.</div>;
+        return (
+          <div className="space-y-6 fade-in font-poppins pb-20">
+             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#0B132B] uppercase">Senarai Laporan & Dokumen</h3>
+                    <p className="text-xs text-gray-500">Muat turun laporan analisis peperiksaan untuk rujukan.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 shadow-sm">
+                      <Filter size={14} /> Tapis
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-100 text-gray-600 text-xs uppercase font-bold">
+                      <tr>
+                        <th className="px-6 py-4">Nama Dokumen</th>
+                        <th className="px-6 py-4 text-center">Jenis</th>
+                        <th className="px-6 py-4 text-center">Tarikh Jana</th>
+                        <th className="px-6 py-4 text-center">Saiz</th>
+                        <th className="px-6 py-4 text-center">Tindakan</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {reportsList.map((report) => (
+                        <tr key={report.id} className="hover:bg-gray-50 transition-colors group">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-lg ${report.type === 'PDF' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                                <FileText size={18} />
+                              </div>
+                              <span className="font-bold text-gray-800 text-sm group-hover:text-[#0B132B]">{report.title}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${report.type === 'PDF' ? 'bg-red-100 text-red-600 border border-red-200' : 'bg-green-100 text-green-600 border border-green-200'}`}>
+                              {report.type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center text-xs text-gray-500 font-mono">{report.date}</td>
+                          <td className="px-6 py-4 text-center text-xs text-gray-500 font-mono">{report.size}</td>
+                          <td className="px-6 py-4 text-center">
+                            <button className="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-50 transition-colors" title="Muat Turun">
+                              <Download size={18} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="p-4 bg-gray-50 border-t border-gray-200 text-center">
+                  <button className="text-xs font-bold text-gray-500 hover:text-[#0B132B] uppercase tracking-wider">Lihat Semua Laporan</button>
+                </div>
+             </div>
+             {renderNotesSection()}
+          </div>
+        );
     }
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 fade-in pb-20">
+    <div className="p-4 md:p-8 space-y-6 fade-in">
       {/* HEADER SECTION */}
       <div className="border-b border-gray-400 pb-4">
         <div className="flex items-center gap-2 text-sm text-[#0B132B] font-mono mb-2">
@@ -551,6 +750,9 @@ export const KurikulumPeperiksaan: React.FC = () => {
             position: 'absolute',
             left: '-9999px',
             top: 0,
+            width: '297mm',
+            height: 0,
+            overflow: 'hidden',
             display: 'block',
             visibility: 'visible',
             backgroundColor: '#ffffff', // Required for clean capture

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '@/context/AppContext';
 import { RolePermission, UserCredential } from '../types';
 
 // Icons
@@ -15,8 +15,7 @@ const Icons = {
 export const AdminSettings: React.FC = () => {
   const { 
     user, userCredentials, updateUserCredentials, 
-    rolePermissions, updateRolePermissions, 
-    showToast 
+    rolePermissions, updateRolePermissions
   } = useApp();
 
   const [selectedRole, setSelectedRole] = useState<string>('admin');

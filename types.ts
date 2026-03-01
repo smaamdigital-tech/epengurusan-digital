@@ -158,3 +158,20 @@ export interface HipEvent {
   teacher: string;
   activity: string;
 }
+
+export interface ExamItem {
+  id: number;
+  date: string;
+  dalaman?: string;
+  jaj?: string;
+  awam?: string;
+  isHoliday?: boolean;
+}
+
+export interface DetailedScheduleRow {
+  id: number;
+  hari: string;
+  tarikh: string;
+  tarikhDisplay: string;
+  slots: unknown[]; 
+}

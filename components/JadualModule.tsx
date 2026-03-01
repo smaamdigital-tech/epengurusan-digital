@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import React, { useState } from 'react';
+import { useApp } from '@/context/AppContext';
 
 interface JadualModuleProps {
   type: string;
@@ -131,43 +131,9 @@ const CLASS_LIST = [
     "5 Al-Hanafi", "5 Al-Syafie"
 ];
 
-const PERSENDIRIAN_SUBJECTS = [
-  'BM', 'BI', 'MAT', 'SCN', 'SEJ', 'PNG', 'PSV', 'PJPK', 'GEO',
-  'SYA', 'USL', 'LAM', 'MAN', 'ADB', 'DATA', 'PPPSS', 'OB',
-  'GMLM', 'KOKO', 'SUKAN/PERMAINAN', 'PER/UB/KELAB', 'SOLAT JUMAAT',
-  'RBT', 'MAA', 'AWAB', 'KKQ', 'ZUHUR', 'PER'
-];
-
-const PERSENDIRIAN_COLORS = [
-    { value: 'bg-blue-100 text-blue-900 border-blue-200', label: 'Biru (Teknik Vokasional)' },
-    { value: 'bg-orange-100 text-orange-900 border-orange-200', label: 'Oren (Mate & Sains)' },
-    { value: 'bg-yellow-100 text-yellow-900 border-yellow-200', label: 'Kuning (Kemanusiaan)' },
-    { value: 'bg-green-100 text-green-900 border-green-200', label: 'Hijau (Agama)' },
-    { value: 'bg-red-100 text-red-900 border-red-200', label: 'Merah (Sukan/Koko)' },
-    { value: 'bg-purple-100 text-purple-900 border-purple-200', label: 'Ungu (Bahasa)' },
-    { value: 'bg-gray-200 text-gray-700 border-gray-300', label: 'Kelabu (Rehat/Zuhur)' },
-    { value: 'bg-white text-gray-900 border-gray-200', label: 'Putih (Umum)' },
-];
-
-const PERSENDIRIAN_DAYS = ['ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT'];
-const PERSENDIRIAN_PERIODS = [
-  '7.30 - 8.00', '8.00 - 8.30', '8.30 - 9.00', '9.00 - 9.30', '9.30 - 10.00',
-  '10.00 - 10.30', '10.30 - 11.00', '11.00 - 11.30', '11.30 - 12.00',
-  '12.00 - 12.30', '12.30 - 1.00', '1.00 - 1.30', '1.30 - 2.00',
-  '2.00 - 2.30', '2.30 - 3.00', '3.00 - 3.30', '3.30 - 4.00',
-  '4.00 - 4.30', '4.30 - 5.00'
-];
-
-const getShortName = (fullName: string) => {
-    const index = TEACHER_FULL_NAMES.indexOf(fullName);
-    return index !== -1 ? TEACHER_LIST[index] : fullName;
-}
-
 export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   const { 
-    user, showToast, checkPermission, 
-    speechSchedule, updateSpeechSchedule, 
-    teacherGroups, updateTeacherGroups 
+    user, showToast, checkPermission
   } = useApp();
   
   const canEdit = checkPermission(
@@ -180,93 +146,6 @@ export const JadualModule: React.FC<JadualModuleProps> = ({ type }) => {
   );
   
   const isSuperAdmin = user?.role === 'adminsistem';
-
-  // --- LAZY INITIALIZATION ---
-  const [classTeachers, setClassTeachers] = useState<ClassTeacher[]>(() => {
-      try {
-          const saved = localStorage.getItem('smaam_class_teachers');
-          return saved ? JSON.parse(saved) : INITIAL_CLASS_TEACHERS;
-      } catch (e) { return INITIAL_CLASS_TEACHERS; }
-  });
-
-  const [coordinators, setCoordinators] = useState<Coordinator[]>(() => {
-      try {
-          const saved = localStorage.getItem('smaam_coordinators');
-          return saved ? JSON.parse(saved) : INITIAL_COORDINATORS;
-      } catch (e) { return INITIAL_COORDINATORS; }
-  });
-
-  const [monitoringList, setMonitoringList] = useState<MonitoringGroup[]>(() => {
-      try {
-          const saved = localStorage.getItem('smaam_monitoring_list');
-          return saved ? JSON.parse(saved) : INITIAL_MONITORING_LIST;
-      } catch (e) { return INITIAL_MONITORING_LIST; }
-  });
-  
-  const [personalSchedule, setPersonalSchedule] = useState<PersonalScheduleSlot[]>(() => {
-      try {
-          const saved = localStorage.getItem('smaam_personal_schedule');
-          return saved ? JSON.parse(saved) : [];
-      } catch (e) { return []; }
-  });
-
-  const [classSchedule, setClassSchedule] = useState<ClassScheduleSlot[]>(() => {
-      try {
-          const saved = localStorage.getItem('smaam_class_schedule');
-          return saved ? JSON.parse(saved) : [];
-      } catch (e) { return []; }
-  });
-
-  const [sectionTitles, setSectionTitles] = useState(() => {
-      try {
-          const saved = localStorage.getItem('smaam_jadual_titles');
-          return saved ? JSON.parse(saved) : {
-            guruKelas_list: 'Senarai Guru Kelas',
-            guruKelas_coord: 'Penyelaras Tingkatan',
-            berucap_table: 'Jadual Bertugas & Berucap',
-            berucap_list: 'Senarai Kumpulan',
-            persendirian_select: 'Pilih Guru',
-            kelas_select: 'Pilih Kelas',
-          };
-      } catch (e) { 
-          return {
-            guruKelas_list: 'Senarai Guru Kelas',
-            guruKelas_coord: 'Penyelaras Tingkatan',
-            berucap_table: 'Jadual Bertugas & Berucap',
-            berucap_list: 'Senarai Kumpulan',
-            persendirian_select: 'Pilih Guru',
-            kelas_select: 'Pilih Kelas',
-          };
-      }
-  });
-
-  // States for View Selection
-  const [selectedTeacher, setSelectedTeacher] = useState(TEACHER_FULL_NAMES[0]);
-  const [selectedClass, setSelectedClass] = useState(CLASS_LIST[0]);
-
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'classTeacher' | 'coordinator' | 'addClass' | 'addCoordinator' | 'monitoring' | 'scheduleSlot' | 'relief' | 'speech' | 'editGroup' | 'addGroup' | 'addTeacher' | null>(null);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({});
-
-  // --- Handlers ---
-  const saveToStorage = (key: string, data: any) => {
-      localStorage.setItem(key, JSON.stringify(data));
-  };
-
-  const handleEditTitle = (key: keyof typeof sectionTitles) => {
-    const newVal = prompt("Ubah Tajuk:", sectionTitles[key]);
-    if (newVal && newVal.trim() !== "") {
-      const updated = { ...sectionTitles, [key]: newVal };
-      setSectionTitles(updated);
-      saveToStorage('smaam_jadual_titles', updated);
-      showToast("Tajuk berjaya dikemaskini.");
-    }
-  };
-
-  // ... (Existing component logic truncated for brevity as the main fix is the Lazy Initialization above) ...
-  // ... The rest of the file logic remains the same but using the lazy initialized states ...
 
   return (
     <div className="fade-in">

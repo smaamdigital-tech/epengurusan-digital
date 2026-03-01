@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '@/context/AppContext';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // --- CONSTANTS & MOCK DATA ---
 const TEACHER_NAMES = [
@@ -41,6 +43,15 @@ interface AbsentRecord {
   date: string;
 }
 
+interface MasterScheduleItem {
+  teacherName: string;
+  day: string; // Isnin, Selasa, etc.
+  startTime: string; // 07:30
+  endTime: string; // 08:00
+  className: string;
+  subject: string;
+}
+
 interface ReliefAssignment {
   recordId: string;
   slotId: string;
@@ -68,51 +79,149 @@ export const GuruGanti: React.FC = () => {
   const [assignments, setAssignments] = useState<ReliefAssignment[]>([]);
   const [isGenerated, setIsGenerated] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Master Schedule State
+  const [masterSchedule, setMasterSchedule] = useState<MasterScheduleItem[]>([]);
 
   // Print Preview State
   const [showPreview, setShowPreview] = useState(false);
 
-  // --- LOGIC: MOCK GENERATOR ---
+  // --- LOGIC: IMPORT CSV ---
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      if (!text) return;
+
+      const lines = text.split('\n');
+      const newSchedule: MasterScheduleItem[] = [];
+
+      // Skip header row (index 0)
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // Format: Nama Guru, Hari, Masa Mula, Masa Tamat, Kelas, Subjek
+        const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g, ''));
+        if (parts.length >= 6) {
+            newSchedule.push({
+                teacherName: parts[0],
+                day: parts[1],
+                startTime: parts[2],
+                endTime: parts[3],
+                className: parts[4],
+                subject: parts[5]
+            });
+        }
+      }
+
+      setMasterSchedule(newSchedule);
+      showToast(`Berjaya import ${newSchedule.length} rekod jadual.`);
+    };
+    reader.readAsText(file);
+  };
+
+  // --- LOGIC: GENERATOR ---
   const generateSchedule = () => {
     setIsProcessing(true);
     setTimeout(() => {
         const newAssignments: ReliefAssignment[] = [];
+        const dayName = getDayName(selectedDate); // e.g., "Isnin"
         
         absentList.forEach(absent => {
             if (absent.status === 'TIDAK_PERLU') return;
 
-            const classCount = Math.floor(Math.random() * 3) + 2; 
-            const usedSlots = new Set();
+            // 1. Determine Classes to Replace
+            let classesToReplace: { slotId: string, className: string, subject: string }[] = [];
 
-            for(let i=0; i<classCount; i++) {
-                let slotIdx = Math.floor(Math.random() * TIME_SLOTS.length);
-                if (slotIdx === 5) slotIdx++; // Skip Rehat
-                const slot = TIME_SLOTS[slotIdx];
-                
-                if (usedSlots.has(slot.id)) continue;
-                usedSlots.add(slot.id);
+            if (masterSchedule.length > 0) {
+                // Use Real Data
+                const teacherClasses = masterSchedule.filter(item => 
+                    item.teacherName === absent.teacherName && 
+                    item.day.toLowerCase() === dayName.toLowerCase()
+                );
 
-                const candidates = TEACHER_NAMES
-                    .filter(t => 
-                        t !== absent.teacherName &&
-                        !absentList.find(a => a.teacherName === t) &&
-                        !exemptedTeachers.includes(t)
-                    )
-                    .sort(() => 0.5 - Math.random())
-                    .slice(0, 3)
-                    .map(t => ({ name: t, currentLoad: Math.floor(Math.random() * 5) }));
+                teacherClasses.forEach(cls => {
+                    // Find matching slot ID based on start time
+                    const slot = TIME_SLOTS.find(s => s.label.startsWith(cls.startTime));
+                    if (slot) {
+                        classesToReplace.push({
+                            slotId: slot.id,
+                            className: cls.className,
+                            subject: cls.subject
+                        });
+                    }
+                });
+            } else {
+                // Use Mock Data (Fallback)
+                const classCount = Math.floor(Math.random() * 3) + 2; 
+                const usedSlots = new Set();
+                for(let i=0; i<classCount; i++) {
+                    let slotIdx = Math.floor(Math.random() * TIME_SLOTS.length);
+                    if (slotIdx === 5) slotIdx++; // Skip Rehat
+                    const slot = TIME_SLOTS[slotIdx];
+                    if (usedSlots.has(slot.id)) continue;
+                    usedSlots.add(slot.id);
+                    classesToReplace.push({
+                        slotId: slot.id,
+                        className: `${Math.floor(Math.random()*5)+1} ${['Al-Hanafi', 'Al-Syafie', 'Al-Maliki'][Math.floor(Math.random()*3)]}`,
+                        subject: ['BM', 'BI', 'MAT', 'SEJ', 'PI', 'SAINS'][Math.floor(Math.random()*6)]
+                    });
+                }
+            }
 
+            // 2. Assign Relief Teachers
+            classesToReplace.forEach(cls => {
+                let candidates: { name: string, currentLoad: number }[] = [];
+
+                if (masterSchedule.length > 0) {
+                    // Real Availability Check
+                    const slotTime = TIME_SLOTS.find(s => s.id === cls.slotId)?.label.split(' - ')[0]; // e.g. "07:30"
+                    
+                    candidates = TEACHER_NAMES
+                        .filter(t => {
+                            if (t === absent.teacherName) return false;
+                            if (absentList.find(a => a.teacherName === t)) return false;
+                            if (exemptedTeachers.includes(t)) return false;
+
+                            // Check if teacher is busy in Master Schedule
+                            const isBusy = masterSchedule.some(m => 
+                                m.teacherName === t && 
+                                m.day.toLowerCase() === dayName.toLowerCase() &&
+                                m.startTime === slotTime
+                            );
+                            return !isBusy;
+                        })
+                        .map(t => ({ name: t, currentLoad: 0 })); // Load calculation could be improved later
+                } else {
+                    // Mock Candidates
+                    candidates = TEACHER_NAMES
+                        .filter(t => 
+                            t !== absent.teacherName &&
+                            !absentList.find(a => a.teacherName === t) &&
+                            !exemptedTeachers.includes(t)
+                        )
+                        .sort(() => 0.5 - Math.random())
+                        .slice(0, 3)
+                        .map(t => ({ name: t, currentLoad: Math.floor(Math.random() * 5) }));
+                }
+
+                // Shuffle and pick top 3
+                candidates = candidates.sort(() => 0.5 - Math.random()).slice(0, 3);
                 const assignedTeacher = candidates.length > 0 ? candidates[0].name : "TIADA GURU (SILA PILIH)";
 
                 newAssignments.push({
                     recordId: absent.id,
-                    slotId: slot.id,
-                    className: `${Math.floor(Math.random()*5)+1} ${['Al-Hanafi', 'Al-Syafie', 'Al-Maliki'][Math.floor(Math.random()*3)]}`,
-                    subject: ['BM', 'BI', 'MAT', 'SEJ', 'PI', 'SAINS'][Math.floor(Math.random()*6)],
+                    slotId: cls.slotId,
+                    className: cls.className,
+                    subject: cls.subject,
                     reliefTeacher: assignedTeacher,
                     candidates: candidates
                 });
-            }
+            });
         });
 
         newAssignments.sort((a, b) => parseInt(a.slotId) - parseInt(b.slotId));
@@ -190,35 +299,37 @@ export const GuruGanti: React.FC = () => {
       }, 500);
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
       const element = document.getElementById('pdf-content');
-      if (!element) return;
+      if (!element) {
+          showToast("Ralat: Kandungan PDF tidak dijumpai.");
+          return;
+      }
 
       showToast("Sedang menjana PDF...");
 
-      if (typeof (window as any).html2pdf === 'undefined') {
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-          script.onload = () => generatePDF(element);
-          document.body.appendChild(script);
-      } else {
-          generatePDF(element);
-      }
-  };
-
-  const generatePDF = (element: HTMLElement) => {
-      const formattedDate = selectedDate.split('-').reverse().join('-');
-      const opt = {
-          margin: 0, 
-          filename: `Jadual_Guru_Ganti_${formattedDate}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, logging: false },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      
-      (window as any).html2pdf().set(opt).from(element).save().then(() => {
+      try {
+          const canvas = await html2canvas(element, {
+              scale: 2,
+              useCORS: true,
+              logging: false,
+              backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+          
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          const formattedDate = selectedDate.split('-').reverse().join('-');
+          pdf.save(`Jadual_Guru_Ganti_${formattedDate}.pdf`);
+          
           showToast("PDF berjaya dimuat turun.");
-      });
+      } catch (error) {
+          console.error("PDF Generation Error:", error);
+          showToast("Gagal menjana PDF.");
+      }
   };
 
   const getDayName = (dateStr: string) => {
@@ -246,10 +357,18 @@ export const GuruGanti: React.FC = () => {
         `}</style>
 
         <div className="bg-transparent p-6 mb-6 border-l-8 border-red-600 print:hidden relative">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 justify-between">
                 <div>
                     <h1 className="text-2xl font-bold tracking-wide font-montserrat text-black">PENGURUSAN GURU GANTI</h1>
                     <h2 className="text-sm font-light tracking-widest text-gray-600 uppercase">Sistem Penjanaan Automatik</h2>
+                </div>
+                <div>
+                    <input type="file" accept=".csv" id="csvUpload" className="hidden" onChange={handleFileUpload} />
+                    <button onClick={() => document.getElementById('csvUpload')?.click()} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 shadow-md transition-colors">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Import Jadual Induk
+                    </button>
+                    {masterSchedule.length > 0 && <p className="text-xs text-green-600 font-bold mt-1 text-right">{masterSchedule.length} rekod dimuat.</p>}
                 </div>
             </div>
         </div>
@@ -336,22 +455,85 @@ export const GuruGanti: React.FC = () => {
 
             {/* --- PRINT PREVIEW MODAL --- */}
             {showPreview && (
-                <div id="print-preview-modal" className="fixed inset-0 z-50 bg-gray-900/95 flex justify-center items-start overflow-y-auto pt-10 pb-20">
+                <div id="print-preview-modal" className="fixed inset-0 z-[100] bg-gray-900/95 flex justify-center items-start overflow-y-auto pt-10 pb-20 print:p-0 print:bg-transparent print:static print:block print:z-auto">
+                    <style>{`
+                        @media print {
+                            body * { visibility: hidden; }
+                            #print-preview-modal, #print-preview-modal * { visibility: visible; }
+                            #print-preview-modal { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white; box-shadow: none; }
+                            .no-print { display: none !important; }
+                            @page { size: A4 portrait; margin: 10mm; }
+                            .break-inside-avoid { page-break-inside: avoid; break-inside: avoid; }
+                            table { page-break-inside: auto; width: 100%; }
+                            tr { page-break-inside: avoid; page-break-after: auto; }
+                            thead { display: table-header-group; }
+                            tfoot { display: table-footer-group; }
+                        }
+                    `}</style>
                     <div className="bg-white text-black w-full max-w-[210mm] min-h-[297mm] shadow-2xl relative mx-auto my-auto print:shadow-none print:w-full print:max-w-none">
-                        <div className="no-print sticky top-0 left-0 right-0 bg-[#3A506B] text-white p-4 flex justify-between items-center shadow-md z-50 mb-8 rounded-t-lg"><h3 className="font-bold text-lg flex items-center gap-2"><Icons.Print /> Pratonton Cetakan</h3><div className="flex gap-3"><button onClick={() => setShowPreview(false)} className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors"><Icons.Close /> Tutup</button><button onClick={handleDownloadPDF} className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition-colors"><Icons.Download /> Muat Turun PDF</button><button onClick={handlePrint} className="bg-[#C9B458] hover:bg-yellow-500 text-[#0B132B] px-6 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition-colors">🖨️ Cetak / Simpan PDF</button></div></div>
-                        <div id="pdf-content" className="p-10 font-serif text-black">
-                            <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8"><img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-28 w-auto object-contain" alt="Logo Sekolah" /><div className="flex-1 text-center text-black"><h1 className="text-3xl font-extrabold uppercase tracking-wide mb-1">JADUAL GURU GANTI</h1><h2 className="text-xl font-bold uppercase text-black">{getFormattedDate(selectedDate)}</h2><p className="text-sm font-semibold mt-1 uppercase text-black tracking-widest">SMA Al-Khairiah Al-Islamiah Mersing</p></div></div>
+                        <div className="no-print sticky top-0 left-0 right-0 bg-[#3A506B] text-white p-4 flex justify-between items-center shadow-md z-50 mb-8 rounded-t-lg"><h3 className="font-bold text-lg flex items-center gap-2"><Icons.Print /> Pratonton Cetakan</h3><div className="flex gap-3"><button onClick={() => setShowPreview(false)} className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors"><Icons.Close /> Tutup</button><button onClick={handleDownloadPDF} className="bg-teal-600 hover:bg-teal-500 text-white px-6 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition-colors"><Icons.Download /> Muat Turun PDF</button><button onClick={() => window.print()} className="bg-[#C9B458] hover:bg-yellow-500 text-[#0B132B] px-6 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2 transition-colors"><Icons.Print /> Cetak</button></div></div>
+                        <div id="pdf-content" className="p-10 font-serif print:shadow-none print:m-0 print:p-0" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
+                            <div className="flex items-center gap-4 mb-8 pb-6" style={{ borderBottom: '2px solid #000000' }}>
+                                <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-28 w-auto object-contain" alt="Logo Sekolah" style={{ height: '112px', width: 'auto' }} />
+                                <div className="flex-1 text-center" style={{ color: '#000000' }}>
+                                    <h1 className="text-3xl font-extrabold uppercase tracking-wide mb-1" style={{ fontSize: '30px', fontWeight: '800', letterSpacing: '0.025em', marginBottom: '4px' }}>JADUAL GURU GANTI</h1>
+                                    <h2 className="text-xl font-bold uppercase" style={{ fontSize: '20px', fontWeight: '700' }}>{getFormattedDate(selectedDate)}</h2>
+                                    <p className="text-sm font-semibold mt-1 uppercase tracking-widest" style={{ fontSize: '14px', fontWeight: '600', marginTop: '4px', letterSpacing: '0.1em' }}>SMA Al-Khairiah Al-Islamiah Mersing</p>
+                                </div>
+                            </div>
                             {absentList.filter(a => a.status === 'PERLU_DIGANTI').map((absentTeacher) => {
                                 const teacherAssignments = assignments.filter(a => a.recordId === absentTeacher.id);
                                 if (teacherAssignments.length === 0) return null;
                                 return (
-                                    <div key={absentTeacher.id} className="mb-10 break-inside-avoid text-black">
-                                        <div className="mb-4 bg-gray-100 p-3 border-l-4 border-black"><p className="font-bold text-lg uppercase text-black">{absentTeacher.teacherName}</p><p className="text-sm italic text-black">Sebab: {absentTeacher.reason}</p></div>
-                                        <table className="w-full text-left border-collapse border border-black mb-4 text-sm text-black"><thead><tr className="bg-gray-200 text-black"><th className="border border-black px-3 py-2 font-bold uppercase w-32 text-center text-black">Masa</th><th className="border border-black px-3 py-2 font-bold uppercase w-48 text-black">Kelas / Subjek</th><th className="border border-black px-3 py-2 font-bold uppercase text-black text-center">Guru Ganti</th><th className="border border-black px-3 py-2 font-bold uppercase w-32 text-center text-black">CATATAN</th></tr></thead><tbody>{teacherAssignments.map((assign) => { const slotLabel = TIME_SLOTS.find(s => s.id === assign.slotId)?.label || assign.slotId; return (<tr key={assign.slotId}><td className="border border-black px-3 py-2 font-semibold text-xs text-center align-middle text-black">{slotLabel}</td><td className="border border-black px-3 py-2 align-middle text-black"><div className="font-bold text-base text-black">{assign.className}</div><div className="text-xs uppercase bg-black text-white inline-block px-1 rounded mt-1">{assign.subject}</div></td><td className="border border-black px-3 py-2 font-bold uppercase align-middle text-lg text-black text-center">{assign.reliefTeacher || "TIADA GURU"}</td><td className="border border-black px-3 py-2"></td></tr>); })}</tbody></table>
+                                    <div key={absentTeacher.id} className="mb-10 break-inside-avoid" style={{ marginBottom: '40px', pageBreakInside: 'avoid', color: '#000000' }}>
+                                        <div className="mb-4 p-3" style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#f3f4f6', borderLeft: '4px solid #000000' }}>
+                                            <p className="font-bold text-lg uppercase" style={{ fontWeight: '700', fontSize: '18px', color: '#000000' }}>{absentTeacher.teacherName}</p>
+                                            <p className="text-sm italic" style={{ fontSize: '14px', fontStyle: 'italic', color: '#000000' }}>Sebab: {absentTeacher.reason}</p>
+                                        </div>
+                                        <table className="w-full text-left border-collapse mb-4 text-sm" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px', fontSize: '14px', color: '#000000', border: '1px solid #000000' }}>
+                                            <thead>
+                                                <tr style={{ backgroundColor: '#e5e7eb' }}>
+                                                    <th className="px-3 py-2 font-bold uppercase w-32 text-center" style={{ border: '1px solid #000000', padding: '8px 12px', fontWeight: '700', width: '128px', textAlign: 'center', color: '#000000' }}>Masa</th>
+                                                    <th className="px-3 py-2 font-bold uppercase w-48" style={{ border: '1px solid #000000', padding: '8px 12px', fontWeight: '700', width: '192px', color: '#000000' }}>Kelas / Subjek</th>
+                                                    <th className="px-3 py-2 font-bold uppercase text-center" style={{ border: '1px solid #000000', padding: '8px 12px', fontWeight: '700', textAlign: 'center', color: '#000000' }}>Guru Ganti</th>
+                                                    <th className="px-3 py-2 font-bold uppercase w-32 text-center" style={{ border: '1px solid #000000', padding: '8px 12px', fontWeight: '700', width: '128px', textAlign: 'center', color: '#000000' }}>CATATAN</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {teacherAssignments.map((assign) => { 
+                                                    const slotLabel = TIME_SLOTS.find(s => s.id === assign.slotId)?.label || assign.slotId; 
+                                                    return (
+                                                        <tr key={assign.slotId}>
+                                                            <td className="px-3 py-2 font-semibold text-xs text-center align-middle" style={{ border: '1px solid #000000', padding: '8px 12px', fontWeight: '600', fontSize: '12px', textAlign: 'center', verticalAlign: 'middle', color: '#000000' }}>{slotLabel}</td>
+                                                            <td className="px-3 py-2 align-middle" style={{ border: '1px solid #000000', padding: '8px 12px', verticalAlign: 'middle', color: '#000000' }}>
+                                                                <div className="font-bold text-base" style={{ fontWeight: '700', fontSize: '16px', color: '#000000' }}>{assign.className}</div>
+                                                                <div className="text-xs uppercase inline-block px-1 rounded mt-1" style={{ fontSize: '12px', textTransform: 'uppercase', backgroundColor: '#000000', color: '#ffffff', padding: '0 4px', borderRadius: '4px', marginTop: '4px' }}>{assign.subject}</div>
+                                                            </td>
+                                                            <td className="px-3 py-2 font-bold uppercase align-middle text-lg text-center" style={{ border: '1px solid #000000', padding: '8px 12px', fontWeight: '700', textTransform: 'uppercase', verticalAlign: 'middle', fontSize: '18px', textAlign: 'center', color: '#000000' }}>{assign.reliefTeacher || "TIADA GURU"}</td>
+                                                            <td className="px-3 py-2" style={{ border: '1px solid #000000', padding: '8px 12px', color: '#000000' }}></td>
+                                                        </tr>
+                                                    ); 
+                                                })}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 );
                             })}
-                            <div className="mt-20 pt-10 border-t border-gray-400 break-inside-avoid text-black"><div className="flex justify-between items-end px-12"><div className="text-center w-1/3"><p className="mb-20 font-bold text-sm uppercase text-black">Disediakan Oleh,</p><div className="border-t border-black w-full mt-2"></div><p className="font-bold text-xs mt-2 uppercase tracking-wide text-black">Penyelaras Jadual Ganti</p></div><div className="text-center w-1/3"><p className="mb-20 font-bold text-sm uppercase text-black">Disahkan Oleh,</p><div className="border-t border-black w-full mt-2"></div><p className="font-bold text-xs mt-2 uppercase tracking-wide text-black">Pengetua / PK Pentadbiran</p></div></div><div className="mt-12 text-center text-[10px] text-black pt-4 border-t border-dotted border-gray-400">Dicetak secara automatik melalui Sistem Pengurusan Digital SMAAM pada {new Date().toLocaleString('ms-MY')}</div></div>
+                            <div className="mt-20 pt-10 break-inside-avoid" style={{ marginTop: '80px', paddingTop: '40px', borderTop: '1px solid #9ca3af', pageBreakInside: 'avoid', color: '#000000' }}>
+                                <div className="flex justify-between items-end px-12" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingLeft: '48px', paddingRight: '48px' }}>
+                                    <div className="text-center w-1/3" style={{ textAlign: 'center', width: '33.333333%' }}>
+                                        <p className="mb-20 font-bold text-sm uppercase" style={{ marginBottom: '80px', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase', color: '#000000' }}>Disediakan Oleh,</p>
+                                        <div className="w-full mt-2" style={{ borderTop: '1px solid #000000', width: '100%', marginTop: '8px' }}></div>
+                                        <p className="font-bold text-xs mt-2 uppercase tracking-wide" style={{ fontWeight: '700', fontSize: '12px', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.025em', color: '#000000' }}>Penyelaras Jadual Ganti</p>
+                                    </div>
+                                    <div className="text-center w-1/3" style={{ textAlign: 'center', width: '33.333333%' }}>
+                                        <p className="mb-20 font-bold text-sm uppercase" style={{ marginBottom: '80px', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase', color: '#000000' }}>Disahkan Oleh,</p>
+                                        <div className="w-full mt-2" style={{ borderTop: '1px solid #000000', width: '100%', marginTop: '8px' }}></div>
+                                        <p className="font-bold text-xs mt-2 uppercase tracking-wide" style={{ fontWeight: '700', fontSize: '12px', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.025em', color: '#000000' }}>Pengetua / PK Pentadbiran</p>
+                                    </div>
+                                </div>
+                                <div className="mt-12 text-center text-[10px] pt-4" style={{ marginTop: '48px', textAlign: 'center', fontSize: '10px', paddingTop: '16px', borderTop: '1px dotted #9ca3af', color: '#000000' }}>Dicetak secara automatik melalui Sistem Pengurusan Digital SMAAM pada {new Date().toLocaleString('ms-MY')}</div>
+                            </div>
                         </div>
                     </div>
                 </div>

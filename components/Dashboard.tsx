@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '@/context/AppContext';
 import { getInitialItems } from './UnitContent';
-import { Announcement, Program } from '../types';
+import { Announcement, Program, ExamItem } from '../types';
 
 // Minimalist Corporate Icon Components
 const Icons = {
@@ -104,8 +104,17 @@ const isDateInCurrentWeek = (dateRangeStr: string): boolean => {
     startDate.setHours(0, 0, 0);
 
     const today = new Date();
+    const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
     
-    // Check if today is between start and end
+    // If Saturday (6) or Sunday (0), shift to next Monday to show next week's data
+    if (dayOfWeek === 6) {
+        today.setDate(today.getDate() + 2);
+    } else if (dayOfWeek === 0) {
+        today.setDate(today.getDate() + 1);
+    }
+    today.setHours(0, 0, 0, 0);
+    
+    // Check if today (or next Monday if weekend) is between start and end
     return today >= startDate && today <= endDate;
 
   } catch {
@@ -180,8 +189,19 @@ const parseMalayDate = (dateStr: string): Date | null => {
 const getCurrentWeekRange = () => {
   const now = new Date();
   const day = now.getDay();
+
+  // If Saturday (6) or Sunday (0), shift to next Monday to show next week's data
+  if (day === 6) {
+      now.setDate(now.getDate() + 2);
+  } else if (day === 0) {
+      now.setDate(now.getDate() + 1);
+  }
+
+  // Recalculate day based on shifted date (should be Monday=1)
+  const shiftedDay = now.getDay(); 
+  
   // Adjust to make Monday (1) the start of week. If Sunday (0), go back 6 days.
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const diff = now.getDate() - shiftedDay + (shiftedDay === 0 ? -6 : 1);
   
   const monday = new Date(now);
   monday.setDate(diff);
@@ -203,6 +223,11 @@ export const Dashboard: React.FC = () => {
     sumurSchedule, hipSchedule
   } = useApp();
   
+  const isWeekendMode = React.useMemo(() => {
+    const d = new Date().getDay();
+    return d === 0 || d === 6;
+  }, []);
+
   const [isEditing, setIsEditing] = useState(false);
   const [tempWelcome, setTempWelcome] = useState(siteConfig.welcomeMessage);
   
@@ -237,12 +262,18 @@ export const Dashboard: React.FC = () => {
           return d && d >= start && d <= end;
       });
 
+      // Filter hipSchedule for current week matches
+      const weeklyHipEvents = hipSchedule.filter(h => {
+          const d = parseMalayDate(h.date);
+          return d && d >= start && d <= end;
+      });
+
       return {
           currentSumurProgram: weeklySumurEvents.find(e => e.program.trim().toUpperCase() === 'SUMUR') || null,
           currentHayyaProgram: weeklySumurEvents.find(e => e.program.trim().toUpperCase().includes('HAYYA')) || null,
-          currentEnglishProgram: weeklySumurEvents.find(e => e.program.trim().toUpperCase().includes('ENGLISH')) || null
+          currentEnglishProgram: weeklyHipEvents.find(e => e.program.trim().toUpperCase().includes('ENGLISH')) || null
       };
-  }, [sumurSchedule]);
+  }, [sumurSchedule, hipSchedule]);
 
   // Announcement Modal State
   const [showAnnounceModal, setShowAnnounceModal] = useState(false);
@@ -391,12 +422,12 @@ export const Dashboard: React.FC = () => {
     // 6. Exam Weeks (Peperiksaan)
     const examDataKey = 'smaam_data_Kurikulum_Peperiksaan';
     const savedExams = localStorage.getItem(examDataKey);
-    let examItems: any[] = [];
+    let examItems: ExamItem[] = [];
     if (savedExams) {
         try { examItems = JSON.parse(savedExams); } catch { examItems = []; }
     }
 
-    examItems.forEach((item: any) => {
+    examItems.forEach((item: ExamItem) => {
         // Exam dates are ranges like "12 – 16 Jan 2026"
         // We check if the range overlaps with the current month
         const rangeParts = item.date.split('–').map((s: string) => s.trim());
@@ -542,7 +573,7 @@ export const Dashboard: React.FC = () => {
     <div className="p-4 md:p-8 space-y-8 fade-in pb-24 relative font-sans">
       
       {/* Sticky Section Header */}
-      <div className="sticky top-0 z-20 bg-[#A9CCE3]/95 backdrop-blur-md pt-4 pb-4 border-b border-[#2DD4BF] flex flex-col md:flex-row justify-between items-end gap-2 -mx-4 md:-mx-8 px-4 md:px-8 mb-6 shadow-sm">
+      <div className="pt-4 pb-4 flex flex-col md:flex-row justify-between items-end gap-2 -mx-4 md:-mx-8 px-4 md:px-8 mb-6">
         <div>
           {isEditing ? (
             <div className="flex gap-2">
@@ -580,7 +611,9 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="flex justify-between items-start relative z-10 mb-2">
               <div>
-                <p className="text-[#2DD4BF] text-xs font-bold uppercase tracking-widest mb-1">Guru Bertugas Minggu Ini</p>
+                <p className="text-[#2DD4BF] text-xs font-bold uppercase tracking-widest mb-1">
+                    {isWeekendMode ? "Guru Bertugas Minggu Hadapan" : "Guru Bertugas Minggu Ini"}
+                </p>
                 <div className="flex items-center gap-2">
                     <h3 className="text-xl font-medium text-white group-hover:text-[#2DD4BF] transition-colors leading-tight">
                         {currentWeekItem ? currentWeekItem.group : "Tiada rekod minggu ini"}
@@ -626,7 +659,9 @@ export const Dashboard: React.FC = () => {
             <div className="flex justify-between items-start relative z-10 mb-2">
               <div className="flex-1 pr-2">
                 <p className="text-[#C9B458] text-xs font-bold uppercase tracking-widest mb-1">
-                    {currentKokoAssembly ? "PERHIMPUNAN KOKURIKULUM" : "PERHIMPUNAN RASMI"}
+                    {currentKokoAssembly 
+                        ? (isWeekendMode ? "PERHIMPUNAN KOKURIKULUM MINGGU HADAPAN" : "PERHIMPUNAN KOKURIKULUM") 
+                        : (isWeekendMode ? "PERHIMPUNAN MINGGU HADAPAN" : "PERHIMPUNAN RASMI")}
                 </p>
                 {currentKokoAssembly ? (
                     <>
@@ -682,7 +717,9 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="flex justify-between items-start relative z-10 mb-2">
               <div className="flex-1 pr-2">
-                <p className="text-green-400 text-xs font-bold uppercase tracking-widest mb-1 leading-tight">PERJUMPAAN KOKURIKULUM MINGGU INI</p>
+                <p className="text-green-400 text-xs font-bold uppercase tracking-widest mb-1 leading-tight">
+                    {isWeekendMode ? "PERJUMPAAN KOKURIKULUM MINGGU HADAPAN" : "PERJUMPAAN KOKURIKULUM MINGGU INI"}
+                </p>
                 {currentKokoActivity ? (
                     <>
                        <h3 className="text-lg font-medium text-white group-hover:text-green-400 transition-colors leading-tight line-clamp-3 mt-1">
@@ -712,7 +749,9 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="flex justify-between items-start relative z-10 mb-2">
               <div className="flex-1 pr-2">
-                <p className="text-pink-500 text-xs font-bold uppercase tracking-widest mb-1">SUMUR</p>
+                <p className="text-pink-500 text-xs font-bold uppercase tracking-widest mb-1">
+                    {isWeekendMode ? "SUMUR MINGGU HADAPAN" : "SUMUR MINGGU INI"}
+                </p>
                 {currentSumurProgram ? (
                     <>
                         <h3 className="text-lg font-medium text-white group-hover:text-pink-300 transition-colors leading-tight line-clamp-2 mt-1">
@@ -721,7 +760,9 @@ export const Dashboard: React.FC = () => {
                         <p className="text-[10px] text-pink-200/70 font-mono mt-2">{currentSumurProgram.date}</p>
                     </>
                 ) : (
-                    <p className="text-xs text-gray-500 italic mt-2">Tiada aktiviti minggu ini</p>
+                    <p className="text-xs text-gray-500 italic mt-2">
+                        {isWeekendMode ? "Tiada aktiviti minggu hadapan" : "Tiada aktiviti minggu ini"}
+                    </p>
                 )}
               </div>
               <div className="bg-[#0B132B]/50 p-3 rounded-xl border border-pink-500/30 text-pink-500 shadow-inner group-hover:scale-110 group-hover:bg-pink-500 group-hover:text-[#0B132B] transition-all">
@@ -737,7 +778,9 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="flex justify-between items-start relative z-10 mb-2">
               <div className="flex-1 pr-2">
-                <p className="text-purple-400 text-xs font-bold uppercase tracking-widest mb-1">HAYYA BIL ARABIAH</p>
+                <p className="text-purple-400 text-xs font-bold uppercase tracking-widest mb-1">
+                    {isWeekendMode ? "HAYYA BIL ARABIAH MINGGU HADAPAN" : "HAYYA BIL ARABIAH MINGGU INI"}
+                </p>
                 {currentHayyaProgram ? (
                     <>
                         <h3 className="text-lg font-medium text-white group-hover:text-purple-300 transition-colors leading-tight line-clamp-2 mt-1">
@@ -749,7 +792,9 @@ export const Dashboard: React.FC = () => {
                         <p className="text-[10px] text-purple-200/70 font-mono mt-1">{currentHayyaProgram.date}</p>
                     </>
                 ) : (
-                    <p className="text-xs text-gray-500 italic mt-2">Tiada aktiviti minggu ini</p>
+                    <p className="text-xs text-gray-500 italic mt-2">
+                        {isWeekendMode ? "Tiada aktiviti minggu hadapan" : "Tiada aktiviti minggu ini"}
+                    </p>
                 )}
               </div>
               <div className="bg-[#0B132B]/50 p-3 rounded-xl border border-purple-400/30 text-purple-400 shadow-inner group-hover:scale-110 group-hover:bg-purple-400 group-hover:text-[#0B132B] transition-all">
@@ -765,7 +810,9 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="flex justify-between items-start relative z-10 mb-2">
               <div className="flex-1 pr-2">
-                <p className="text-orange-400 text-xs font-bold uppercase tracking-widest mb-1">OH MY ENGLISH !</p>
+                <p className="text-orange-400 text-xs font-bold uppercase tracking-widest mb-1">
+                    {isWeekendMode ? "OH MY ENGLISH ! MINGGU HADAPAN" : "OH MY ENGLISH ! MINGGU INI"}
+                </p>
                 {currentEnglishProgram ? (
                     <>
                         <h3 className="text-lg font-medium text-white group-hover:text-orange-300 transition-colors leading-tight line-clamp-2 mt-1">
@@ -777,7 +824,9 @@ export const Dashboard: React.FC = () => {
                         <p className="text-[10px] text-orange-200/70 font-mono mt-1">{currentEnglishProgram.date}</p>
                     </>
                 ) : (
-                    <p className="text-xs text-gray-500 italic mt-2">Tiada aktiviti minggu ini</p>
+                    <p className="text-xs text-gray-500 italic mt-2">
+                        {isWeekendMode ? "Tiada aktiviti minggu hadapan" : "Tiada aktiviti minggu ini"}
+                    </p>
                 )}
               </div>
               <div className="bg-[#0B132B]/50 p-3 rounded-xl border border-orange-400/30 text-orange-400 shadow-inner group-hover:scale-110 group-hover:bg-orange-400 group-hover:text-[#0B132B] transition-all">

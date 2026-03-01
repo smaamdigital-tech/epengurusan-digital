@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '@/context/AppContext';
 import { Program } from '../types';
 
 export const ProgramView: React.FC = () => {

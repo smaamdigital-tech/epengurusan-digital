@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurikulum SMAAM - Portal Digital</title>
+    
+    <!-- CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/lucide-react"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B132B;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1C2541;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3A506B;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #C9B458;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Print Styles */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-only { display: block !important; }
+        }
+
+        /* Org Chart Styles */
+        .org-node {
+            border: 2px solid #C9B458;
+            background: #1C2541;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 150px;
+            position: relative;
+        }
+        .org-line {
+            height: 20px;
+            width: 2px;
+            background: #C9B458;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo, useRef } = React;
+
+        // --- CONSTANTS & DATA ---
+        const TEACHER_FULL_NAMES = [
+            "Zulkeffle bin Muhammad", "Noratikah binti Abd. Kadir", "Shaharer bin Hj Husain", "Zulkifli bin Md Aspan",
+            "Saemah binti Supandi", "Rosmawati binti Hussin", "Nooraind binti Ali", "Zahrah Khairiah binti Saleh",
+            "Mazuin binti Mat", "Ahmad Fikruddin bin Ahmad Raza'i", "Annur Ayuni binti Mohamed", "Muhammad Hafiz bin Jalil",
+            "Nik Noorizati binti Ab Kahar", "Noorlela binti Zainudin", "Nor Azean binti Ismail", "Salman bin A Rahman",
+            "Siti Aminah binti Mohamed", "Syahidatun Najihah binti Aziz", "Mohd Nor bin Salikin", "Siti Khadijah binti Moh Zain",
+            "Nurul Hidayah binti Mohd", "Siti Masyitah binti Ahmad", "Mohd Sukri bin Ismail", "Mohd Nor bin Salikin",
+            "Siti Liyana binti Mohd", "Siti Aminah binti Mohamed", "Syahidatun Najihah binti Aziz", "Zarith Sofia binti Ahmad"
+        ];
+
+        const TEACHER_SHORT_NAMES = [
+            "UZ ZULKEFFLE", "UZH ATIKAH", "UZ SHAHARER", "UZ ZULKIFLI",
+            "C. ROS", "C. ZAHRAH", "C. MAZUIN", "C. AIND",
+            "UZH SAEMAH", "UZH NOR AZEAN", "C. FIKRUDDIN", "C. FIRROS",
+            "C. LIYANA", "T. HAKIM", "T. IZATI", "C. SHIDAH",
+            "T. AIN", "C. IZZATI", "C. SYAFIQAH", "C. LIZA",
+            "C. HAFIZ", "C. AMIRA", "UZH LELA", "UZH AYUNI",
+            "UZ SALMAN", "UZ MNUR", "UZH HIDAYAH", "UZH MASYITAH",
+            "UZ SUKRI", "UZ MNOR", "UZH LIYANA", "UZH AMINAH",
+            "UZH NAJIHAH", "UZH ZARITH"
+        ];
+
+        const TIME_SLOTS = [
+            { id: '1', label: '07:30 - 08:00' }, { id: '2', label: '08:00 - 08:30' }, { id: '3', label: '08:30 - 09:00' },
+            { id: '4', label: '09:00 - 09:30' }, { id: '5', label: '09:30 - 10:00' }, { id: '6', label: '10:00 - 10:30 (Rehat)' },
+            { id: '7', label: '10:30 - 11:00' }, { id: '8', label: '11:00 - 11:30' }, { id: '9', label: '11:30 - 12:00' },
+            { id: '10', label: '12:00 - 12:30' }, { id: '11', label: '12:30 - 01:00' }
+        ];
+
+        const committeeData = {
+            1: { id: 1, name: "Induk Kurikulum", description: "Merancang, melaksana dan memantau semua program kurikulum sekolah." },
+            2: { id: 2, name: "Jadual Waktu & Guru Ganti", description: "Menguruskan jadual waktu induk, kelas dan guru serta penyediaan jadual guru ganti." },
+            3: { id: 3, name: "Peperiksaan & Pentaksiran", description: "Menguruskan semua urusan peperiksaan dalaman dan awam serta pentaksiran bilik darjah." },
+            4: { id: 4, name: "Pusat Sumber Sekolah (PSS)", description: "Menguruskan perpustakaan, bahan bantu mengajar dan program NILAM." },
+            5: { id: 5, name: "Kecemerlangan Akademik", description: "Merancang program peningkatan prestasi murid bagi semua tingkatan." },
+            6: { id: 6, name: "Panitia Mata Pelajaran", description: "Menguruskan hal ehwal mata pelajaran, sukatan pelajaran dan peningkatan prestasi subjek." },
+            7: { id: 7, name: "MBMMBI", description: "Memartabatkan Bahasa Malaysia dan Memperkukuh Bahasa Inggeris." },
+            8: { id: 8, name: "STEM", description: "Mempromosikan pendidikan Sains, Teknologi, Kejuruteraan dan Matematik." },
+            9: { id: 9, name: "KBAT", description: "Menerapkan Kemahiran Berfikir Aras Tinggi dalam PdP." },
+            10: { id: 10, name: "ICT & Bestari", description: "Menguruskan makmal komputer dan integrasi teknologi dalam pendidikan." },
+            11: { id: 11, name: "Organisasi Kurikulum", description: "Carta Organisasi Pentadbiran Kurikulum SMAAM." }
+        };
+
+        const tasksData = {
+            1: ["Mesyuarat JKS 4 kali setahun", "Memantau pelaksanaan PdP", "Menilai keberkesanan program kurikulum"],
+            2: ["Menyediakan jadual waktu induk", "Menyediakan jadual waktu kelas & guru", "Menguruskan jadual guru ganti harian"],
+            3: ["Menyediakan takwim peperiksaan", "Menguruskan pendaftaran peperiksaan awam", "Menganalisis keputusan peperiksaan"],
+            4: ["Menguruskan pinjaman buku", "Melaksanakan program NILAM", "Menyediakan bahan bantu mengajar"],
+            5: ["Program Motivasi", "Kelas Tambahan", "Teknik Menjawab Soalan"],
+            6: ["Mesyuarat Panitia", "Penyediaan RPT & RPH", "Penyediaan soalan ujian & peperiksaan"],
+            7: ["Minggu Bahasa", "Sudut Pidato", "Program Reading Progress"],
+            8: ["Karnival STEM", "Projek Inovasi", "Lawatan Sambil Belajar"],
+            9: ["Latihan KBAT untuk guru", "Penyediaan modul KBAT", "Pemantauan elemen KBAT dalam RPH"],
+            10: ["Penyelenggaraan komputer", "Latihan Google Classroom", "Pengurusan ID DELIMa"]
+        };
+
+        const INITIAL_EXAM_WEEKS = [
+            { id: 1, week: '1', date: '12 – 16 Jan 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 2, week: '2', date: '19 – 23 Jan 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 3, week: '3', date: '26 – 30 Jan 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 4, week: '4', date: '2 – 6 Feb 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 5, week: '5', date: '9 – 13 Feb 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 6, week: '6', date: '16 – 20 Feb 2026', dalaman: '17 Feb (Tahun Baru Cina)\n18 Feb (CNY Hari Kedua)\n19 Feb (Awal Ramadan)', jaj: '17 Feb (Tahun Baru Cina)\n18 Feb (CNY Hari Kedua)\n19 Feb (Awal Ramadan)', awam: '17 Feb (Tahun Baru Cina)\n18 Feb (CNY Hari Kedua)\n19 Feb (Awal Ramadan)' },
+            { id: 7, week: '7', date: '23 – 27 Feb 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 8, week: '8', date: '2 – 6 Mac 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 9, week: '9', date: '9 – 13 Mac 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 10, week: '10', date: '16 – 20 Mac 2026', dalaman: '', jaj: '', awam: '' },
+            { id: 1001, week: '', date: '21 – 29 Mac 2026', dalaman: 'CUTI PENGGAL 1, TAHUN 2026', jaj: '', awam: '', isHoliday: true },
+            { id: 11, week: '11', date: '30 Mac – 3 Apr 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)' },
+            { id: 12, week: '12', date: '6 – 10 Apr 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)' },
+            { id: 13, week: '13', date: '13 – 17 Apr 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)' },
+            { id: 14, week: '14', date: '20 – 24 Apr 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)' },
+            { id: 15, week: '15', date: '27 Apr – 1 Mei 2026', dalaman: '1 Mei (Hari Pekerja)', jaj: '1 Mei (Hari Pekerja)', awam: '1 Mei (Hari Pekerja)\nKerja Kursus Al-Syariah (5402/2)' },
+            { id: 16, week: '16', date: '4 – 8 Mei 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 17, week: '17', date: '11 – 15 Mei 2026', dalaman: 'PPT', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 18, week: '18', date: '18 – 22 Mei 2026', dalaman: 'PPT', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 1002, week: '', date: '23.05.2026 – 07.06.2026', dalaman: 'CUTI PERTENGAHAN TAHUN 2026', jaj: '', awam: '', isHoliday: true },
+            { id: 19, week: '19', date: '8 – 12 Jun 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 20, week: '20', date: '15 – 19 Jun 2026', dalaman: '17 Jun (Awal Muharram)', jaj: '17 Jun (Awal Muharram)', awam: '17 Jun (Awal Muharram)\nKerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 21, week: '21', date: '22 – 26 Jun 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 22, week: '22', date: '29 Jun – 3 Jul 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 23, week: '23', date: '6 – 10 Jul 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 24, week: '24', date: '13 – 17 Jul 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { id: 25, week: '25', date: '20 – 24 Jul 2026', dalaman: '21 Jul (Hari Hol — Johor)', jaj: '21 Jul (Hari Hol — Johor)', awam: '21 Jul (Hari Hol — Johor)\nKerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' }
+        ];
+
+        const SCHOOL_HOLIDAYS = [
+            { id: 1, event: "Cuti Tahun Baru", date: "01 Jan 2026" },
+            { id: 2, event: "Cuti Tahun Baru Cina", date: "29 Jan - 30 Jan 2026" },
+            { id: 3, event: "Cuti Hari Raya Aidilfitri", date: "20 Mac - 22 Mac 2026" },
+            { id: 4, event: "Cuti Hari Pekerja", date: "01 Mei 2026" },
+            { id: 5, event: "Cuti Hari Wesak", date: "04 Mei 2026" },
+            { id: 6, event: "Cuti Hari Keputeraan YDP Agong", date: "01 Jun 2026" },
+            { id: 7, event: "Cuti Hari Raya Aidiladha", date: "27 Jun - 28 Jun 2026" },
+            { id: 8, event: "Cuti Awal Muharram", date: "17 Jul 2026" },
+            { id: 9, event: "Cuti Hari Kebangsaan", date: "31 Ogos 2026" },
+            { id: 10, event: "Cuti Maulidur Rasul", date: "26 Sep 2026" },
+            { id: 11, event: "Cuti Hari Malaysia", date: "16 Sep 2026" },
+            { id: 12, event: "Cuti Deepavali", date: "09 Nov 2026" },
+            { id: 13, event: "Cuti Hari Krismas", date: "25 Dis 2026" }
+        ];
+
+        // --- COMPONENTS ---
+
+        const Icons = {
+            Home: () => <i data-lucide="home"></i>,
+            Users: () => <i data-lucide="users"></i>,
+            Calendar: () => <i data-lucide="calendar"></i>,
+            FileText: () => <i data-lucide="file-text"></i>,
+            Clock: () => <i data-lucide="clock"></i>,
+            RefreshCw: () => <i data-lucide="refresh-cw"></i>,
+            Download: () => <i data-lucide="download"></i>,
+            Printer: () => <i data-lucide="printer"></i>,
+            Plus: () => <i data-lucide="plus"></i>,
+            Trash2: () => <i data-lucide="trash-2"></i>,
+            Edit: () => <i data-lucide="edit"></i>,
+            ChevronRight: () => <i data-lucide="chevron-right"></i>,
+            ChevronLeft: () => <i data-lucide="chevron-left"></i>,
+            Eye: () => <i data-lucide="eye"></i>,
+            X: () => <i data-lucide="x"></i>,
+            Info: () => <i data-lucide="info"></i>,
+            TrendingUp: () => <i data-lucide="trending-up"></i>,
+            ClipboardList: () => <i data-lucide="clipboard-list"></i>
+        };
+
+        const LucideIcon = ({ name, size = 18, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        // --- SUB-COMPONENTS ---
+
+        const Jawatankuasa = () => {
+            const [activeId, setActiveId] = useState(1);
+            
+            const handleDownloadPDF = () => {
+                const element = document.getElementById('jawatankuasa-content');
+                const opt = {
+                    margin: 10,
+                    filename: `Jawatankuasa_${committeeData[activeId].name}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
+            };
+
+            return (
+                <div className="fade-in">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        {/* Sidebar Menu */}
+                        <div className="lg:w-1/4 space-y-2">
+                            {Object.values(committeeData).map(c => (
+                                <button 
+                                    key={c.id}
+                                    onClick={() => setActiveId(c.id)}
+                                    className={`w-full text-left px-4 py-3 rounded-lg transition-all flex items-center justify-between group ${activeId === c.id ? 'bg-[#C9B458] text-[#0B132B] font-bold shadow-lg' : 'bg-[#1C2541] text-gray-400 hover:bg-[#253252] hover:text-white'}`}
+                                >
+                                    <span className="text-sm uppercase tracking-wider">{c.name}</span>
+                                    <LucideIcon name="chevron-right" size={16} />
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="lg:w-3/4 bg-[#1C2541] rounded-xl p-8 border border-gray-700 shadow-2xl relative" id="jawatankuasa-content">
+                            <div className="flex justify-between items-start mb-8 border-b border-gray-700 pb-6">
+                                <div>
+                                    <h2 className="text-3xl font-bold text-[#C9B458] font-montserrat uppercase">{committeeData[activeId].name}</h2>
+                                    <p className="text-gray-400 mt-2 italic">{committeeData[activeId].description}</p>
+                                </div>
+                                <button onClick={handleDownloadPDF} className="no-print bg-[#3A506B] hover:bg-[#4a6382] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-bold transition-all">
+                                    <LucideIcon name="download" size={14} /> MUAT TURUN PDF
+                                </button>
+                            </div>
+
+                            {activeId === 11 ? (
+                                <div className="flex flex-col items-center space-y-8 py-10">
+                                    <div className="org-node">
+                                        <div className="text-[#C9B458] font-black text-sm">PENGETUA</div>
+                                        <div className="text-white text-xs mt-1">Zulkeffle bin Muhammad</div>
+                                    </div>
+                                    <div className="org-line"></div>
+                                    <div className="flex gap-10">
+                                        <div className="org-node">
+                                            <div className="text-[#C9B458] font-black text-sm">GPK PENTADBIRAN</div>
+                                            <div className="text-white text-xs mt-1">Noratikah binti Abd. Kadir</div>
+                                        </div>
+                                        <div className="org-node">
+                                            <div className="text-[#C9B458] font-black text-sm">GPK HEM</div>
+                                            <div className="text-white text-xs mt-1">Shaharer bin Hj Husain</div>
+                                        </div>
+                                        <div className="org-node">
+                                            <div className="text-[#C9B458] font-black text-sm">GPK KOKURIKULUM</div>
+                                            <div className="text-white text-xs mt-1">Zulkifli bin Md Aspan</div>
+                                        </div>
+                                    </div>
+                                    <div className="org-line"></div>
+                                    <div className="org-node bg-[#C9B458]">
+                                        <div className="text-[#0B132B] font-black text-sm">SETIAUSAHA KURIKULUM</div>
+                                        <div className="text-[#0B132B] text-xs mt-1 font-bold">Siti Khadijah binti Moh Zain</div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div>
+                                        <h3 className="text-[#C9B458] font-bold mb-4 flex items-center gap-2 border-b border-gray-800 pb-2">
+                                            <LucideIcon name="users" size={18} /> SENARAI JAWATANKUASA
+                                        </h3>
+                                        <ul className="space-y-3">
+                                            {tasksData[activeId]?.map((task, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                                                    <span className="text-[#C9B458] mt-1">•</span>
+                                                    <span>{task}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="bg-[#0B132B] p-6 rounded-xl border border-gray-800">
+                                        <h3 className="text-[#C9B458] font-bold mb-4 flex items-center gap-2">
+                                            <LucideIcon name="info" size={18} /> FUNGSI & TUGASAN
+                                        </h3>
+                                        <p className="text-sm text-gray-400 leading-relaxed">
+                                            Jawatankuasa ini bertanggungjawab sepenuhnya dalam memastikan kelancaran pengurusan {committeeData[activeId].name.toLowerCase()} di peringkat sekolah mengikut garis panduan KPM dan JAINJ.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Takwim = () => {
+            const [view, setView] = useState('list'); // 'list' or 'annual'
+            const year = 2026;
+            const months = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
+            
+            const parseRange = (dateStr) => {
+                if (!dateStr) return null;
+                const parts = dateStr.split(' - ');
+                if (parts.length === 2) {
+                    const [d1, m1] = parts[0].split(' ');
+                    const [d2, m2] = parts[1].split(' ');
+                    const monthMap = { 'Jan': 0, 'Feb': 1, 'Mac': 2, 'Apr': 3, 'Mei': 4, 'Jun': 5, 'Jul': 6, 'Ogos': 7, 'Sep': 8, 'Okt': 9, 'Nov': 10, 'Dis': 11 };
+                    return {
+                        start: new Date(year, monthMap[m1], parseInt(d1)),
+                        end: new Date(year, monthMap[m2], parseInt(d2))
+                    };
+                }
+                return null;
+            };
+
+            const getDayLetter = (m, d) => {
+                const date = new Date(year, m, d);
+                if (date.getMonth() !== m) return null;
+                const days = ['A', 'I', 'S', 'R', 'K', 'J', 'S'];
+                return days[date.getDay()];
+            };
+
+            return (
+                <div className="fade-in">
+                    <div className="flex gap-2 mb-6">
+                        <button onClick={() => setView('list')} className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${view === 'list' ? 'bg-[#C9B458] text-[#0B132B]' : 'bg-[#1C2541] text-gray-400 hover:text-white'}`}>SENARAI AKTIVITI</button>
+                        <button onClick={() => setView('annual')} className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${view === 'annual' ? 'bg-[#C9B458] text-[#0B132B]' : 'bg-[#1C2541] text-gray-400 hover:text-white'}`}>TAKWIM TAHUNAN</button>
+                    </div>
+
+                    {view === 'list' ? (
+                        <div className="bg-[#1C2541] rounded-xl shadow-2xl overflow-hidden border border-gray-700">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-[#0B132B] text-[#C9B458] text-xs uppercase font-bold tracking-widest">
+                                    <tr>
+                                        <th className="px-6 py-4">Minggu</th>
+                                        <th className="px-6 py-4">Tarikh</th>
+                                        <th className="px-6 py-4">Peperiksaan Dalaman</th>
+                                        <th className="px-6 py-4">JAJ / Awam</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800 text-sm">
+                                    {INITIAL_EXAM_WEEKS.map(ew => (
+                                        <tr key={ew.id} className="hover:bg-[#253252] transition-colors">
+                                            <td className="px-6 py-4 font-bold text-[#C9B458]">{ew.week}</td>
+                                            <td className="px-6 py-4 text-gray-300 font-mono">{ew.date}</td>
+                                            <td className="px-6 py-4 text-white font-semibold">{ew.dalaman}</td>
+                                            <td className="px-6 py-4 text-gray-400 italic">{ew.jaj !== '-' ? ew.jaj : ew.awam}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="bg-[#1C2541] rounded-xl shadow-2xl overflow-hidden border border-gray-700 custom-scrollbar overflow-x-auto">
+                            <table className="w-full min-w-[1200px] border-collapse text-[10px]">
+                                <thead>
+                                    <tr className="bg-[#C9B458] text-[#0B132B]">
+                                        <th className="p-2 border border-[#0B132B] w-10 sticky left-0 bg-[#C9B458] z-20">HB</th>
+                                        {months.map(m => <th key={m} className="p-2 border border-[#0B132B] min-w-[80px]">{m}</th>)}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Array.from({ length: 31 }, (_, i) => i + 1).map(date => (
+                                        <tr key={date}>
+                                            <td className="bg-[#0B132B] text-[#C9B458] font-bold text-center border border-gray-700 sticky left-0 z-10">{date}</td>
+                                            {months.map((_, mIdx) => {
+                                                const dayLetter = getDayLetter(mIdx, date);
+                                                if (!dayLetter) return <td key={mIdx} className="bg-black/20 border border-gray-800"></td>;
+                                                
+                                                const currentDate = new Date(year, mIdx, date);
+                                                let isHoliday = false;
+                                                let eventName = "";
+
+                                                // Check Holidays
+                                                SCHOOL_HOLIDAYS.forEach(h => {
+                                                    const parts = h.date.split(' - ');
+                                                    if (parts.length === 2) {
+                                                        const start = new Date(parts[0] + " " + year);
+                                                        const end = new Date(parts[1] + " " + year);
+                                                        if (currentDate >= start && currentDate <= end) { isHoliday = true; eventName = h.event; }
+                                                    } else {
+                                                        const d = new Date(h.date);
+                                                        if (currentDate.getTime() === d.getTime()) { isHoliday = true; eventName = h.event; }
+                                                    }
+                                                });
+
+                                                // Check Exams
+                                                INITIAL_EXAM_WEEKS.forEach(ew => {
+                                                    const range = parseRange(ew.date);
+                                                    if (range && currentDate >= range.start && currentDate <= range.end) {
+                                                        if (!eventName) eventName = ew.dalaman;
+                                                    }
+                                                });
+
+                                                return (
+                                                    <td key={mIdx} className={`border border-gray-800 p-1 min-h-[40px] align-top relative group hover:bg-[#253252] ${isHoliday ? 'bg-yellow-900/20' : ''}`}>
+                                                        <span className="absolute top-0 right-1 text-[8px] text-gray-600 group-hover:text-white">{dayLetter}</span>
+                                                        {eventName && (
+                                                            <div className="mt-2">
+                                                                <div className={`w-1.5 h-1.5 rounded-full mb-1 ${isHoliday ? 'bg-yellow-400' : 'bg-[#C9B458]'}`}></div>
+                                                                <span className="text-[8px] leading-tight text-gray-400 group-hover:text-white block truncate" title={eventName}>{eventName}</span>
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                );
+                                            })}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const Peperiksaan = () => {
+            const [activeTab, setActiveTab] = useState('jadual');
+            const [selectedForm, setSelectedForm] = useState('5');
+            
+            const initialSchedule = [
+                {
+                    id: 1, hari: "ISNIN", tarikh: "2026-03-10", tarikhDisplay: "10 MAC 2026",
+                    slots: [
+                        { id: 101, waktu: "08:00 AM - 10:00 AM", subjek: "BAHASA MELAYU Kertas 1", durasi: "2 JAM", guruA: "C. ROS", guruB: "C. HAFIZ" },
+                        { id: 102, waktu: "11:00 AM - 01:30 PM", subjek: "BAHASA MELAYU Kertas 2", durasi: "2 JAM 30 MIN", guruA: "C. ROS", guruB: "C. HAFIZ" }
+                    ]
+                },
+                {
+                    id: 2, hari: "SELASA", tarikh: "2026-03-11", tarikhDisplay: "11 MAC 2026",
+                    slots: [
+                        { id: 201, waktu: "08:00 AM - 09:30 AM", subjek: "BAHASA INGGERIS Kertas 1", durasi: "1 JAM 30 MIN", guruA: "T. IZATI", guruB: "T. HAKIM" },
+                        { id: 202, waktu: "10:30 AM - 12:00 PM", subjek: "BAHASA INGGERIS Kertas 2", durasi: "1 JAM 30 MIN", guruA: "T. IZATI", guruB: "T. HAKIM" }
+                    ]
+                }
+            ];
+
+            const handlePrint = () => {
+                const element = document.getElementById('exam-schedule-print');
+                const opt = {
+                    margin: 5,
+                    filename: `Jadual_Peperiksaan_Tingkatan_${selectedForm}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                };
+                html2pdf().set(opt).from(element).save();
+            };
+
+            return (
+                <div className="fade-in">
+                    <div className="flex gap-2 mb-6 border-b border-gray-700">
+                        {['jadual', 'info', 'analisis'].map(t => (
+                            <button key={t} onClick={() => setActiveTab(t)} className={`px-6 py-3 rounded-t-lg font-bold text-sm uppercase tracking-widest transition-all ${activeTab === t ? 'bg-[#1C2541] text-[#C9B458] border-t-2 border-[#C9B458]' : 'text-gray-400 hover:text-white'}`}>{t}</button>
+                        ))}
+                    </div>
+
+                    {activeTab === 'jadual' && (
+                        <div className="space-y-6">
+                            <div className="flex flex-wrap justify-between items-center gap-4 bg-[#1C2541] p-6 rounded-xl border border-gray-700 shadow-xl">
+                                <div className="flex gap-2">
+                                    {['1', '2', '3', '4', '5'].map(f => (
+                                        <button key={f} onClick={() => setSelectedForm(f)} className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${selectedForm === f ? 'bg-[#C9B458] text-[#0B132B]' : 'bg-[#0B132B] text-gray-400 hover:text-white'}`}>TING {f}</button>
+                                    ))}
+                                </div>
+                                <button onClick={handlePrint} className="bg-[#3A506B] hover:bg-[#4a6382] text-white px-6 py-2 rounded-lg font-bold text-xs flex items-center gap-2 shadow-lg transition-all">
+                                    <LucideIcon name="printer" size={14} /> CETAK JADUAL PDF
+                                </button>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-300" id="exam-schedule-print">
+                                <div className="p-8 bg-gray-50 border-b border-gray-200 text-center">
+                                    <h2 className="text-2xl font-black text-gray-900 uppercase font-montserrat">Jadual Waktu Peperiksaan Akhir Tahun</h2>
+                                    <p className="text-gray-500 font-bold tracking-widest mt-1">SESI AKADEMIK 2025/2026 • TINGKATAN {selectedForm}</p>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-center border-collapse min-w-[1000px] text-black">
+                                        <thead>
+                                            <tr className="bg-gray-200 text-gray-800 text-xs font-black uppercase tracking-widest">
+                                                <th className="px-4 py-6 border border-gray-300 w-40">Hari / Tarikh</th>
+                                                <th className="px-4 py-6 border border-gray-300 w-48">Sesi / Masa</th>
+                                                <th className="px-4 py-6 border border-gray-300">Mata Pelajaran</th>
+                                                <th className="px-4 py-6 border border-gray-300 w-32">Tempoh</th>
+                                                <th className="px-4 py-6 border border-gray-300 w-40">{selectedForm} AL-HANAFI</th>
+                                                <th className="px-4 py-6 border border-gray-300 w-40">{selectedForm} AL-SYAFIE</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-sm font-poppins">
+                                            {initialSchedule.map(day => (
+                                                <React.Fragment key={day.id}>
+                                                    {day.slots.map((slot, idx) => (
+                                                        <tr key={slot.id} className="hover:bg-gray-50 transition-colors">
+                                                            {idx === 0 && (
+                                                                <td rowSpan={day.slots.length} className="px-4 py-8 border border-gray-300 font-black bg-gray-100 align-middle">
+                                                                    <div className="text-lg leading-none">{day.hari}</div>
+                                                                    <div className="text-[10px] text-gray-500 mt-1">{day.tarikhDisplay}</div>
+                                                                </td>
+                                                            )}
+                                                            <td className="px-4 py-6 border border-gray-300 font-mono text-xs">{slot.waktu}</td>
+                                                            <td className="px-4 py-6 border border-gray-300 font-bold uppercase text-gray-900">{slot.subjek}</td>
+                                                            <td className="px-4 py-6 border border-gray-300 font-bold text-gray-600">{slot.durasi}</td>
+                                                            <td className="px-4 py-6 border border-gray-300 font-bold text-xs">{slot.guruA}</td>
+                                                            <td className="px-4 py-6 border border-gray-300 font-bold text-xs">{slot.guruB}</td>
+                                                        </tr>
+                                                    ))}
+                                                </React.Fragment>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="p-6 bg-gray-50 border-t border-gray-200">
+                                    <p className="text-[10px] text-gray-400 italic">Nota: Calon dikehendaki berada di dewan peperiksaan 15 minit sebelum waktu bermula.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const GuruGanti = () => {
+            const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+            const [absentList, setAbsentList] = useState([]);
+            const [formTeacher, setFormTeacher] = useState('');
+            const [formReason, setFormReason] = useState('');
+            const [assignments, setAssignments] = useState([]);
+            const [isGenerated, setIsGenerated] = useState(false);
+
+            const handleAddAbsent = () => {
+                if (!formTeacher || !formReason) return;
+                const newRecord = {
+                    id: Date.now(),
+                    teacherName: formTeacher,
+                    reason: formReason,
+                    status: 'PERLU_DIGANTI'
+                };
+                setAbsentList([...absentList, newRecord]);
+                setFormTeacher('');
+                setFormReason('');
+                setIsGenerated(false);
+            };
+
+            const generateSchedule = () => {
+                const newAssignments = [];
+                absentList.forEach(absent => {
+                    const slots = [1, 3, 7]; // Mock slots
+                    slots.forEach(sId => {
+                        const slot = TIME_SLOTS.find(s => s.id === sId.toString());
+                        newAssignments.push({
+                            id: Math.random(),
+                            absentTeacher: absent.teacherName,
+                            slotLabel: slot.label,
+                            className: "5 AL-HANAFI",
+                            subject: "BAHASA MELAYU",
+                            reliefTeacher: TEACHER_SHORT_NAMES[Math.floor(Math.random() * TEACHER_SHORT_NAMES.length)]
+                        });
+                    });
+                });
+                setAssignments(newAssignments);
+                setIsGenerated(true);
+            };
+
+            const handlePrint = () => {
+                const element = document.getElementById('relief-print-content');
+                const opt = {
+                    margin: 10,
+                    filename: `Jadual_Guru_Ganti_${selectedDate}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
+            };
+
+            return (
+                <div className="fade-in space-y-8">
+                    {/* Input Section */}
+                    <div className="bg-[#1C2541] rounded-xl p-6 border border-gray-700 shadow-xl">
+                        <h3 className="text-[#C9B458] font-bold mb-6 flex items-center gap-2 uppercase tracking-widest">
+                            <LucideIcon name="plus" size={18} /> Rekod Ketidakhadiran Guru
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label className="text-[10px] text-gray-400 font-bold uppercase block mb-1">Tarikh</label>
+                                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="w-full bg-[#0B132B] border border-gray-600 rounded-lg px-3 py-2 text-white outline-none focus:border-[#C9B458] [&::-webkit-calendar-picker-indicator]:filter-[invert(1)]" />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-400 font-bold uppercase block mb-1">Nama Guru</label>
+                                <select value={formTeacher} onChange={e => setFormTeacher(e.target.value)} className="w-full bg-[#0B132B] border border-gray-600 rounded-lg px-3 py-2 text-white outline-none focus:border-[#C9B458]">
+                                    <option value="">Pilih Guru...</option>
+                                    {TEACHER_FULL_NAMES.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-400 font-bold uppercase block mb-1">Sebab</label>
+                                <select value={formReason} onChange={e => setFormReason(e.target.value)} className="w-full bg-[#0B132B] border border-gray-600 rounded-lg px-3 py-2 text-white outline-none focus:border-[#C9B458]">
+                                    <option value="">Pilih Sebab...</option>
+                                    <option value="Cuti Sakit">Cuti Sakit (MC)</option>
+                                    <option value="Berkursus">Berkursus</option>
+                                    <option value="Urusan Keluarga">Urusan Keluarga</option>
+                                </select>
+                            </div>
+                            <div className="flex items-end">
+                                <button onClick={handleAddAbsent} className="w-full bg-[#C9B458] text-[#0B132B] font-bold py-2 rounded-lg hover:bg-yellow-500 transition-all shadow-lg">TAMBAH</button>
+                            </div>
+                        </div>
+
+                        {absentList.length > 0 && (
+                            <div className="mt-8 overflow-x-auto rounded-lg border border-gray-800">
+                                <table className="w-full text-left">
+                                    <thead className="bg-[#0B132B] text-[#C9B458] text-xs font-bold uppercase">
+                                        <tr><th className="px-6 py-3">Nama Guru</th><th className="px-6 py-3">Sebab</th><th className="px-6 py-3 text-center">Tindakan</th></tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-800 text-sm">
+                                        {absentList.map(a => (
+                                            <tr key={a.id} className="hover:bg-[#253252]">
+                                                <td className="px-6 py-4 font-bold text-white">{a.teacherName}</td>
+                                                <td className="px-6 py-4 text-gray-400">{a.reason}</td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <button onClick={() => setAbsentList(absentList.filter(x => x.id !== a.id))} className="text-red-400 hover:text-white"><LucideIcon name="trash-2" size={16} /></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+
+                    {absentList.length > 0 && (
+                        <div className="flex justify-center">
+                            <button onClick={generateSchedule} className="bg-[#3A506B] hover:bg-[#4a6382] text-white px-10 py-4 rounded-xl font-black shadow-2xl flex items-center gap-3 transition-all transform hover:scale-105">
+                                <LucideIcon name="refresh-cw" size={20} /> JANA JADUAL GANTI AUTOMATIK
+                            </button>
+                        </div>
+                    )}
+
+                    {isGenerated && (
+                        <div className="space-y-6 animate-in fade-in">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-xl font-bold text-white uppercase tracking-widest">Keputusan Penjanaan</h3>
+                                <button onClick={handlePrint} className="bg-[#C9B458] text-[#0B132B] px-6 py-2 rounded-lg font-bold text-xs flex items-center gap-2 shadow-lg">
+                                    <LucideIcon name="printer" size={14} /> CETAK PDF
+                                </button>
+                            </div>
+
+                            <div className="bg-white rounded-2xl shadow-2xl p-10 text-black font-serif" id="relief-print-content">
+                                <div className="text-center border-b-2 border-black pb-6 mb-8">
+                                    <h1 className="text-3xl font-black uppercase">Jadual Guru Ganti</h1>
+                                    <p className="text-lg font-bold mt-1 uppercase">SMA Al-Khairiah Al-Islamiah Mersing</p>
+                                    <p className="text-sm font-bold mt-2">Tarikh: {new Date(selectedDate).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' })}</p>
+                                </div>
+
+                                <table className="w-full border-collapse border border-black text-sm">
+                                    <thead>
+                                        <tr className="bg-gray-100">
+                                            <th className="border border-black p-3 w-32">Masa</th>
+                                            <th className="border border-black p-3">Guru Tidak Hadir</th>
+                                            <th className="border border-black p-3">Kelas / Subjek</th>
+                                            <th className="border border-black p-3">Guru Ganti</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {assignments.map(a => (
+                                            <tr key={a.id}>
+                                                <td className="border border-black p-3 text-center font-bold">{a.slotLabel}</td>
+                                                <td className="border border-black p-3 font-bold">{a.absentTeacher}</td>
+                                                <td className="border border-black p-3 text-center">
+                                                    <div className="font-black">{a.className}</div>
+                                                    <div className="text-[10px] uppercase">{a.subject}</div>
+                                                </td>
+                                                <td className="border border-black p-3 text-center font-black text-lg">{a.reliefTeacher}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                <div className="mt-20 flex justify-between px-10">
+                                    <div className="text-center w-1/3">
+                                        <div className="border-t border-black pt-2 font-bold text-xs">Penyelaras Jadual Ganti</div>
+                                    </div>
+                                    <div className="text-center w-1/3">
+                                        <div className="border-t border-black pt-2 font-bold text-xs">Pengetua / PK Pentadbiran</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const JadualWaktu = () => {
+            return (
+                <div className="fade-in bg-[#1C2541] rounded-xl p-10 border border-gray-700 shadow-2xl text-center">
+                    <LucideIcon name="clock" size={64} className="mx-auto text-[#C9B458] mb-6" />
+                    <h2 className="text-2xl font-bold text-white uppercase tracking-widest mb-4">Pengurusan Jadual Waktu</h2>
+                    <p className="text-gray-400 max-w-lg mx-auto leading-relaxed">
+                        Modul ini membolehkan pengurusan jadual waktu induk sekolah, jadual waktu kelas, dan jadual waktu persendirian guru secara digital.
+                    </p>
+                    <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-[#0B132B] p-6 rounded-xl border border-gray-800 hover:border-[#C9B458] transition-all cursor-pointer">
+                            <LucideIcon name="file-text" size={32} className="text-[#C9B458] mb-4 mx-auto" />
+                            <h4 className="font-bold text-sm uppercase">Jadual Induk</h4>
+                        </div>
+                        <div className="bg-[#0B132B] p-6 rounded-xl border border-gray-800 hover:border-[#C9B458] transition-all cursor-pointer">
+                            <LucideIcon name="users" size={32} className="text-[#C9B458] mb-4 mx-auto" />
+                            <h4 className="font-bold text-sm uppercase">Jadual Kelas</h4>
+                        </div>
+                        <div className="bg-[#0B132B] p-6 rounded-xl border border-gray-800 hover:border-[#C9B458] transition-all cursor-pointer">
+                            <LucideIcon name="trending-up" size={32} className="text-[#C9B458] mb-4 mx-auto" />
+                            <h4 className="font-bold text-sm uppercase">Analisis Beban</h4>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+
+        const App = () => {
+            const [activeMenu, setActiveMenu] = useState('jawatankuasa');
+            
+            const menuItems = [
+                { id: 'jawatankuasa', label: 'Jawatankuasa', icon: 'users' },
+                { id: 'takwim', label: 'Takwim', icon: 'calendar' },
+                { id: 'peperiksaan', label: 'Peperiksaan', icon: 'file-text' },
+                { id: 'guruganti', label: 'Guru Ganti', icon: 'refresh-cw' },
+                { id: 'jadualwaktu', label: 'Jadual Waktu', icon: 'clock' }
+            ];
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    {/* Header */}
+                    <header className="bg-[#0B132B] border-b border-gray-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-2xl">
+                        <div className="flex items-center gap-4">
+                            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-12 w-auto" alt="Logo" />
+                            <div>
+                                <h1 className="text-xl font-black text-white tracking-tighter font-montserrat leading-none">SMAAM DIGITAL</h1>
+                                <p className="text-[10px] text-[#C9B458] font-bold tracking-[0.3em] uppercase mt-1">Sistem Pengurusan Kurikulum</p>
+                            </div>
+                        </div>
+                        <div className="hidden md:flex gap-6">
+                            {menuItems.map(item => (
+                                <button 
+                                    key={item.id}
+                                    onClick={() => setActiveMenu(item.id)}
+                                    className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-all ${activeMenu === item.id ? 'text-[#C9B458] border-b-2 border-[#C9B458] pb-1' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    <LucideIcon name={item.icon} size={14} />
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="md:hidden">
+                            <select 
+                                value={activeMenu} 
+                                onChange={e => setActiveMenu(e.target.value)}
+                                className="bg-[#1C2541] border border-gray-700 text-white text-xs rounded-lg px-3 py-2 outline-none"
+                            >
+                                {menuItems.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+                            </select>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
+                        <div className="mb-10">
+                            <div className="flex items-center gap-2 text-xs text-[#C9B458] font-mono mb-2">
+                                <span className="font-bold opacity-50">KURIKULUM</span>
+                                <span className="opacity-30">/</span>
+                                <span className="uppercase font-bold">{activeMenu}</span>
+                            </div>
+                            <h2 className="text-4xl font-black text-white font-montserrat uppercase tracking-tight">
+                                {menuItems.find(m => m.id === activeMenu)?.label}
+                            </h2>
+                        </div>
+
+                        <div className="min-h-[600px]">
+                            {activeMenu === 'jawatankuasa' && <Jawatankuasa />}
+                            {activeMenu === 'takwim' && <Takwim />}
+                            {activeMenu === 'peperiksaan' && <Peperiksaan />}
+                            {activeMenu === 'guruganti' && <GuruGanti />}
+                            {activeMenu === 'jadualwaktu' && <JadualWaktu />}
+                        </div>
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-[#0B132B] border-t border-gray-800 p-8 text-center">
+                        <p className="text-gray-500 text-[10px] font-bold tracking-widest uppercase">
+                            &copy; 2026 SMA Al-Khairiah Al-Islamiah Mersing • Dibangunkan oleh Unit ICT SMAAM
+                        </p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

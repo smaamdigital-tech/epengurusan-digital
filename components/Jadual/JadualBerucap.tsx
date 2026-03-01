@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp } from '@/context/AppContext';
+import { PrintPreviewModal } from '../PrintPreviewModal';
 
 const TEACHER_LIST = [
     "ZULKEFFLE BIN MUHAMMAD", "NORATIKAH ABD. KADIR", "SHAHARER BIN HJ HUSAIN", "ZULKIFLI BIN MD ASPAN",
@@ -75,9 +76,40 @@ export const JadualBerucap: React.FC = () => {
   const canEdit = checkPermission('canUpdateJadualBerucap');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [modalType, setModalType] = useState<'speech' | 'addGroup' | 'editGroup' | null>(null);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
+
+  const handleDownloadPDF = () => {
+      setShowPreview(true);
+  };
+
+  const executeDownload = () => {
+      const element = document.getElementById('pdf-content');
+      if (!element) return;
+      
+      showToast("Sedang menjana PDF...");
+      
+      const opt = {
+          margin: 5,
+          filename: `Jadual_Berucap.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      
+      (window as any).html2pdf().set(opt).from(element).save().then(() => {
+          showToast("PDF berjaya dimuat turun.");
+      }).catch((err: any) => {
+          console.error("PDF Error:", err);
+          showToast("Gagal menjana PDF.");
+      });
+  };
+
+  const handlePrint = () => {
+      window.print();
+  };
 
   // --- LAZY INITIALIZATION FOR TITLES ---
   const [sectionTitles, setSectionTitles] = useState(() => {
@@ -166,11 +198,16 @@ export const JadualBerucap: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8 space-y-6 fade-in pb-20">
-      <div className="border-b border-gray-400 pb-4">
-        <h2 className="text-3xl font-bold text-black font-montserrat uppercase flex items-center gap-3">
-          Jadual Guru Berucap
-        </h2>
-        <p className="text-black font-medium mt-1 opacity-80">Jadual Guru Berucap dan Kumpulan Bertugas Mingguan.</p>
+      <div className="border-b border-gray-400 pb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="text-center md:text-left">
+            <h2 className="text-3xl font-bold text-black font-montserrat uppercase flex items-center md:justify-start justify-center gap-3">
+              Jadual Guru Berucap
+            </h2>
+            <p className="text-black font-medium mt-1 opacity-80">Jadual Guru Berucap dan Kumpulan Bertugas Mingguan.</p>
+        </div>
+        <button onClick={handleDownloadPDF} className="bg-[#C9B458] text-[#0B132B] px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 shadow-lg inline-flex items-center gap-2 transition-transform hover:scale-105">
+            📥 Muat Turun PDF
+        </button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
@@ -326,6 +363,87 @@ export const JadualBerucap: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* PRINT PREVIEW MODAL */}
+      <PrintPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onDownload={executeDownload}
+        onPrint={handlePrint}
+        title="Pratonton Jadual Guru Berucap"
+        orientation="landscape"
+      >
+        <div className="flex items-center gap-4 border-b-2 border-black pb-6 mb-8">
+            <img src="https://i.postimg.cc/7P9SQBg6/smaam_background_BARU.png" className="h-24 w-auto object-contain" alt="Logo Sekolah" crossOrigin="anonymous" />
+            <div className="flex-1 text-center text-black">
+                <h1 className="text-2xl font-extrabold uppercase tracking-wide mb-1">SEKOLAH MENENGAH AGAMA AL-KHAIRIAH AL-ISLAMIAH MERSING</h1>
+                <h2 className="text-xl font-bold uppercase text-black">JADUAL GURU BERUCAP & KUMPULAN BERTUGAS</h2>
+            </div>
+        </div>
+
+        <div className="mb-8">
+            <table className="w-full text-center border-collapse border border-black table-fixed">
+                <thead>
+                    <tr className="bg-gray-300 text-black text-[10px] font-bold uppercase tracking-wide">
+                        <th className="p-2 border border-black w-16">Minggu</th>
+                        <th className="p-2 border border-black w-24">Tarikh</th>
+                        <th className="p-2 border border-black w-24">Kumpulan</th>
+                        <th className="p-2 border border-black">Guru Berucap</th>
+                        <th className="p-2 border border-black">Tajuk / Tema</th>
+                    </tr>
+                </thead>
+                <tbody className="text-[10px] text-black font-medium">
+                    {speechSchedule.map((item) => (
+                        <tr key={item.id} className="h-12">
+                            <td className="p-2 border border-black font-bold">{item.week}</td>
+                            <td className="p-2 border border-black font-mono">{item.date}</td>
+                            <td className="p-2 border border-black">{item.group.replace('KUMPULAN ', 'K')}</td>
+                            <td className="p-2 border border-black text-left px-4">{item.speaker}</td>
+                            <td className="p-2 border border-black text-left px-4">
+                                <div>{item.topic || '-'}</div>
+                                <div className="flex gap-1 mt-1">
+                                    {item.civic && <span className="text-[8px] border border-black px-1 rounded">{item.civic}</span>}
+                                    {item.sumur && <span className="text-[8px] border border-black px-1 rounded">{item.sumur}</span>}
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        <div className="mt-8">
+            <h3 className="text-lg font-bold uppercase mb-4 border-b border-black inline-block">Senarai Kumpulan Bertugas</h3>
+            <div className="grid grid-cols-3 gap-4">
+                {teacherGroups.map((group) => (
+                    <div key={group.id} className="border border-black p-2 rounded text-[9px]">
+                        <h4 className="font-bold uppercase mb-2 border-b border-black pb-1">{group.name}</h4>
+                        <ul className="list-disc pl-4 space-y-0.5">
+                            {group.members.map((member, idx) => (
+                                <li key={idx}>{member}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-black flex justify-between text-xs font-bold uppercase">
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disediakan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Penyelaras Jadual</p>
+            </div>
+            <div className="text-center w-1/3">
+                <p className="mb-16">Disahkan Oleh:</p>
+                <div className="border-t border-black w-2/3 mx-auto"></div>
+                <p className="mt-2">Pengetua</p>
+            </div>
+        </div>
+        <div className="mt-8 text-center text-[10px] italic text-gray-500">
+            Dicetak pada {new Date().toLocaleDateString('ms-MY')} melalui Sistem Pengurusan Digital SMAAM
+        </div>
+      </PrintPreviewModal>
     </div>
   );
 };

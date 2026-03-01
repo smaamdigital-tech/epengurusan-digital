@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '@/context/AppContext';
 
 interface MenuItem {
   name: string;
@@ -74,14 +74,15 @@ const Icons = {
   )
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) => {
-  const { activeTab, setActiveTab, user, logout, permissions, schoolProfile } = useApp();
+export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
+  const { activeTab, setActiveTab, user, permissions } = useApp();
   const [expanded, setExpanded] = useState<string[]>([]);
 
   // MENU ITEMS DEFINITION (Matched to App.tsx mapping)
   const menuItems: MenuItem[] = React.useMemo(() => [
     { name: 'Dashboard', icon: <Icons.Dashboard /> },
     { name: 'Profil Sekolah', icon: <Icons.Profile /> },
+    { name: 'Organisasi', icon: <Icons.Admin /> },
     { 
       name: 'Takwim', 
       icon: <Icons.Takwim />,
@@ -148,10 +149,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
     const activeParent = menuItems.find(item => 
       item.subItems && activeTab.startsWith(item.name)
     );
-    if (activeParent) {
-      setExpanded(prev => prev.includes(activeParent.name) ? prev : [...prev, activeParent.name]);
+    if (activeParent && !expanded.includes(activeParent.name)) {
+      // Use a small delay to avoid synchronous setState in effect warning
+      const timer = setTimeout(() => {
+        setExpanded(prev => prev.includes(activeParent.name) ? prev : [...prev, activeParent.name]);
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [activeTab, menuItems]);
+  }, [activeTab, menuItems, expanded]);
 
   const toggleExpand = (name: string) => {
     if (expanded.includes(name)) {
@@ -177,40 +182,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
   };
 
   return (
-    // Updated Sidebar: Navy Blue (#0B132B) to Deep Teal/Turquoise (#006064) Gradient
-    <div className="w-full h-full bg-gradient-to-b from-[#0B132B] via-[#004e64] to-[#006064] flex flex-col border-r border-[#2DD4BF]/30 relative overflow-hidden shadow-2xl font-sans">
+    // Updated Sidebar: Combination of Luminous Navy and Turquoise Green
+    <div className="w-full h-full bg-gradient-to-b from-[#001F3F] to-[#00897B] flex flex-col relative overflow-hidden shadow-2xl font-sans">
       
-      {/* Background Pattern: Preserved transparency & blend mode */}
+      {/* Background Pattern: Building image overlay as seen in the request */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-10 bg-cover bg-center mix-blend-overlay"
+        className="absolute inset-0 pointer-events-none opacity-20 bg-cover bg-center mix-blend-overlay"
         style={{ backgroundImage: 'url(https://i.postimg.cc/D0pqvnTy/SMAAM2024.png)' }}
       ></div>
 
       {/* Main Content Wrapper */}
       <div className="flex flex-col h-full relative z-10">
         
-        {/* Logo Area */}
-        <div className="h-24 flex items-center justify-between px-5 border-b border-[#2DD4BF]/30 bg-[#0B132B]/30 backdrop-blur-sm">
+        {/* Logo Area - Simplified for Sidebar */}
+        <div className="h-16 flex items-center justify-center px-5 relative">
           <div className="flex items-center gap-3">
-            {schoolProfile?.logoUrl ? (
-              <img src={schoolProfile.logoUrl} alt="Logo" className="w-10 h-10 object-contain bg-white rounded-full p-0.5 border-2 border-[#2DD4BF]" />
-            ) : (
-              <div className="w-10 h-10 bg-[#006064] rounded-full flex items-center justify-center text-white font-bold text-xl border-2 border-[#2DD4BF]">
-                S
-              </div>
-            )}
-            <div className="flex flex-col">
-              <span className="font-bold text-lg text-white tracking-wide leading-none">SMAAM</span>
-              <span className="text-[0.65rem] text-[#2DD4BF] font-semibold tracking-widest uppercase mt-1">Digital System</span>
-            </div>
+             <span className="font-bold text-white tracking-tight">MENU UTAMA</span>
           </div>
-          
-          <button 
-            onClick={onCloseMobile} 
-            className="md:hidden text-[#2DD4BF] hover:text-white text-xl"
-          >
-            ✕
-          </button>
         </div>
 
         {/* Navigation */}
@@ -224,20 +212,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
               <div key={item.name} className="mb-1">
                 <button
                   onClick={() => handleItemClick(item)}
-                  className={`w-full text-left px-5 py-3.5 flex items-center justify-between transition-all duration-200 group border-l-4
+                  className={`w-full text-left px-5 py-3 flex items-center justify-between transition-all duration-200 group
                     ${(isParentActive && !hasSub) || (isParentActive && !isExpanded)
-                      ? 'bg-gradient-to-r from-[#2DD4BF]/20 to-transparent text-[#2DD4BF] border-[#2DD4BF]' 
-                      : 'text-gray-300 border-transparent hover:bg-[#2DD4BF]/10 hover:text-white hover:border-[#2DD4BF]/50'
+                      ? 'bg-[#E0F2F1]/10 text-[#E0F2F1] border-l-4 border-[#E0F2F1]' 
+                      : 'text-gray-300 hover:bg-white/5 hover:text-white'
                     }`}
                 >
                   <div className="flex items-center">
-                    <span className={`mr-4 transition-transform duration-300 ${isParentActive ? 'scale-110 text-[#2DD4BF]' : 'group-hover:scale-110 group-hover:text-[#2DD4BF]'}`}>
+                    <span className={`mr-4 transition-transform duration-300 ${isParentActive ? 'text-[#E0F2F1]' : 'text-gray-400 group-hover:text-white'}`}>
                       {item.icon}
                     </span>
                     <span className="font-medium text-sm tracking-wide">{item.name}</span>
                   </div>
                   {hasSub && (
-                    <span className={`text-[0.6rem] transition-transform duration-300 ${isExpanded ? 'rotate-180 text-[#2DD4BF]' : 'text-gray-500'}`}>
+                    <span className={`text-[0.6rem] transition-transform duration-300 ${isExpanded ? 'rotate-180 text-white' : 'text-gray-500'}`}>
                       ▼
                     </span>
                   )}
@@ -245,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
 
                 {/* Submenu */}
                 {hasSub && (
-                  <div className={`overflow-hidden transition-all duration-300 bg-[#000000]/20 ${isExpanded ? 'max-h-[400px] py-1 border-b border-[#2DD4BF]/20' : 'max-h-0'}`}>
+                  <div className={`overflow-hidden transition-all duration-300 bg-black/10 ${isExpanded ? 'max-h-[400px] py-1' : 'max-h-0'}`}>
                     {item.subItems?.map((sub) => {
                       const fullTabName = `${item.name} - ${sub}`;
                       const isSubActive = activeTab === fullTabName;
@@ -254,10 +242,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
                         <button
                           key={sub}
                           onClick={() => handleSubItemClick(item.name, sub)}
-                          className={`w-full text-left pl-14 pr-6 py-2.5 text-xs font-medium transition-colors block border-l-2
+                          className={`w-full text-left pl-14 pr-6 py-2 text-xs font-medium transition-colors block
                             ${isSubActive 
-                              ? 'text-[#2DD4BF] font-semibold bg-[#2DD4BF]/10 border-[#2DD4BF]' 
-                              : 'text-gray-400 border-transparent hover:text-white hover:border-gray-500'
+                              ? 'text-[#E0F2F1] bg-[#E0F2F1]/5' 
+                              : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}
                         >
                           {sub}
@@ -274,41 +262,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onCloseMobile }) 
           {user?.role === 'adminsistem' && (
             <button
               onClick={() => { setActiveTab('Tetapan Admin'); if(onCloseMobile) onCloseMobile(); }}
-              className={`w-full text-left px-5 py-3.5 mt-4 flex items-center transition-all duration-200 group border-l-4
+              className={`w-full text-left px-5 py-3 mt-4 flex items-center transition-all duration-200 group
                 ${activeTab === 'Tetapan Admin' 
-                  ? 'bg-gradient-to-r from-[#2DD4BF]/20 to-transparent text-[#2DD4BF] border-[#2DD4BF]' 
-                  : 'text-gray-300 border-transparent hover:bg-[#2DD4BF]/10 hover:text-white'
+                  ? 'bg-[#E0F2F1]/10 text-[#E0F2F1] border-l-4 border-[#E0F2F1]' 
+                  : 'text-gray-300 hover:bg-white/5 hover:text-white'
                 }`}
             >
-              <span className={`mr-4 transition-transform duration-300 ${activeTab === 'Tetapan Admin' ? 'scale-110 text-[#2DD4BF]' : 'group-hover:scale-110 group-hover:text-[#2DD4BF]'}`}>
+              <span className={`mr-4 transition-transform duration-300 ${activeTab === 'Tetapan Admin' ? 'text-[#E0F2F1]' : 'text-gray-400 group-hover:text-white'}`}>
                 <Icons.Settings />
               </span>
-              <span className="font-medium text-sm tracking-wide">Admin Sistem</span>
+              <span className="font-medium text-sm tracking-wide">Panel Admin</span>
             </button>
           )}
         </div>
 
         {/* Footer / Login Status */}
-        <div className="p-4 border-t border-[#2DD4BF]/30 bg-[#0B132B]/30 backdrop-blur-sm">
-          {user ? (
-            <button
-              onClick={logout}
-              className="w-full bg-[#1C2541]/50 hover:bg-red-900/30 text-red-300 py-3 rounded-lg transition-colors flex items-center justify-center gap-3 border border-red-900/30 hover:border-red-500/50 font-bold text-xs uppercase tracking-wider group"
-            >
-              <span className="group-hover:-translate-x-1 transition-transform"><Icons.Logout /></span>
-              Log Keluar
-            </button>
-          ) : (
-            <button
-              onClick={onOpenLogin}
-              className="w-full bg-[#006064]/40 hover:bg-[#006064]/60 text-[#2DD4BF] py-3 rounded-lg transition-colors flex items-center justify-center gap-3 border border-[#2DD4BF]/50 font-bold text-xs uppercase tracking-wider shadow-lg"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-              Log Masuk
-            </button>
-          )}
+        <div className="p-4">
+          {/* Logout button moved to Header */}
         </div>
       </div>
     </div>

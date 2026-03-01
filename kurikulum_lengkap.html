@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengurusan Digital SMAAM - Kurikulum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Sidebar (Simplified) -->
+    <div class="flex h-screen overflow-hidden">
+        <aside class="w-64 bg-gradient-to-b from-[#0B132B] to-[#006064] text-white hidden md:flex flex-col no-print">
+            <div class="p-6 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[#006064] font-bold text-xl border-2 border-[#2DD4BF]">S</div>
+                    <div>
+                        <div class="font-bold text-lg leading-none">SMAAM</div>
+                        <div class="text-[0.6rem] text-[#2DD4BF] font-semibold tracking-widest uppercase mt-1">Digital System</div>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 py-4 overflow-y-auto custom-scrollbar">
+                <div class="px-4 mb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Main Menu</div>
+                <div class="space-y-1">
+                    <button class="w-full flex items-center px-6 py-3 text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                        <span class="mr-3">📊</span> Dashboard
+                    </button>
+                    <div class="bg-white/10 border-l-4 border-[#2DD4BF]">
+                        <button class="w-full flex items-center px-6 py-3 text-sm font-bold text-[#2DD4BF]">
+                            <span class="mr-3">📚</span> Kurikulum
+                        </button>
+                        <div class="bg-black/20 py-1">
+                            <button onclick="switchTab('jawatankuasa')" id="btn-jawatankuasa" class="w-full text-left pl-14 py-2 text-xs font-medium text-[#2DD4BF] border-l-2 border-[#2DD4BF] bg-[#2DD4BF]/10">Jawatankuasa</button>
+                            <button onclick="switchTab('takwim')" id="btn-takwim" class="w-full text-left pl-14 py-2 text-xs font-medium text-gray-400 hover:text-white transition-colors">Takwim</button>
+                            <button onclick="switchTab('guruganti')" id="btn-guruganti" class="w-full text-left pl-14 py-2 text-xs font-medium text-gray-400 hover:text-white transition-colors">Guru Ganti</button>
+                            <button onclick="switchTab('peperiksaan')" id="btn-peperiksaan" class="w-full text-left pl-14 py-2 text-xs font-medium text-gray-400 hover:text-white transition-colors">Peperiksaan</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 no-print">
+                <div class="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                    <span>KURIKULUM</span>
+                    <span>/</span>
+                    <span id="breadcrumb-active" class="text-gray-900 font-bold uppercase">Jawatankuasa</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="text-xs font-bold text-gray-900">PENGGUNA AWAM</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Pelawat</div>
+                    </div>
+                    <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold border border-gray-300">U</div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar bg-slate-50">
+                
+                <!-- JAWATANKUASA TAB -->
+                <div id="tab-jawatankuasa" class="tab-content fade-in">
+                    <div class="mb-8 border-b border-gray-300 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900 font-montserrat uppercase">Jawatankuasa Kurikulum</h2>
+                        <p class="text-gray-600 mt-1 font-medium">Senarai jawatankuasa dan bidang tugas pengurusan kurikulum SMAAM 2026.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <!-- Sidebar Menu -->
+                        <div class="lg:col-span-4 space-y-2 no-print">
+                            <div id="committee-menu" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <!-- Menu items will be injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Details Area -->
+                        <div class="lg:col-span-8 space-y-6">
+                            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                                <div class="bg-[#0B132B] p-6 text-white">
+                                    <h3 id="committee-title" class="text-xl font-bold uppercase tracking-wide">PENGURUSAN KURIKULUM</h3>
+                                    <p class="text-gray-400 text-xs mt-1 font-bold tracking-widest uppercase">Senarai Ahli Jawatankuasa</p>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left">
+                                        <thead class="bg-gray-50 text-gray-500 text-[10px] font-bold uppercase tracking-widest border-b border-gray-200">
+                                            <tr>
+                                                <th class="px-6 py-4">Peranan</th>
+                                                <th class="px-6 py-4">Jawatan</th>
+                                                <th class="px-6 py-4">Nama Pegawai</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="committee-table-body" class="divide-y divide-gray-100 text-sm">
+                                            <!-- Data will be injected here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                                <div class="bg-gray-50 p-6 border-b border-gray-200">
+                                    <h3 class="text-gray-900 font-bold uppercase tracking-wide flex items-center gap-2">
+                                        <span>📋</span> Bidang Tugas & Tanggungjawab
+                                    </h3>
+                                </div>
+                                <div id="committee-tasks" class="p-8 space-y-4 text-gray-600 text-sm leading-relaxed">
+                                    <!-- Tasks will be injected here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAKWIM TAB -->
+                <div id="tab-takwim" class="tab-content hidden fade-in">
+                    <div class="mb-8 border-b border-gray-300 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900 font-montserrat uppercase">Takwim Kurikulum</h2>
+                        <p class="text-gray-600 mt-1 font-medium">Perancangan aktiviti dan program kurikulum sepanjang tahun 2026.</p>
+                    </div>
+
+                    <div class="space-y-8">
+                        <!-- Activity Table -->
+                        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                                <h3 class="font-bold text-gray-900 uppercase">Jadual Aktiviti Tahunan</h3>
+                                <div class="flex gap-2 no-print">
+                                    <button onclick="window.print()" class="px-4 py-2 bg-[#0B132B] text-white rounded-lg text-xs font-bold shadow-lg">Cetak</button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="bg-gray-100 text-gray-600 text-xs uppercase font-bold">
+                                        <tr>
+                                            <th class="px-6 py-4">Tarikh</th>
+                                            <th class="px-6 py-4">Aktiviti / Program</th>
+                                            <th class="px-6 py-4 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="takwim-table-body" class="divide-y divide-gray-200 text-sm">
+                                        <!-- Data will be injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Exam Weeks Table -->
+                        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 border-b border-gray-200 bg-gray-50">
+                                <h3 class="font-bold text-gray-900 uppercase">Perancangan Minggu Peperiksaan</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-center border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-widest">
+                                            <th class="px-4 py-4 border border-gray-200">Minggu</th>
+                                            <th class="px-4 py-4 border border-gray-200">Tarikh</th>
+                                            <th class="px-4 py-4 border border-gray-200">Dalaman</th>
+                                            <th class="px-4 py-4 border border-gray-200">JAJ</th>
+                                            <th class="px-4 py-4 border border-gray-200">Awam</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exam-weeks-body" class="text-xs">
+                                        <!-- Data will be injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GURU GANTI TAB -->
+                <div id="tab-guruganti" class="tab-content hidden fade-in">
+                    <div class="mb-8 border-b border-gray-300 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900 font-montserrat uppercase">Pengurusan Guru Ganti</h2>
+                        <p class="text-gray-600 mt-1 font-medium">Sistem penjanaan jadual ganti (Relief) harian.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 text-center">
+                        <div class="w-20 h-20 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">🛡️</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Akses Terhad</h3>
+                        <p class="text-gray-500 max-w-md mx-auto mb-8">Hanya pentadbir dan guru yang diberi kuasa sahaja boleh mengakses modul pengurusan guru ganti.</p>
+                        <button class="px-8 py-3 bg-[#0B132B] text-white rounded-xl font-bold shadow-xl hover:scale-105 transition-transform">Log Masuk Pentadbir</button>
+                    </div>
+                </div>
+
+                <!-- PEPERIKSAAN TAB -->
+                <div id="tab-peperiksaan" class="tab-content hidden fade-in">
+                    <div class="mb-8 border-b border-gray-300 pb-4">
+                        <h2 class="text-3xl font-bold text-gray-900 font-montserrat uppercase">Pengurusan Peperiksaan</h2>
+                        <p class="text-gray-600 mt-1 font-medium">Jadual waktu, analisis, dan pelaporan peperiksaan.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 no-print">
+                        <button onclick="switchExamSubTab('info')" id="btn-exam-info" class="p-4 bg-[#0B132B] text-white rounded-xl font-bold shadow-lg border-b-4 border-[#C9B458]">ℹ️ Maklumat</button>
+                        <button onclick="switchExamSubTab('jadual')" id="btn-exam-jadual" class="p-4 bg-white text-gray-600 rounded-xl font-bold shadow-sm border border-gray-200 hover:bg-gray-50">📅 Jadual Waktu</button>
+                        <button onclick="switchExamSubTab('analisis')" id="btn-exam-analisis" class="p-4 bg-white text-gray-600 rounded-xl font-bold shadow-sm border border-gray-200 hover:bg-gray-50">📈 Analisis</button>
+                        <button onclick="switchExamSubTab('laporan')" id="btn-exam-laporan" class="p-4 bg-white text-gray-600 rounded-xl font-bold shadow-sm border border-gray-200 hover:bg-gray-50">📑 Pelaporan</button>
+                    </div>
+
+                    <!-- Exam Sub-Tabs -->
+                    <div id="exam-info" class="exam-sub-tab fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Exam Cards -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:border-[#C9B458] transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded">UP1</div>
+                                    <span class="text-xs font-bold px-2 py-1 rounded-full border bg-yellow-50 text-yellow-600 border-yellow-200">Akan Datang</span>
+                                </div>
+                                <h3 class="text-gray-900 font-bold text-lg mb-2">Ujian Pentaksiran 1</h3>
+                                <div class="text-gray-500 text-sm space-y-1">
+                                    <p>📅 Mula: <span class="text-gray-900 font-medium">10-03-2026</span></p>
+                                    <p>🏁 Tamat: <span class="text-gray-900 font-medium">14-03-2026</span></p>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:border-[#C9B458] transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded">PPT</div>
+                                    <span class="text-xs font-bold px-2 py-1 rounded-full border bg-yellow-50 text-yellow-600 border-yellow-200">Akan Datang</span>
+                                </div>
+                                <h3 class="text-gray-900 font-bold text-lg mb-2">Peperiksaan Pertengahan Tahun</h3>
+                                <div class="text-gray-500 text-sm space-y-1">
+                                    <p>📅 Mula: <span class="text-gray-900 font-medium">15-06-2026</span></p>
+                                    <p>🏁 Tamat: <span class="text-gray-900 font-medium">26-06-2026</span></p>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:border-[#C9B458] transition-all group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded">SPM</div>
+                                    <span class="text-xs font-bold px-2 py-1 rounded-full border bg-yellow-50 text-yellow-600 border-yellow-200">Akan Datang</span>
+                                </div>
+                                <h3 class="text-gray-900 font-bold text-lg mb-2">Percubaan SPM</h3>
+                                <div class="text-gray-500 text-sm space-y-1">
+                                    <p>📅 Mula: <span class="text-gray-900 font-medium">01-11-2026</span></p>
+                                    <p>🏁 Tamat: <span class="text-gray-900 font-medium">20-11-2026</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="exam-jadual" class="exam-sub-tab hidden fade-in">
+                        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-900 uppercase">Jadual Waktu Peperiksaan Akhir Tahun</h3>
+                                <button onclick="window.print()" class="px-4 py-2 bg-[#0B132B] text-white rounded-lg text-xs font-bold shadow-lg no-print">Cetak</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-center border-collapse min-w-[1000px]">
+                                    <thead>
+                                        <tr class="bg-gray-100 text-gray-800 text-xs font-bold uppercase tracking-wider">
+                                            <th class="px-6 py-4 border border-gray-200">Hari / Tarikh</th>
+                                            <th class="px-6 py-4 border border-gray-200">Masa</th>
+                                            <th class="px-6 py-4 border border-gray-200">Mata Pelajaran</th>
+                                            <th class="px-6 py-4 border border-gray-200">Tempoh</th>
+                                            <th class="px-6 py-4 border border-gray-200">Pengawas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="exam-schedule-body" class="text-sm text-gray-700">
+                                        <!-- Data will be injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="exam-analisis" class="exam-sub-tab hidden fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <p class="text-xs text-gray-500 font-bold uppercase mb-1">Gred Purata Sekolah (GPS)</p>
+                                <h3 class="text-3xl font-black text-gray-900">2.15</h3>
+                                <p class="text-xs text-green-600 font-bold mt-1">▲ 0.20 Peningkatan</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <p class="text-xs text-gray-500 font-bold uppercase mb-1">Peratus Layak Sijil</p>
+                                <h3 class="text-3xl font-black text-gray-900">96.5%</h3>
+                                <p class="text-xs text-green-600 font-bold mt-1">▲ 1.5% Peningkatan</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <p class="text-xs text-gray-500 font-bold uppercase mb-1">Jumlah Calon</p>
+                                <h3 class="text-3xl font-black text-gray-900">145</h3>
+                                <p class="text-xs text-gray-500 font-bold mt-1">Tingkatan 5</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 text-center">
+                            <p class="text-gray-500 italic">Visualisasi carta interaktif hanya tersedia dalam sistem digital penuh.</p>
+                        </div>
+                    </div>
+
+                    <div id="exam-laporan" class="exam-sub-tab hidden fade-in">
+                        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 bg-gray-50 border-b border-gray-200">
+                                <h3 class="font-bold text-gray-900 uppercase">Senarai Laporan Jana</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="bg-gray-100 text-gray-600 text-xs uppercase font-bold">
+                                        <tr>
+                                            <th class="px-6 py-4">Nama Dokumen</th>
+                                            <th class="px-6 py-4 text-center">Jenis</th>
+                                            <th class="px-6 py-4 text-center">Tarikh</th>
+                                            <th class="px-6 py-4 text-center">Tindakan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 text-sm">
+                                        <tr>
+                                            <td class="px-6 py-4 font-bold text-gray-800">Analisis Keseluruhan Tingkatan 5</td>
+                                            <td class="px-6 py-4 text-center"><span class="px-2 py-1 bg-red-100 text-red-600 text-[10px] font-bold rounded">PDF</span></td>
+                                            <td class="px-6 py-4 text-center text-gray-500">15-03-2026</td>
+                                            <td class="px-6 py-4 text-center"><button class="text-blue-600 font-bold">Muat Turun</button></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-6 py-4 font-bold text-gray-800">Analisis Mata Pelajaran (Semua Subjek)</td>
+                                            <td class="px-6 py-4 text-center"><span class="px-2 py-1 bg-green-100 text-green-600 text-[10px] font-bold rounded">EXCEL</span></td>
+                                            <td class="px-6 py-4 text-center text-gray-500">15-03-2026</td>
+                                            <td class="px-6 py-4 text-center"><button class="text-blue-600 font-bold">Muat Turun</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="h-12 bg-white border-t border-gray-200 flex items-center justify-center px-8 text-[10px] text-gray-400 font-medium uppercase tracking-widest no-print">
+                &copy; 2026 SMA Al-Khairiah Al-Islamiah Mersing • Sistem Pengurusan Digital
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const menuItems = [
+            { id: 1, label: "PENGURUSAN KURIKULUM" },
+            { id: 2, label: "PANITIA MATA PELAJARAN" },
+            { id: 3, label: "HIGHLY IMMERSIVE PROGRAMME (HIP) DAN HAYYA BIL ’ARABIAH (HA)" },
+            { id: 4, label: "PUSAT SUMBER SEKOLAH" },
+            { id: 5, label: "PEMBELAJARAN MAYA" },
+            { id: 6, label: "JADUAL WAKTU" },
+            { id: 7, label: "PENTAKSIRAN DAN PEPERIKSAAN" },
+            { id: 8, label: "PEMBELAJARAN ABAD KE-21 (PAK21) DAN KBAT" },
+            { id: 9, label: "PENGURUSAN PENCERAPAN" },
+            { id: 10, label: "PROGRAM TAHFIZ AL-SYATIBI DAN ULUL ALBAB" },
+            { id: 11, label: "CARTA INDUK PENTAKSIRAN BERASASKAN SEKOLAH (PBS)" },
+        ];
+
+        const committeeData = {
+            1: [
+                { role: "Pengerusi", position: "Pengetua", name: "Zulkeffle bin Muhammad" },
+                { role: "Tim. Pengerusi", position: "GPK Pentadbiran", name: "Noratikah binti Abd. Kadir" },
+                { role: "Naib Pengerusi 1", position: "GPK Hal Ehwal Murid", name: "Shaharer bin Hj Husain" },
+                { role: "Naib Pengerusi 2", position: "GPK Kokurikulum", name: "Zulkifli bin Md Aspan" },
+                { role: "Setiausaha", position: "SU Kurikulum", name: "Saemah binti Supandi" },
+                { role: "AJK", position: "Penyelaras PBD", name: "Nurul Izzati binti Roslin" },
+                { role: "AJK", position: "GKMP Agama", name: "Saemah binti Supandi" },
+                { role: "AJK", position: "GKMP Dini", name: "Nor Azean binti Ismail" },
+                { role: "AJK", position: "GKMP Bahasa", name: "Rosmawati @ Rohayati binti Hussin" },
+                { role: "AJK", position: "GKMP Kemanusiaan", name: "Nooraind binti Ali" },
+                { role: "AJK", position: "GKMP Sains & Mat", name: "Zahrah Khairiah Nasution binti Saleh" },
+                { role: "AJK", position: "GKMP Tek & Vok", name: "Mazuin binti Mat" },
+                { role: "AJK", position: "Guru Bimbingan & Kaunseling", name: "Muhammad Hafiz bin Jalil" },
+                { role: "AJK", position: "Guru Data", name: "Noorlela binti Zainudin" },
+                { role: "AJK", position: "Guru Perpustakaan & Media", name: "Nuurul Amira binti Razak" },
+                { role: "AJK", position: "Penyelaras ICT/DELIMA", name: "Syahidatun Najihah binti Aziz" },
+                { role: "AJK", position: "SU Jadual Waktu", name: "Mohamad Nasreen Hakim bin Che Mohamed" },
+                { role: "AJK", position: "Penyelaras Pep. Dalaman", name: "Annur Ayuni binti Mohamed" },
+                { role: "AJK", position: "Penyelaras SPM", name: "Nor Ain binti Mohamed Jori" },
+            ],
+            2: [
+                { role: "Pengerusi", position: "Pengetua", name: "Zulkeffle bin Muhammad" },
+                { role: "Timbalan Pengerusi", position: "GPK Pentadbiran", name: "Noratikah binti Abd. Kadir" },
+                { role: "Setiausaha", position: "PK01 (Pengurusan Panitia)", name: "Nor Azean binti Ismail" },
+                { role: "Bidang Agama", position: "KP Usul Al-Din", name: "Nor Hidayah binti Mahadun" },
+                { role: "Bidang Agama", position: "KP Al-Syariah", name: "Annur Ayuni binti Mohamed" },
+                { role: "Bidang Agama", position: "KP Manahij Al-’Ulum", name: "Mohd Nor bin Salikin" },
+                { role: "Bidang Agama", position: "KP Tahfiz", name: "Salman bin A Rahman" },
+                { role: "Bidang Dini", position: "KP LAM", name: "Norliyana binti Mhd. Amin" },
+                { role: "Bidang Dini", position: "KP Al-Adab Wa Al-Balaghah", name: "Masyitah binti Razali" },
+                { role: "Bidang Bahasa", position: "KP Bahasa Melayu", name: "Siti Nurul Liza binti Sidin" },
+                { role: "Bidang Bahasa", position: "KP Bahasa Inggeris", name: "Nik Noorizati binti Ab Kahar" },
+                { role: "Bidang Sains & Mat", position: "KP Sains", name: "Liyana binti Iskandar" },
+                { role: "Bidang Sains & Mat", position: "KP Matematik", name: "Norashidah binti A Wahab" },
+                { role: "Bidang Tek & Vok", position: "KP RBT", name: "Aina Fazrina binti Paing" },
+                { role: "Bidang Tek & Vok", position: "KP Perniagaan", name: "Nurul Syafiqah binti Husin" },
+                { role: "Bidang Kemanusiaan", position: "KP Sejarah", name: "Ahmad Fikruddin bin Ahmad Raza'i" },
+                { role: "Bidang Kemanusiaan", position: "KP Geografi", name: "Nurul Izzati binti Roslin" },
+                { role: "Bidang Kemanusiaan", position: "KP Pend. Seni Visual", name: "Syahidatun Najihah binti Aziz" },
+                { role: "Bidang Kemanusiaan", position: "KP PJPK", name: "Mohd Nur bin Ahmad" },
+            ],
+            10: [
+                { role: "Pengerusi", position: "Pengetua", name: "Zulkeffle bin Muhammad" },
+                { role: "Tim. Pengerusi", position: "GPK Pentadbiran", name: "Noratikah binti Abd. Kadir" },
+                { role: "Naib Pengerusi 1", position: "GPK Hal Ehwal Murid", name: "Shaharer bin Hj Husain" },
+                { role: "Naib Pengerusi 2", position: "GPK Kokurikulum", name: "Zulkifli bin Md Aspan" },
+                { role: "Penyelaras", position: "Penyelaras Program Tahfiz", name: "Salman bin A Rahman" },
+                { role: "Setiausaha", position: "Setiausaha Program Tahfiz", name: "Mohd Nor bin Salikin" },
+                { role: "AJK", position: "Guru Tahfiz", name: "Islahuddin bin Muchtar" },
+                { role: "AJK", position: "Guru Tahfiz", name: "Ahmad Fikruddin bin Ahmad Raza'i" },
+                { role: "AJK", position: "Guru Tahfiz", name: "Mohamad Sukri bin Ali" },
+                { role: "AJK", position: "Guru Tahfiz", name: "Nor Hidayah binti Mahadun" },
+                { role: "AJK", position: "Guru Tahfiz", name: "Masyitah binti Razali" },
+            ]
+        };
+
+        const tasksData = {
+            1: [
+                "Mengadakan mesyuarat sekurang-kurang empat (4) kali setahun.",
+                "Menentukan dasar dan hala tuju pengurusan kurikulum sekolah.",
+                "Merancang dan mengurus pengoperasian kurikulum di sekolah.",
+                "Merancang dan mengawal pengurusan sumber berkaitan kurikulum di sekolah.",
+                "Mengenal pasti dan menyelesaikan isu dan permasalahan berkaitan kurikulum di sekolah.",
+                "Merancang, memantau, menilai dan menambah baik pelaksanaan program dan aktiviti kurikulum di sekolah.",
+                "Membina hubungan seranta dengan ibu bapa, komuniti dan pihak yang berkepentingan.",
+                "Melaporkan dan mendokumenkan program dan aktiviti berkaitan kurikulum di sekolah.",
+                "Mengurus dan menyelia pengoperasian bilik khas berkaitan kurikulum.",
+            ],
+            2: [
+                "Menentukan penggunaan DSKP yang dikemas kini.",
+                "Menentukan penggunaan alat bantu mengajar dan kaedah-kaedah pengajaran/pembelajaran yang dikemas kini.",
+                "Bertanggungjawab menyediakan rancangan pengajaran tahunan.",
+                "Menyelaraskan penyediaan soalan-soalan peperiksaan dalaman dan pemeriksaan kertas-kertas jawapan.",
+                "Menganalisis keputusan peperiksaan dan mengkaji serta mencari jalan untuk memajukan tahap pencapaian.",
+            ],
+            10: [
+                "Merancang dan melaksanakan program Tahfiz Al-Syatibi dan Ulul Albab.",
+                "Memantau hafazan murid secara berkala.",
+                "Menguruskan ujian isbat hafazan.",
+                "Memastikan pencapaian murid selaras dengan sasaran hafazan tahunan.",
+            ]
+        };
+
+        const takwimData = [
+            { date: "08-01-2026", event: "Mesyuarat Pentadbiran & Kurikulum", status: "Selesai" },
+            { date: "11-01-2026", event: "Pendaftaran", status: "Selesai" },
+            { date: "12-01-2026", event: "Mesyuarat Panitia 1", status: "Selesai" },
+            { date: "13-01-2026", event: "PLC Panitia", status: "Selesai" },
+            { date: "27-01-2026", event: "PLC Panitia", status: "Selesai" },
+            { date: "01-02-2026", event: "PLC Panitia", status: "Akan Datang" },
+            { date: "10-02-2026", event: "PLC Panitia", status: "Akan Datang" },
+            { date: "19-02-2026", event: "Awal Ramadan", status: "Akan Datang" },
+            { date: "10-03-2026", event: "PLC Panitia", status: "Akan Datang" },
+            { date: "14-04-2026", event: "Mesyuarat Kurikulum 2", status: "Akan Datang" },
+        ];
+
+        const examWeeks = [
+            { week: '1', date: '12 – 16 Jan 2026', dalaman: '', jaj: '', awam: '' },
+            { week: '2', date: '19 – 23 Jan 2026', dalaman: '', jaj: '', awam: '' },
+            { week: '6', date: '16 – 20 Feb 2026', dalaman: '17 Feb (Tahun Baru Cina)\n18 Feb (CNY Hari Kedua)\n19 Feb (Awal Ramadan)', jaj: '17 Feb (Tahun Baru Cina)\n18 Feb (CNY Hari Kedua)\n19 Feb (Awal Ramadan)', awam: '17 Feb (Tahun Baru Cina)\n18 Feb (CNY Hari Kedua)\n19 Feb (Awal Ramadan)' },
+            { week: '', date: '21 – 29 Mac 2026', dalaman: 'CUTI PENGGAL 1, TAHUN 2026', jaj: '', awam: '', isHoliday: true },
+            { week: '11', date: '30 Mac – 3 Apr 2026', dalaman: '', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)' },
+            { week: '17', date: '11 – 15 Mei 2026', dalaman: 'PPT', jaj: '', awam: 'Kerja Kursus Al-Syariah (5402/2)\nKerja Kursus Perniagaan (3766/3)' },
+            { week: '', date: '23.05.2026 – 07.06.2026', dalaman: 'CUTI PERTENGAHAN TAHUN 2026', jaj: '', awam: '', isHoliday: true },
+            { week: '38', date: '26 – 30 Okt 2026', dalaman: 'UASA', jaj: '', awam: '' },
+            { week: '', date: '01.12.2026 – 31.12.2026', dalaman: 'Cuti Akhir Persekolahan Tahun 2026', jaj: '', awam: '', isHoliday: true }
+        ];
+
+        const examSchedule = [
+            { date: "10 MAC 2026", time: "08:00 AM - 10:00 AM", subject: "BAHASA MELAYU Kertas 1", duration: "2 JAM", teacher: "C. ROS / C. HAFIZ" },
+            { date: "10 MAC 2026", time: "11:00 AM - 01:30 PM", subject: "BAHASA MELAYU Kertas 2", duration: "2 JAM 30 MIN", teacher: "C. ROS / C. HAFIZ" },
+            { date: "11 MAC 2026", time: "08:00 AM - 09:30 AM", subject: "BAHASA INGGERIS Kertas 1", duration: "1 JAM 30 MIN", teacher: "T. IZATI / T. HAKIM" },
+            { date: "11 MAC 2026", time: "10:30 AM - 12:00 PM", subject: "BAHASA INGGERIS Kertas 2", duration: "1 JAM 30 MIN", teacher: "T. IZATI / T. HAKIM" },
+        ];
+
+        // --- UI LOGIC ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('breadcrumb-active').innerText = tabId;
+            document.querySelectorAll('aside button[id^="btn-"]').forEach(btn => {
+                btn.classList.remove('text-[#2DD4BF]', 'border-[#2DD4BF]', 'bg-[#2DD4BF]/10');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('text-[#2DD4BF]', 'border-l-2', 'border-[#2DD4BF]', 'bg-[#2DD4BF]/10');
+                activeBtn.classList.remove('text-gray-400');
+            }
+        }
+
+        function switchExamSubTab(subTabId) {
+            document.querySelectorAll('.exam-sub-tab').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById('exam-' + subTabId).classList.remove('hidden');
+            document.querySelectorAll('button[id^="btn-exam-"]').forEach(btn => {
+                btn.classList.remove('bg-[#0B132B]', 'text-white', 'border-b-4', 'border-[#C9B458]', 'shadow-lg');
+                btn.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+            });
+            const activeBtn = document.getElementById('btn-exam-' + subTabId);
+            activeBtn.classList.add('bg-[#0B132B]', 'text-white', 'border-b-4', 'border-[#C9B458]', 'shadow-lg');
+            activeBtn.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+        }
+
+        function renderCommittee(id) {
+            const data = committeeData[id] || [];
+            const tasks = tasksData[id] || ["Tiada maklumat bidang tugas tersedia."];
+            const title = menuItems.find(item => item.id === id).label;
+            document.getElementById('committee-title').innerText = title;
+            const tbody = document.getElementById('committee-table-body');
+            tbody.innerHTML = data.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 font-bold text-gray-400 text-[10px] uppercase tracking-widest">${row.role}</td>
+                    <td class="px-6 py-4 font-bold text-gray-900">${row.position}</td>
+                    <td class="px-6 py-4 text-gray-600">${row.name}</td>
+                </tr>
+            `).join('');
+            const tasksDiv = document.getElementById('committee-tasks');
+            tasksDiv.innerHTML = tasks.map(task => `
+                <div class="flex gap-3 items-start">
+                    <span class="text-[#0B132B] mt-1">🔹</span>
+                    <p>${task}</p>
+                </div>
+            `).join('');
+            document.querySelectorAll('.committee-menu-item').forEach(item => {
+                item.classList.remove('bg-[#0B132B]', 'text-white');
+                item.classList.add('text-gray-600', 'hover:bg-gray-50');
+            });
+            document.getElementById('comm-item-' + id).classList.add('bg-[#0B132B]', 'text-white');
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            const menuDiv = document.getElementById('committee-menu');
+            menuDiv.innerHTML = menuItems.map(item => `
+                <button id="comm-item-${item.id}" onclick="renderCommittee(${item.id})" class="committee-menu-item w-full text-left px-6 py-4 text-xs font-bold uppercase tracking-wide border-b border-gray-100 transition-all flex items-center justify-between group">
+                    <span>${item.label}</span>
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity">➜</span>
+                </button>
+            `).join('');
+
+            const takwimBody = document.getElementById('takwim-table-body');
+            takwimBody.innerHTML = takwimData.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 font-mono text-gray-500 font-bold">${row.date}</td>
+                    <td class="px-6 py-4 font-bold text-gray-800">${row.event}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${row.status === 'Selesai' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-yellow-50 text-yellow-600 border-yellow-200'}">
+                            ${row.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+
+            const examWeeksBody = document.getElementById('exam-weeks-body');
+            examWeeksBody.innerHTML = examWeeks.map(row => `
+                <tr class="${row.isHoliday ? 'bg-yellow-50 font-bold' : 'hover:bg-gray-50'} transition-colors">
+                    <td class="px-4 py-3 border border-gray-200">${row.week || '-'}</td>
+                    <td class="px-4 py-3 border border-gray-200 font-mono">${row.date}</td>
+                    <td class="px-4 py-3 border border-gray-200 text-left whitespace-pre-wrap">${row.dalaman}</td>
+                    <td class="px-4 py-3 border border-gray-200 text-left whitespace-pre-wrap">${row.jaj}</td>
+                    <td class="px-4 py-3 border border-gray-200 text-left whitespace-pre-wrap">${row.awam}</td>
+                </tr>
+            `).join('');
+
+            const examBody = document.getElementById('exam-schedule-body');
+            examBody.innerHTML = examSchedule.map(row => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-6 border border-gray-200 font-bold bg-gray-50">${row.date}</td>
+                    <td class="px-6 py-6 border border-gray-200 font-mono">${row.time}</td>
+                    <td class="px-6 py-6 border border-gray-200 font-black uppercase text-gray-900">${row.subject}</td>
+                    <td class="px-6 py-6 border border-gray-200 font-bold">${row.duration}</td>
+                    <td class="px-6 py-6 border border-gray-200"><div class="bg-gray-100 py-2 rounded-lg border border-gray-200 text-xs font-bold">${row.teacher}</div></td>
+                </tr>
+            `).join('');
+
+            renderCommittee(1);
+        };
+    </script>
+</body>
+</html>
